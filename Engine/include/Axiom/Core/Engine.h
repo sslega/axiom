@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Assert.h"
 #include "Window.h"
+#include "Game.h"
 
-namespace ax
+namespace axiom
 {
     struct EngineConfig
     {
@@ -16,11 +16,11 @@ namespace ax
         Engine(EngineConfig config);
         ~Engine() = default;
         
-        int Run();
+        int Run(Game* game);
 
     private:
         EngineConfig m_config;
-        Window m_window;
+        // Window m_window;
 
         void Tick();
         void Render();

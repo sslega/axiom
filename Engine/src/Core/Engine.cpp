@@ -1,34 +1,36 @@
-#include "Axiom/Core/Engine.h"
-#include "Axiom/Core/Window.h"
+#include "axiom/core/Engine.h"
+#include "axiom/core/Window.h"
+#include "axiom/core/Game.h"
 
-using namespace ax;
-
-Engine::Engine(EngineConfig config)
-: m_config(config)
-, m_window(m_config.windowConfig)
+namespace axiom
 {
-}
-
-int Engine::Run()
-{
-    bool shouldClose = false;
-    while (!shouldClose)
+    Engine::Engine(EngineConfig config)
+    : m_config(config)
     {
-        Tick();
-        Render(); 
-        shouldClose = m_window.ShouldClose();
     }
 
-    m_window.CloseWindow();
+    int Engine::Run(Game* game)
+    {
+        // bool shouldClose = false;
+        // while (!shouldClose)
+        // {
+        //     Tick();
+        //     Render(); 
+        //     shouldClose = m_window.ShouldClose();
+        // }
 
-    return 0;    
-}
+        // m_window.CloseWindow();
 
-void Engine::Tick()
-{
-    m_window.Update();
-}
-void Engine::Render()
-{
-    m_window.Render();
+        return 0;    
+    }
+
+    void Engine::Tick()
+    {
+        // m_window.Update();
+    }
+
+    void Engine::Render()
+    {
+        // m_window.Render();
+    }
 }

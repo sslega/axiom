@@ -24,19 +24,8 @@ file(GLOB_RECURSE ENGINE_SOURCES
     src/*.cpp
 )
 
-message(STATUS "ENGINE_SOURCES =")
-foreach(_f IN LISTS ENGINE_SOURCES)
-  message(STATUS "  ${_f}")
-endforeach()
-
 add_library(Engine STATIC ${ENGINE_SOURCES})
 
-target_include_directories(Engine
-    PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
+target_include_directories(Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include )
 
-target_link_libraries(Engine
-    PUBLIC
-        glfw
-)
+target_link_libraries(Engine PUBLIC glfw )

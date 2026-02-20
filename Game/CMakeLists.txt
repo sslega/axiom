@@ -1,10 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
-project(Game LANGUAGES CXX)
+add_library( Game STATIC src/MyGame.cpp )
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
-add_executable(Game src/Game.cpp)
-
-target_link_libraries(Game PRIVATE Engine)
+target_include_directories( Game PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}/include )
+target_link_libraries( Game PUBLIC Engine )

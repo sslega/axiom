@@ -4,7 +4,7 @@
 
 struct GLFWwindow;
 
-namespace ax
+namespace axiom
 {
     struct WindowDesc
     {
