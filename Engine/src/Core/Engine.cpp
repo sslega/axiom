@@ -1,6 +1,6 @@
-#include "axiom/core/Engine.h"
-#include "axiom/core/Window.h"
-#include "axiom/core/Game.h"
+#include "axiom/Core/Engine.h"
+#include "axiom/Core/Game.h"
+#include "axiom/Platform/Window.h"
 
 namespace axiom
 {
