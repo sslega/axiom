@@ -7,20 +7,19 @@ namespace axiom
 {
     struct EngineConfig
     {
-        WindowDesc windowConfig;
     };
 
     class Engine
     {
     public:
-        Engine(EngineConfig config);
+        Engine(EngineConfig config, IWindow& window);
         ~Engine() = default;
         
         int Run(Game* game);
 
     private:
         EngineConfig m_config;
-        // Window m_window;
+        IWindow* m_window;
 
         void Tick();
         void Render();

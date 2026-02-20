@@ -12,21 +12,35 @@ namespace axiom
         int height = 600;
         bool fullscreen = false;
         bool vsync = true;
-        std::string title = "Axiom Engine";
+        std::string title = "Axiom Engine Window";
     };
-    
-    class Window
+
+    class IWindow
     {
     public:
-        Window(WindowDesc desc);
-        ~Window() = default;
+        virtual void Update() = 0;
+        virtual void Render() = 0;
+        virtual bool ShouldClose() const = 0;
+        virtual void CloseWindow() = 0;
 
-        void Update();
-        void Render();
+        virtual std::uint32_t Width()  const = 0;
+        virtual std::uint32_t Height() const = 0;
+        virtual std::string_view Title() const = 0;
+    };
+    
+    class GlfwWindow : public IWindow
+    {
+    public:
+        GlfwWindow (WindowDesc desc);
+        ~GlfwWindow () = default;
 
-        bool ShouldClose() const;
-
-        void CloseWindow();
+        void Update() override;
+        void Render() override;
+        bool ShouldClose() const override;
+        void CloseWindow() override;
+        std::uint32_t Width()  const override;
+        std::uint32_t Height() const override;  
+        std::string_view Title() const override;
 
     private:
         GLFWwindow* m_window;

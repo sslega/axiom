@@ -4,7 +4,7 @@
 
 namespace axiom
 {
-    Window::Window(WindowDesc desc)
+    GlfwWindow::GlfwWindow(WindowDesc desc)
     {
         if (!glfwInit())
         {
@@ -28,24 +28,24 @@ namespace axiom
         glfwMakeContextCurrent(m_window);
     }
 
-    void Window::Update()
+    void GlfwWindow::Update()
     {
         glfwPollEvents();
     }
 
-    void Window::Render()
+    void GlfwWindow::Render()
     {
         assert(m_window);
 
         glfwSwapBuffers(m_window);
     }
 
-    bool Window::ShouldClose() const
+    bool GlfwWindow::ShouldClose() const
     {
         return glfwWindowShouldClose(m_window);
     }
 
-    void Window::CloseWindow()
+    void GlfwWindow::CloseWindow()
     {
         assert(m_window);
         
@@ -53,5 +53,24 @@ namespace axiom
         m_window = nullptr;
         glfwTerminate();
         
+    }
+
+    std::uint32_t GlfwWindow::Width() const
+    {
+        int width;
+        glfwGetWindowSize(m_window, &width, nullptr);
+        return static_cast<std::uint32_t>(width);
+    }
+
+    std::uint32_t GlfwWindow::Height() const
+    {
+        int height;
+        glfwGetWindowSize(m_window, nullptr, &height);
+        return static_cast<std::uint32_t>(height);
+    }
+
+    std::string_view GlfwWindow::Title() const
+    {
+        return std::string_view(glfwGetWindowTitle(m_window));
     }
 }

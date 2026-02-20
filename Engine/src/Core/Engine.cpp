@@ -4,33 +4,33 @@
 
 namespace axiom
 {
-    Engine::Engine(EngineConfig config)
-    : m_config(config)
+
+    Engine::Engine(EngineConfig config, IWindow& window)
     {
+        m_config = config;
+        m_window = &window;
     }
 
-    int Engine::Run(Game* game)
+    int Engine::Run(Game *game)
     {
-        // bool shouldClose = false;
-        // while (!shouldClose)
-        // {
-        //     Tick();
-        //     Render(); 
-        //     shouldClose = m_window.ShouldClose();
-        // }
+        while (!m_window->ShouldClose())
+        {
+            Tick();
+            Render(); 
+        }
 
-        // m_window.CloseWindow();
+        m_window->CloseWindow();
 
         return 0;    
     }
 
     void Engine::Tick()
     {
-        // m_window.Update();
+        m_window->Update();
     }
 
     void Engine::Render()
     {
-        // m_window.Render();
+        m_window->Render();
     }
 }
