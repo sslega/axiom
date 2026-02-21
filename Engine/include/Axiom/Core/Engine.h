@@ -1,7 +1,10 @@
 #pragma once
 
 #include "axiom/Platform/Window.h"
-#include "Game.h"
+#include "axiom/Renderer/Renderer.h"
+#include "axiom/Core/Game.h"
+#include <unordered_map>
+#include <typeindex>
 
 namespace axiom
 {
@@ -12,16 +15,27 @@ namespace axiom
     class Engine
     {
     public:
-        Engine(EngineConfig config, IWindow& window);
+        Engine(EngineConfig engineConfig, IWindow& window);
         ~Engine() = default;
         
         int Run(Game* game);
 
     private:
-        EngineConfig m_config;
+        EngineConfig m_engineConfig;
+        
         IWindow* m_window;
 
-        void Tick();
+        std::unordered_map<std::type_index, std::unique_ptr<EngineModule>> m_engineModules;
+
+        void Update();
         void Render();
+
+        void InitializeModules();
+
+        template<typename T>
+        void RegisterModule();
+
+        template<typename T>
+        void UnregisterModule();
     };
 }
