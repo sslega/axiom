@@ -1,6 +1,6 @@
 #pragma once
 
-#include "axiom/Platform/Window.h"
+#include "axiom/Platform/ApplicationWindow.h"
 #include "axiom/Renderer/Renderer.h"
 #include "axiom/Core/Game.h"
 #include <unordered_map>
@@ -15,7 +15,7 @@ namespace axiom
     class Engine
     {
     public:
-        Engine(EngineConfig engineConfig, IWindow& window);
+        Engine(EngineConfig engineConfig, ApplicationWindowDesc windowConfig);
         ~Engine() = default;
         
         int Run(Game* game);
@@ -23,10 +23,11 @@ namespace axiom
     private:
         EngineConfig m_engineConfig;
         
-        IWindow* m_window;
+        UniquePtr<IApplicationWindow> m_applicationWindow;
 
         std::unordered_map<std::type_index, std::unique_ptr<EngineModule>> m_engineModules;
 
+        void PoolEvents();
         void Update();
         void Render();
 

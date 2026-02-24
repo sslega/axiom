@@ -1,14 +1,15 @@
 #include "axiom/Core/Engine.h"
 #include "axiom/Core/Game.h"
-#include "axiom/Platform/Window.h"
+#include "axiom/Platform/ApplicationWindow.h"
 
 namespace axiom
 {
 
-    Engine::Engine(EngineConfig config, IWindow& window)
+    Engine::Engine(EngineConfig config, ApplicationWindowDesc windowConfig)
     {
         m_engineConfig = config;
-        m_window = &window;
+        m_applicationWindow = IApplicationWindow::Create(windowConfig);
+        // m_applicationWindow = std::unique_ptr<IApplicationWindow>(&window);
     }
 
     int Engine::Run(Game *game)
@@ -17,20 +18,26 @@ namespace axiom
         
         InitializeModules();
         
-        while (!m_window->ShouldClose())
+        while (!m_applicationWindow->ShouldClose())
         {
+            PoolEvents();
             Update();
             Render(); 
         }
 
-        m_window->CloseWindow();
+        m_applicationWindow->CloseWindow();
 
         return 0;    
     }
 
+    void Engine::PoolEvents()
+    {
+        m_applicationWindow->PoolEvents();
+    }
+
     void Engine::Update()
     {
-        m_window->Update();
+        m_applicationWindow->Update();
 
         for (auto& [type, module] : m_engineModules)
         {
@@ -41,7 +48,7 @@ namespace axiom
 
     void Engine::Render()
     {
-        m_window->Render();
+        m_applicationWindow->Render();
 
         for (auto& [type, module] : m_engineModules)
         {
