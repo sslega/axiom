@@ -1,5 +1,5 @@
 #include "axiom/Core/Engine.h"
-#include "axiom/Core/Game.h"
+#include "axiom/Core/Application.h"
 #include "axiom/Platform/ApplicationWindow.h"
 
 namespace axiom
@@ -12,7 +12,7 @@ namespace axiom
         // m_applicationWindow = std::unique_ptr<IApplicationWindow>(&window);
     }
 
-    int Engine::Run(Game *game)
+    int Engine::Run(Application* game)
     {
         std::printf("Starting Axiom Engine...\n");
         
@@ -56,10 +56,20 @@ namespace axiom
         }
     }
 
+    void Engine::RegisterModules()
+    {
+        RegisterModule<Renderer>();
+    }
+
     void Engine::InitializeModules()
     {
         printf("Initializing engine modules...\n");
-        RegisterModule<Renderer>();
+        for (auto& [type, module] : m_engineModules)
+        {
+            printf("Initializing module: %s\n", type.name());
+            module->Initialize();
+        }
+        // RegisterModule<Renderer>();
     }
 
     template <typename T>

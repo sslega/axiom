@@ -1,10 +1,11 @@
 #pragma once
 
-#include "axiom/core/Game.h"
+#include "axiom/core/Application.h"
 
-class MyGame : public axiom::Game
+class MyGame : public axiom::Application
 {
 public:
     MyGame(); 
     ~MyGame() = default;
 };
+

@@ -1,8 +1,7 @@
 #include "axiom/Core/Engine.h" 
-#include "axiom/Core/Game.h"
+#include "axiom/Core/Application.h"
 
-extern axiom::Game* CreateGame();
-
+extern axiom::Application* CreateApplication();
 int main()
 {
     axiom::EngineConfig engineConfig;
@@ -20,5 +19,6 @@ int main()
     
     // axiom::Engine engine(engineConfig, window);
 
-    return engine.Run(CreateGame());
+
+    return engine.Run(CreateApplication());
 }

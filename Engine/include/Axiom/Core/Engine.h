@@ -2,7 +2,7 @@
 
 #include "axiom/Platform/ApplicationWindow.h"
 #include "axiom/Renderer/Renderer.h"
-#include "axiom/Core/Game.h"
+#include "axiom/Core/Application.h"
 #include <unordered_map>
 #include <typeindex>
 
@@ -18,7 +18,7 @@ namespace axiom
         Engine(EngineConfig engineConfig, ApplicationWindowDesc windowConfig);
         ~Engine() = default;
         
-        int Run(Game* game);
+        int Run(Application* game);
 
     private:
         EngineConfig m_engineConfig;
@@ -31,6 +31,7 @@ namespace axiom
         void Update();
         void Render();
 
+        void RegisterModules();
         void InitializeModules();
 
         template<typename T>

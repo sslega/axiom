@@ -1,10 +1,11 @@
-#include "axiom/core/Game.h"
+#include "axiom/core/Application.h"
 #include "MyGame.h"
 
-axiom::Game* CreateGame()
+
+axiom::Application* CreateApplication()
 {
     return new MyGame();
-}
+};
 
 MyGame::MyGame()
 {
