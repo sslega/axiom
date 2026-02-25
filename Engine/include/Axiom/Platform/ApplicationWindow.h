@@ -2,6 +2,8 @@
 
 #include "axiom/Core/CoreTypes.h"
 
+class GLFWwindow;
+
 namespace axiom
 {
     struct ApplicationWindowDesc
@@ -16,6 +18,7 @@ namespace axiom
     class IApplicationWindow
     {
     public:
+        virtual ~IApplicationWindow() = default;
         virtual void PoolEvents() = 0;
         virtual void Update() = 0;
         virtual void Render() = 0;
@@ -27,5 +30,25 @@ namespace axiom
         virtual StringView Title() const = 0;
 
         static UniquePtr<IApplicationWindow> Create(const ApplicationWindowDesc& desc);
+    };
+
+    class ApplicationWindow : public IApplicationWindow
+    {
+        public:  
+        ApplicationWindow(const ApplicationWindowDesc& desc);
+        ~ApplicationWindow();
+
+        void PoolEvents() override;
+        void Update() override;
+        void Render() override;
+        bool ShouldClose() const override;
+        void CloseWindow() override;
+
+        uint32 Width() const override;
+        uint32 Height() const override;
+        StringView Title() const override;
+
+        GLFWwindow* m_window;
+        ApplicationWindowDesc m_desc;
     };
 }
