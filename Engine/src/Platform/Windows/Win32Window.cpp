@@ -2,7 +2,7 @@
 
 namespace axiom
 {
-    Win32Window::Win32Window(ApplicationWindowDesc desc)
+    Win32Window::Win32Window(ApplicationWindowConfig desc)
     {
         m_desc = desc;
 
@@ -68,6 +68,11 @@ namespace axiom
     bool Win32Window::ShouldClose() const
     {
         return m_shouldClose;
+    }
+
+    void* Win32Window::GetNativeWindow() const
+    {
+        return m_hwnd;
     }
 
     void Win32Window::CloseWindow()

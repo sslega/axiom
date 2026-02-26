@@ -6,13 +6,20 @@ class GLFWwindow;
 
 namespace axiom
 {
-    struct ApplicationWindowDesc
+    enum class ApplicationWindowBackend
+    {
+        GLFW,
+        Win32
+    };
+
+    struct ApplicationWindowConfig
     {
         int width = 800;
         int height = 600;
         bool fullscreen = false;
         bool vsync = true;
         String title = "Axiom Engine Window";
+        ApplicationWindowBackend backend = ApplicationWindowBackend::GLFW;
     };
 
     class IApplicationWindow
@@ -29,13 +36,15 @@ namespace axiom
         virtual uint32 Height() const = 0;
         virtual StringView Title() const = 0;
 
-        static UniquePtr<IApplicationWindow> Create(const ApplicationWindowDesc& desc);
+        virtual void* GetNativeWindow() const = 0;
+
+        static UniquePtr<IApplicationWindow> Create(const ApplicationWindowConfig& desc);
     };
 
     class ApplicationWindow : public IApplicationWindow
     {
         public:  
-        ApplicationWindow(const ApplicationWindowDesc& desc);
+        ApplicationWindow(const ApplicationWindowConfig& desc);
         ~ApplicationWindow();
 
         void PoolEvents() override;
@@ -48,7 +57,9 @@ namespace axiom
         uint32 Height() const override;
         StringView Title() const override;
 
+        void* GetNativeWindow() const override;
+
         GLFWwindow* m_window;
-        ApplicationWindowDesc m_desc;
+        ApplicationWindowConfig m_desc;
     };
 }

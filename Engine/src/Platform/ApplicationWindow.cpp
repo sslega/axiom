@@ -5,12 +5,20 @@
 
 namespace axiom
 {
-    UniquePtr<IApplicationWindow> IApplicationWindow::Create(const ApplicationWindowDesc &desc)
+    UniquePtr<IApplicationWindow> IApplicationWindow::Create(const ApplicationWindowConfig &config)
     {
-        return std::make_unique<ApplicationWindow>(desc);
+        switch (config.backend)
+        {
+            case ApplicationWindowBackend::Win32:
+                return std::make_unique<Win32Window>(config);
+            case ApplicationWindowBackend::GLFW:
+                return std::make_unique<ApplicationWindow>(config);
+            default:
+                return nullptr;
+        }
     }
 
-    ApplicationWindow::ApplicationWindow(const ApplicationWindowDesc& desc)
+    ApplicationWindow::ApplicationWindow(const ApplicationWindowConfig& desc)
     {
         m_desc = desc;
 
@@ -41,6 +49,11 @@ namespace axiom
     void ApplicationWindow::PoolEvents()
     {
         glfwPollEvents();
+    }
+
+    void* ApplicationWindow::GetNativeWindow() const
+    {
+        return m_window;
     }
 
     void ApplicationWindow::Update()

@@ -1,19 +1,23 @@
 #include "axiom/Renderer/Renderer.h"
-
+#include "axiom/Renderer/OpenGLRenderer.h"
 
 namespace axiom
 {
-    bool Renderer::Initialize()
+    UniquePtr<IRenderer> CreateRenderer(RenderAPI api)
     {
-        return false;
+        switch (api)
+        {
+            case RenderAPI::OpenGL:
+                return std::make_unique<OpenGLRenderer>();
+            case RenderAPI::Vulkan:
+                return nullptr;
+            case RenderAPI::DirectX11:
+                return nullptr;    
+            case RenderAPI::DirectX12:
+                return nullptr;
+            case RenderAPI::None:
+            default:
+                return nullptr;
+        }
     }
-
-    void Renderer::Shutdown()
-    {
-    }
-
-    void Renderer::Update()
-    {
-    }
-
 }

@@ -3,6 +3,7 @@
 #include "axiom/Platform/ApplicationWindow.h"
 #include "axiom/Renderer/Renderer.h"
 #include "axiom/Core/Application.h"
+#include "Axiom/Core/EngineModule.h"
 #include <unordered_map>
 #include <typeindex>
 
@@ -10,15 +11,19 @@ namespace axiom
 {
     struct EngineConfig
     {
+        RenderAPI renderAPI = RenderAPI::OpenGL;
     };
 
     class Engine
     {
     public:
-        Engine(EngineConfig engineConfig, ApplicationWindowDesc windowConfig);
+        Engine(EngineConfig engineConfig, ApplicationWindowConfig windowConfig);
         ~Engine() = default;
         
         int Run(Application* game);
+
+        RenderAPI GetRenderAPI();
+        IApplicationWindow* GetApplicationWindow();
 
     private:
         EngineConfig m_engineConfig;

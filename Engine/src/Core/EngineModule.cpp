@@ -1,11 +1,17 @@
 #include "axiom/Core/EngineModule.h"
+#include "Axiom/Core/Engine.h"
 #include <cstdio>
 #include <typeinfo>
 
 namespace axiom
 {
-    bool EngineModule::Initialize()
+    EngineModule::EngineModule()
     {
+    }
+
+    bool EngineModule::Initialize(Engine& engine)
+    {
+        m_engine = &engine;
         return true;
     }
 

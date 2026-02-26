@@ -8,7 +8,7 @@ namespace axiom
     class Win32Window : public IApplicationWindow
     {
     public:
-        Win32Window (ApplicationWindowDesc desc);
+        Win32Window (ApplicationWindowConfig desc);
         ~Win32Window () = default;
 
         void PoolEvents();
@@ -20,11 +20,13 @@ namespace axiom
         uint32 Height() const override;  
         StringView Title() const override;
 
+        void* GetNativeWindow() const override;
+
         static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
     private:
         HWND m_hwnd = nullptr;
-        ApplicationWindowDesc m_desc;
+        ApplicationWindowConfig m_desc;
         bool m_shouldClose = false;
         
         

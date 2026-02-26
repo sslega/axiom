@@ -1,21 +1,22 @@
 #include "axiom/Core/Engine.h"
 #include "axiom/Core/Application.h"
 #include "axiom/Platform/ApplicationWindow.h"
+#include "axiom/Renderer/RenderModule.h"  // for RenderModule class
 
 namespace axiom
 {
 
-    Engine::Engine(EngineConfig config, ApplicationWindowDesc windowConfig)
+    Engine::Engine(EngineConfig config, ApplicationWindowConfig windowConfig)
     {
         m_engineConfig = config;
         m_applicationWindow = IApplicationWindow::Create(windowConfig);
-        // m_applicationWindow = std::unique_ptr<IApplicationWindow>(&window);
     }
 
     int Engine::Run(Application* game)
     {
         std::printf("Starting Axiom Engine...\n");
         
+        RegisterModules();
         InitializeModules();
         
         while (!m_applicationWindow->ShouldClose())
@@ -58,7 +59,7 @@ namespace axiom
 
     void Engine::RegisterModules()
     {
-        RegisterModule<Renderer>();
+        RegisterModule<RenderModule>();
     }
 
     void Engine::InitializeModules()
@@ -67,9 +68,8 @@ namespace axiom
         for (auto& [type, module] : m_engineModules)
         {
             printf("Initializing module: %s\n", type.name());
-            module->Initialize();
+            module->Initialize(*this);
         }
-        // RegisterModule<Renderer>();
     }
 
     template <typename T>
@@ -83,5 +83,15 @@ namespace axiom
     void Engine::UnregisterModule()
     {
         m_engineModules.erase(typeid(T));
+    }
+
+    RenderAPI Engine::GetRenderAPI()
+    {
+        return m_engineConfig.renderAPI;
+    }
+
+    IApplicationWindow* Engine::GetApplicationWindow()
+    {
+        return m_applicationWindow.get();
     }
 }
