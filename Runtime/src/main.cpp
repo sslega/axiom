@@ -9,8 +9,8 @@ int main()
     engineConfig.renderAPI = axiom::RenderAPI::OpenGL;
 
     axiom::ApplicationWindowConfig windowConfig;
-    windowConfig.width = 1280;
-    windowConfig.height = 720;
+    windowConfig.width = 800;
+    windowConfig.height = 600;
     windowConfig.title = "Yet Another Game Engine";
     windowConfig.vsync = true;
     windowConfig.fullscreen = false;

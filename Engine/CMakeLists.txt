@@ -1,6 +1,14 @@
 cmake_minimum_required(VERSION 3.20)
 project(Game LANGUAGES CXX)
 
+# ensure all MSVC targets use the DLL runtime (/MD or /MDd) to avoid
+# conflicts such as LNK4098 about MSVCRT vs other libs.  This is a
+# global setting and also affects fetched libraries (glfw, etc.).
+if(MSVC)
+    # the CACHE FORCE ensures it's set before any targets are created
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL" CACHE STRING "" FORCE)
+endif()
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
