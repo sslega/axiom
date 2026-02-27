@@ -17,7 +17,7 @@ namespace axiom
 
     void EngineModule::OnRegister()
     {
-        std::printf("Module registered: %s\n", typeid(*this).name());
+        printf("Module registered: %s\n", typeid(*this).name());
     }
 
     void EngineModule::OnUnregister()

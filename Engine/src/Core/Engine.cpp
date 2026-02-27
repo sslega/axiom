@@ -14,7 +14,7 @@ namespace axiom
 
     int Engine::Run(Application* game)
     {
-        std::printf("Starting Axiom Engine...\n");
+        printf("Starting Axiom Engine...\n");
         
         RegisterModules();
         InitializeModules();
@@ -75,7 +75,7 @@ namespace axiom
     template <typename T>
     void Engine::RegisterModule()
     {
-        std::printf("Registering module: %s\n", typeid(T).name());
+        printf("Registering module: %s\n", typeid(T).name());
         m_engineModules[typeid(T)] = std::make_unique<T>();
     }
 

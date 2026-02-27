@@ -19,7 +19,7 @@ namespace axiom
         m_renderer = CreateRenderer(renderAPI);
         if (!m_renderer)
         {
-            printf("Failed to create renderer for API ", static_cast<int>(renderAPI));
+            printf("Failed to create renderer for API: %s\n", renderAPI);
             return false;
         }
         
@@ -31,8 +31,7 @@ namespace axiom
 
     void RenderModule::Shutdown()
     {
-        if (m_renderer)
-            m_renderer->Shutdown();
+        m_renderer->Shutdown();
         m_renderer.reset();
     }
 
@@ -43,11 +42,8 @@ namespace axiom
 
     void RenderModule::Render()
     {
-        if (m_renderer)
-        {
-            m_renderer->BeginFrame();
-            m_renderer->EndFrame();
-        }
+        m_renderer->BeginFrame();
+        m_renderer->EndFrame();
     }
 
 }

@@ -1,7 +1,7 @@
 #include "axiom/Renderer/OpenGLRenderer.h"
 #include <GLFW/glfw3.h>
 #include <iostream>
-#include <GL/gl.h> // basic OpenGL functions available on Windows
+
 
 namespace axiom
 {
@@ -17,6 +17,45 @@ namespace axiom
         std::cout << "OpenGLRenderer initialized" << std::endl;
         return true;
     }
+
+    // void InitializeShaders()
+    // {
+    //     const char* vertexShaderSrc = R"(
+    //     #version 330 core
+    //     layout (location = 0) in vec3 aPos;
+
+    //     void main()
+    //     {
+    //         gl_Position = vec4(aPos, 1.0);
+    //     }
+    //     )";
+
+    //     const char* fragmentShaderSrc = R"(
+    //     #version 330 core
+    //     out vec4 FragColor;
+
+    //     void main()
+    //     {
+    //         FragColor = vec4(0.2, 0.7, 1.0, 1.0);
+    //     }
+    //     )";
+
+    //     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    //     glShaderSource(vertexShader, 1, &vertexShaderSrc, nullptr);
+    //     glCompileShader(vertexShader);
+
+    //     GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    //     glShaderSource(fragmentShader, 1, &fragmentShaderSrc, nullptr);
+    //     glCompileShader(fragmentShader);
+
+    //     GLuint shaderProgram = glCreateProgram();
+    //     glAttachShader(shaderProgram, vertexShader);
+    //     glAttachShader(shaderProgram, fragmentShader);
+    //     glLinkProgram(shaderProgram);
+
+    //     glDeleteShader(vertexShader);
+    //     glDeleteShader(fragmentShader);
+    // }
 
     void OpenGLRenderer::Shutdown()
     {
