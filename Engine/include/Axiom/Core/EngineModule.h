@@ -9,10 +9,10 @@ namespace axiom
     class EngineModule
     {
     public:
-        EngineModule();
+        EngineModule(Engine& engine);
         virtual ~EngineModule() = default;
 
-        virtual bool Initialize(Engine& engine);
+        virtual bool Initialize();
         virtual void OnRegister();
         virtual void OnUnregister();
         virtual void Shutdown();
@@ -20,6 +20,6 @@ namespace axiom
         virtual void Render();
         
     protected:
-        Engine* m_engine;
+        Engine& m_engine;
     };
 }

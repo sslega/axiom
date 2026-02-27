@@ -8,9 +8,9 @@ namespace axiom
     class RenderModule : public EngineModule
     {
     public:
-        RenderModule();
+        RenderModule(Engine& engine);
 
-        bool Initialize(Engine& engine) override;
+        bool Initialize() override;
         void Shutdown() override;
         void Update() override;
         void Render() override;

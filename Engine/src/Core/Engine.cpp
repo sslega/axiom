@@ -68,7 +68,7 @@ namespace axiom
         for (auto& [type, module] : m_engineModules)
         {
             printf("Initializing module: %s\n", type.name());
-            module->Initialize(*this);
+            module->Initialize();
         }
     }
 
@@ -76,7 +76,7 @@ namespace axiom
     void Engine::RegisterModule()
     {
         printf("Registering module: %s\n", typeid(T).name());
-        m_engineModules[typeid(T)] = std::make_unique<T>();
+        m_engineModules[typeid(T)] = MakeUniquePtr<T>(*this);
     }
 
     template <typename T>
@@ -85,13 +85,13 @@ namespace axiom
         m_engineModules.erase(typeid(T));
     }
 
-    RenderAPI Engine::GetRenderAPI()
+    const RenderAPI Engine::GetRenderAPI() const
     {
         return m_engineConfig.renderAPI;
     }
 
-    IApplicationWindow* Engine::GetApplicationWindow()
+    const IApplicationWindow& Engine::GetApplicationWindow() const
     {
-        return m_applicationWindow.get();
+        return *m_applicationWindow;
     }
 }

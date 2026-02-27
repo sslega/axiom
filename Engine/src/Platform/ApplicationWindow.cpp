@@ -25,7 +25,6 @@ namespace axiom
         if (!glfwInit())
             assert("Failed to initialize GLFW");
 
-        GLFWwindow* window = 
         m_window = glfwCreateWindow(m_desc.width, m_desc.height, m_desc.title.c_str(), NULL, NULL);
         if (!m_window)
         {

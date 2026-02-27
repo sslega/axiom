@@ -2,31 +2,26 @@
 #include "axiom/Renderer/Renderer.h"
 #include "Axiom/Core/Engine.h"
 #include <iostream>
+#include <cassert>
 
 namespace axiom
 {
-    RenderModule::RenderModule()
+    RenderModule::RenderModule(Engine& engine)
+    : EngineModule(engine)
     {
     }
 
-    bool RenderModule::Initialize(Engine &engine)
+    bool RenderModule::Initialize()
     {
-        if (!EngineModule::Initialize(engine))
-        {
-            return false;
-        }
-        RenderAPI renderAPI = m_engine->GetRenderAPI();            
-        m_renderer = CreateRenderer(renderAPI);
-        if (!m_renderer)
-        {
-            printf("Failed to create renderer for API: %s\n", renderAPI);
-            return false;
-        }
-        
-        IApplicationWindow* window = m_engine->GetApplicationWindow();
-        void* native = window->GetNativeWindow();
+        bool bInitialized = EngineModule::Initialize();
+        assert(bInitialized && "EngineModule initialization failed!");
 
-        return m_renderer->Initialize(native);
+        const RenderAPI renderAPI = m_engine.GetRenderAPI();            
+        m_renderer = CreateRenderer(renderAPI);
+        assert(m_renderer && "Failed to create renderer API");
+        
+        const IApplicationWindow& window = m_engine.GetApplicationWindow();
+        return m_renderer->Initialize(window.GetNativeWindow()) && bInitialized;
     }
 
     void RenderModule::Shutdown()

@@ -22,8 +22,8 @@ namespace axiom
         
         int Run(Application* game);
 
-        RenderAPI GetRenderAPI();
-        IApplicationWindow* GetApplicationWindow();
+        const RenderAPI GetRenderAPI() const ;
+        const IApplicationWindow& GetApplicationWindow() const;
 
     private:
         EngineConfig m_engineConfig;

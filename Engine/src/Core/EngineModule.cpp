@@ -5,13 +5,13 @@
 
 namespace axiom
 {
-    EngineModule::EngineModule()
+    EngineModule::EngineModule(Engine& engine)
+        : m_engine(engine)
     {
     }
 
-    bool EngineModule::Initialize(Engine& engine)
+    bool EngineModule::Initialize()
     {
-        m_engine = &engine;
         return true;
     }
 
