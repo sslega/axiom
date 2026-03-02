@@ -1,18 +1,13 @@
 #pragma once
 
-#include <string>
-#include <iostream>
+#include <memory>
 
 namespace axiom
 {
-    using String        = std::string;
-    using StringView    = std::string_view;
-    using uint32        = std::uint32_t;
-
     template<typename T>
     using UniquePtr     = std::unique_ptr<T>;
     template<typename T, typename... Args>
-    UniquePtr<T> MakeUniquePtr(Args&&... args)
+    UniquePtr<T> MakeUnique(Args&&... args)
     {
         return std::make_unique<T>(std::forward<Args>(args)...);
     }
@@ -20,9 +15,9 @@ namespace axiom
     template<typename T>
     using SharedPtr     = std::shared_ptr<T>;
     template<typename T, typename... Args>
-    SharedPtr<T> MakeSharedPtr(Args&&... args)
+    SharedPtr<T> MakeShared(Args&&... args)
     {
-        return std::make_shared<T>(args);
+        return std::make_shared<T>(std::forward<Args>(args)...);
     }
-   
-}
+}    
+    

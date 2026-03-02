@@ -8,7 +8,7 @@ namespace axiom
         switch (api)
         {
             case RenderAPI::OpenGL:
-                return std::make_unique<OpenGLRenderer>();
+                return MakeUnique<OpenGLRenderer>();
             case RenderAPI::Vulkan:
                 return nullptr;
             case RenderAPI::DirectX11:

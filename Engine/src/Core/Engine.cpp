@@ -1,7 +1,7 @@
 #include "axiom/Core/Engine.h"
 #include "axiom/Core/Application.h"
 #include "axiom/Platform/ApplicationWindow.h"
-#include "axiom/Renderer/RenderModule.h"  // for RenderModule class
+#include "axiom/Renderer/RenderModule.h"
 
 namespace axiom
 {
@@ -76,7 +76,7 @@ namespace axiom
     void Engine::RegisterModule()
     {
         printf("Registering module: %s\n", typeid(T).name());
-        m_engineModules[typeid(T)] = MakeUniquePtr<T>(*this);
+        m_engineModules[typeid(T)] = MakeUnique<T>(*this);
     }
 
     template <typename T>

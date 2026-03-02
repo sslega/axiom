@@ -1,6 +1,7 @@
 #pragma once
 
-#include "axiom/Core/CoreTypes.h"
+#include "axiom/Core/Types.h"
+#include "axiom/Core/Memory.h"
 
 class GLFWwindow;
 

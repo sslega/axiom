@@ -10,9 +10,9 @@ namespace axiom
         switch (config.backend)
         {
             case ApplicationWindowBackend::Win32:
-                return std::make_unique<Win32Window>(config);
+                return MakeUnique<Win32Window>(config);
             case ApplicationWindowBackend::GLFW:
-                return std::make_unique<ApplicationWindow>(config);
+                return MakeUnique<ApplicationWindow>(config);
             default:
                 return nullptr;
         }

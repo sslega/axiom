@@ -1,6 +1,7 @@
 #pragma once
 
-#include "axiom/Core/CoreTypes.h"
+#include "axiom/Core/Types.h"
+#include "Axiom/Core/Memory.h"
 #include "axiom/Platform/ApplicationWindow.h" // for IApplicationWindow
 #include <memory>
 

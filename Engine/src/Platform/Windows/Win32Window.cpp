@@ -1,4 +1,5 @@
 #include "axiom/Platform/Windows/Win32Window.h"
+#include <stdexcept>
 
 namespace axiom
 {
