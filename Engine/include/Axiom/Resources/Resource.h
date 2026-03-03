@@ -10,15 +10,15 @@ namespace axiom
     class Resource
     {
     public:
-        Resource();
+        Resource(const Path& path);
         virtual ~Resource() = default;
 
-        String& GetPath();
-        bool LoadFromFile(String& path);
+        const Path& GetPath();
+        bool Load();
         const Vector<char>& GetRawData() const;
 
     private:
-        String m_Path;
+        const Path m_Path;
         Vector<char> m_RawData;
     
     protected:

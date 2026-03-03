@@ -2,7 +2,9 @@
 
 namespace axiom
 {
-
+    Shader::Shader(const Path& path): Resource(path)
+    {
+    }
 
     const String &Shader::GetVertexShader()
     {

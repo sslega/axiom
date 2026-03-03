@@ -8,7 +8,7 @@ namespace axiom
     class Shader : public Resource
     {
     public:
-        Shader() = default;
+        Shader(const Path& path);
 
         const String& GetVertexShader();
         const String& GetFragmentShader();

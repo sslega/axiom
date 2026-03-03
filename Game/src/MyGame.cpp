@@ -1,8 +1,30 @@
-#include "axiom/core/Application.h"
-#include "axiom/Resources/Shader.h"
+#include "Axiom/Core/Application.h"
+#include "Axiom/Core/FileSystem.h"
+#include "Axiom/Core/Types.h"
+#include "Axiom/Resources/Shader.h"
+#include "Axiom/EntryPoint.h"
+
 #include "MyGame.h"
 
-#define RESOURCES "Z:/YetAnotherGameEngine/Engine/Resources"
+
+axiom::EngineConfig CreateEngineConfig()
+{
+    axiom::EngineConfig engineConfig;
+    engineConfig.renderAPI = axiom::RenderAPI::OpenGL;
+    return engineConfig;
+}
+
+axiom::ApplicationWindowConfig CreateApplicationWindowConfig()
+{
+    axiom::ApplicationWindowConfig windowConfig;
+    windowConfig.width = 800;
+    windowConfig.height = 600;
+    windowConfig.title = "Yet Another Game Engine";
+    windowConfig.vsync = true;
+    windowConfig.fullscreen = false;
+    windowConfig.backend = axiom::ApplicationWindowBackend::GLFW;
+    return windowConfig;
+}
 
 axiom::Application* CreateApplication()
 {
@@ -11,8 +33,7 @@ axiom::Application* CreateApplication()
 
 MyGame::MyGame()
 {
-    //TODO: Find a way how to include build in resources in "deploy"
-    axiom::String filePath(RESOURCES "/Shaders/VertexColor.glsl");
-    axiom::Shader shader;
-    bool loaded = shader.LoadFromFile(filePath);
+    axiom::Path shaderPath = axiom::GetShaderPath("VertexColor.glsl");
+    axiom::Shader shader = axiom::Shader(shaderPath);
+    bool loaded = shader.Load();
 }

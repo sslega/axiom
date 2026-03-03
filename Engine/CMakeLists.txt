@@ -54,6 +54,8 @@ target_include_directories(glad
 
 add_library(Engine STATIC)
 
+target_compile_definitions(Engine PUBLIC ENGINE_ROOT_PATH="${ENGINE_ROOT}")
+
 
 file(GLOB_RECURSE ENGINE_SOURCES
     CONFIGURE_DEPENDS
