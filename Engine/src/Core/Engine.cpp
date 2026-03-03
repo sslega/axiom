@@ -1,7 +1,7 @@
-#include "axiom/Core/Engine.h"
-#include "axiom/Core/Application.h"
-#include "axiom/Platform/ApplicationWindow.h"
-#include "axiom/Renderer/RenderModule.h"
+#include "Core/Engine.h"
+#include "Core/Application.h"
+#include "Platform/ApplicationWindow.h"
+#include "Renderer/RenderModule.h"
 
 namespace axiom
 {

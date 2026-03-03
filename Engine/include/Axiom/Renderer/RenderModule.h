@@ -1,7 +1,7 @@
 #pragma once
 
-#include "axiom/Core/Engine.h"
-#include "axiom/Core/EngineModule.h"
+#include "Core/Engine.h"
+#include "Core/EngineModule.h"
 
 namespace axiom
 {

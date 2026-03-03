@@ -1,5 +1,5 @@
-#include "axiom/Platform/ApplicationWindow.h"
-#include "axiom/Platform/Windows/Win32Window.h"
+#include "Platform/ApplicationWindow.h"
+#include "Platform/Windows/Win32Window.h"
 #include <GLFW/glfw3.h>
 #include <assert.h>
 

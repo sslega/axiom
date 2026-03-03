@@ -1,5 +1,5 @@
-#include "axiom/Renderer/Renderer.h"
-#include "axiom/Renderer/OpenGLRenderer.h"
+#include "Renderer/Renderer.h"
+#include "Renderer/OpenGLRenderer.h"
 
 namespace axiom
 {

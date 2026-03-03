@@ -1,5 +1,5 @@
-#include "axiom/Core/EngineModule.h"
-#include "Axiom/Core/Engine.h"
+#include "Core/EngineModule.h"
+#include "Core/Engine.h"
 #include <cstdio>
 #include <typeinfo>
 

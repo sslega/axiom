@@ -1,9 +1,9 @@
 #pragma once
 
-#include "axiom/Platform/ApplicationWindow.h"
-#include "axiom/Renderer/Renderer.h"
-#include "axiom/Core/Application.h"
-#include "Axiom/Core/EngineModule.h"
+#include "../Platform/ApplicationWindow.h"
+#include "../Renderer/Renderer.h"
+#include "Application.h"
+#include "EngineModule.h"
 #include <unordered_map>
 #include <typeindex>
 

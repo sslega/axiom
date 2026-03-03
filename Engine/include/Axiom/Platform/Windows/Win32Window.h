@@ -1,6 +1,6 @@
 #pragma once
 
-#include "axiom/Platform/ApplicationWindow.h"
+#include "Platform/ApplicationWindow.h"
 #include <windows.h>
 
 namespace axiom
