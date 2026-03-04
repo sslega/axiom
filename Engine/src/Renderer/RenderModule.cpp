@@ -1,12 +1,12 @@
 #include "Renderer/RenderModule.h"
 #include "Renderer/Renderer.h"
-#include "Core/Engine.h"
+#include "Core/Application.h"
 #include <iostream>
 #include <cassert>
 
 namespace axiom
 {
-    RenderModule::RenderModule(Engine& engine)
+    RenderModule::RenderModule(Application& engine)
     : EngineModule(engine)
     {
     }
@@ -16,11 +16,11 @@ namespace axiom
         bool bInitialized = EngineModule::Initialize();
         assert(bInitialized && "EngineModule initialization failed!");
 
-        const RenderAPI renderAPI = m_engine.GetRenderAPI();            
+        const RenderAPI renderAPI = m_application.GetRenderAPI();            
         m_renderer = CreateRenderer(renderAPI);
         assert(m_renderer && "Failed to create renderer API");
         
-        const IApplicationWindow& window = m_engine.GetApplicationWindow();
+        const IApplicationWindow& window = m_application.GetApplicationWindow();
         return m_renderer->Initialize(window.GetNativeWindow()) && bInitialized;
     }
 

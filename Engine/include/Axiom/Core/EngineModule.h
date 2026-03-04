@@ -1,15 +1,13 @@
 #pragma once
 
-// #include "Axiom/Core/Engine.h"
-
 namespace axiom
 {
-    class Engine;
+    class Application;
     
     class EngineModule
     {
     public:
-        EngineModule(Engine& engine);
+        EngineModule(Application& engine);
         virtual ~EngineModule() = default;
 
         virtual bool Initialize();
@@ -20,6 +18,6 @@ namespace axiom
         virtual void Render();
         
     protected:
-        Engine& m_engine;
+        Application& m_application;
     };
 }

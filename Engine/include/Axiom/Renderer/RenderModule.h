@@ -1,14 +1,14 @@
 #pragma once
 
-#include "Core/Engine.h"
 #include "Core/EngineModule.h"
+#include "Renderer/Renderer.h"
 
 namespace axiom
 {
     class RenderModule : public EngineModule
     {
     public:
-        RenderModule(Engine& engine);
+        RenderModule(Application& engine);
 
         bool Initialize() override;
         void Shutdown() override;

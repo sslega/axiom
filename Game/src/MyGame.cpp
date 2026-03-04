@@ -6,34 +6,30 @@
 
 #include "MyGame.h"
 
+using namespace axiom;
 
-axiom::EngineConfig CreateEngineConfig()
-{
-    axiom::EngineConfig engineConfig;
-    engineConfig.renderAPI = axiom::RenderAPI::OpenGL;
-    return engineConfig;
-}
 
-axiom::ApplicationWindowConfig CreateApplicationWindowConfig()
+UniquePtr<Application> CreateApplication()
 {
-    axiom::ApplicationWindowConfig windowConfig;
+    AppConfig appConfig;
+    appConfig.renderAPI = axiom::RenderAPI::OpenGL;
+    
+    AppWindowConfig windowConfig;
     windowConfig.width = 800;
     windowConfig.height = 600;
     windowConfig.title = "Yet Another Game Engine";
     windowConfig.vsync = true;
     windowConfig.fullscreen = false;
-    windowConfig.backend = axiom::ApplicationWindowBackend::GLFW;
-    return windowConfig;
-}
+    windowConfig.backend = ApplicationWindowBackend::GLFW;
 
-axiom::Application* CreateApplication()
-{
-    return new MyGame();
+    appConfig.windowConfig = windowConfig;
+    
+    return MakeUnique<MyGame>(appConfig);
 };
 
-MyGame::MyGame()
+MyGame::MyGame(AppConfig appConfig)
+: Application(appConfig)
 {
-    axiom::Path shaderPath = axiom::GetShaderPath("VertexColor.glsl");
-    axiom::Shader shader = axiom::Shader(shaderPath);
+    Shader shader = Shader(GetShaderPath("VertexColor.glsl"));
     bool loaded = shader.Load();
 }

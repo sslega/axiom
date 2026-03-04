@@ -1,12 +1,11 @@
 #include "Core/EngineModule.h"
-#include "Core/Engine.h"
 #include <cstdio>
 #include <typeinfo>
 
 namespace axiom
 {
-    EngineModule::EngineModule(Engine& engine)
-        : m_engine(engine)
+    EngineModule::EngineModule(Application& application)
+        : m_application(application)
     {
     }
 

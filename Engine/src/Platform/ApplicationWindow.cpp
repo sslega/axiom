@@ -5,7 +5,7 @@
 
 namespace axiom
 {
-    UniquePtr<IApplicationWindow> IApplicationWindow::Create(const ApplicationWindowConfig &config)
+    UniquePtr<IApplicationWindow> IApplicationWindow::Create(const AppWindowConfig &config)
     {
         switch (config.backend)
         {
@@ -18,7 +18,7 @@ namespace axiom
         }
     }
 
-    ApplicationWindow::ApplicationWindow(const ApplicationWindowConfig& desc)
+    ApplicationWindow::ApplicationWindow(const AppWindowConfig& desc)
     {
         m_desc = desc;
 

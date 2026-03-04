@@ -8,7 +8,7 @@ namespace axiom
     class Win32Window : public IApplicationWindow
     {
     public:
-        Win32Window (ApplicationWindowConfig desc);
+        Win32Window (AppWindowConfig desc);
         ~Win32Window () = default;
 
         void PoolEvents();
@@ -26,7 +26,7 @@ namespace axiom
 
     private:
         HWND m_hwnd = nullptr;
-        ApplicationWindowConfig m_desc;
+        AppWindowConfig m_desc;
         bool m_shouldClose = false;
         
         

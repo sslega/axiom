@@ -1,17 +1,12 @@
-#include "Core/Engine.h" 
 #include "Core/Application.h"
-#include "Platform/ApplicationWindow.h"
+#include "Core/Types.h"
 
-extern axiom::EngineConfig CreateEngineConfig();
-extern axiom::ApplicationWindowConfig CreateApplicationWindowConfig();
-extern axiom::Application* CreateApplication();
+
+extern axiom::UniquePtr<axiom::Application> CreateApplication();
 
 int main()
 {
-    axiom::EngineConfig engineConfig = CreateEngineConfig();
-    axiom::ApplicationWindowConfig windowConfig = CreateApplicationWindowConfig();
+    axiom::UniquePtr<axiom::Application> application = CreateApplication();
 
-    axiom::Engine engine(engineConfig, windowConfig);
-
-    return engine.Run(CreateApplication());
+    return application->Run();
 }

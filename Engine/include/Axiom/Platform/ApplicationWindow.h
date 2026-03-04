@@ -13,7 +13,7 @@ namespace axiom
         Win32
     };
 
-    struct ApplicationWindowConfig
+    struct AppWindowConfig
     {
         int width = 800;
         int height = 600;
@@ -39,13 +39,13 @@ namespace axiom
 
         virtual void* GetNativeWindow() const = 0;
 
-        static UniquePtr<IApplicationWindow> Create(const ApplicationWindowConfig& desc);
+        static UniquePtr<IApplicationWindow> Create(const AppWindowConfig& desc);
     };
 
     class ApplicationWindow : public IApplicationWindow
     {
         public:  
-        ApplicationWindow(const ApplicationWindowConfig& desc);
+        ApplicationWindow(const AppWindowConfig& desc);
         ~ApplicationWindow();
 
         void PoolEvents() override;
@@ -61,6 +61,6 @@ namespace axiom
         void* GetNativeWindow() const override;
 
         GLFWwindow* m_window;
-        ApplicationWindowConfig m_desc;
+        AppWindowConfig m_desc;
     };
 }

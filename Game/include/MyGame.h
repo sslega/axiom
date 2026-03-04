@@ -5,7 +5,7 @@
 class MyGame : public axiom::Application
 {
 public:
-    MyGame(); 
+    MyGame(axiom::AppConfig appConfig);
     ~MyGame() = default;
 };
 

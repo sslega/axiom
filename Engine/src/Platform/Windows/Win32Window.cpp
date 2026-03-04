@@ -3,7 +3,7 @@
 
 namespace axiom
 {
-    Win32Window::Win32Window(ApplicationWindowConfig desc)
+    Win32Window::Win32Window(AppWindowConfig desc)
     {
         m_desc = desc;
 
