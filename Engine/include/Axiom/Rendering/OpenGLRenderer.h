@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Renderer/Renderer.h"
+#include "Rendering/RenderDevice.h"
 
 namespace axiom
 {
-    class OpenGLRenderer : public IRenderer
+    class OpenGLRenderDevice : public IRenderDevice
     {
     public:
-        ~OpenGLRenderer() override = default;
+        ~OpenGLRenderDevice() override = default;
 
         bool Initialize(void* nativeWindowHandle) override;
         void Shutdown() override;

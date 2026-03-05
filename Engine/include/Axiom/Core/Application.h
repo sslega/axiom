@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Platform/ApplicationWindow.h"
-#include "../Renderer/Renderer.h"
+#include "../Rendering/RenderDevice.h"
 #include "Application.h"
 #include "EngineModule.h"
 #include <unordered_map>

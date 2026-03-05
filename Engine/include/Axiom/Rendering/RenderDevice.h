@@ -16,10 +16,10 @@ namespace axiom
         DirectX12,
     };
 
-    class IRenderer
+    class IRenderDevice
     {
     public:
-        virtual ~IRenderer() = default;
+        virtual ~IRenderDevice() = default;
 
         virtual bool Initialize(void* nativeWindowHandle) = 0;
         virtual void Shutdown() = 0;
@@ -28,5 +28,5 @@ namespace axiom
         virtual void Resize(uint32 width, uint32 height) = 0;
     };
 
-    UniquePtr<IRenderer> CreateRenderer(RenderAPI api);
+    UniquePtr<IRenderDevice> CreateRenderDevice(RenderAPI api);
 }

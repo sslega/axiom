@@ -30,6 +30,6 @@ UniquePtr<Application> CreateApplication()
 MyGame::MyGame(AppConfig appConfig)
 : Application(appConfig)
 {
-    Shader shader = Shader(GetShaderPath("VertexColor.glsl"));
-    bool loaded = shader.Load();
+    // Shader shader = Shader(GetShaderPath("VertexColor.glsl"));
+    // bool loaded = shader.Load();
 }

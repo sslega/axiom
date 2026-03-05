@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/EngineModule.h"
-#include "Renderer/Renderer.h"
+#include "RenderDevice.h"
 
 namespace axiom
 {
@@ -16,6 +16,6 @@ namespace axiom
         void Render() override;
 
     private:
-        UniquePtr<IRenderer> m_renderer;
+        UniquePtr<IRenderDevice> m_renderer;
     };
 }

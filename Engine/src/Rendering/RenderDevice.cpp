@@ -1,14 +1,14 @@
-#include "Renderer/Renderer.h"
-#include "Renderer/OpenGLRenderer.h"
+#include "Rendering/RenderDevice.h"
+#include "Rendering/OpenGLRenderer.h"
 
 namespace axiom
 {
-    UniquePtr<IRenderer> CreateRenderer(RenderAPI api)
+    UniquePtr<IRenderDevice> CreateRenderDevice(RenderAPI api)
     {
         switch (api)
         {
             case RenderAPI::OpenGL:
-                return MakeUnique<OpenGLRenderer>();
+                return MakeUnique<OpenGLRenderDevice>();
             case RenderAPI::Vulkan:
                 return nullptr;
             case RenderAPI::DirectX11:

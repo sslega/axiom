@@ -1,5 +1,5 @@
-#include "Renderer/RenderModule.h"
-#include "Renderer/Renderer.h"
+#include "Rendering/RenderModule.h"
+#include "Rendering/RenderDevice.h"
 #include "Core/Application.h"
 #include <iostream>
 #include <cassert>
@@ -17,7 +17,7 @@ namespace axiom
         assert(bInitialized && "EngineModule initialization failed!");
 
         const RenderAPI renderAPI = m_application.GetRenderAPI();            
-        m_renderer = CreateRenderer(renderAPI);
+        m_renderer = CreateRenderDevice(renderAPI);
         assert(m_renderer && "Failed to create renderer API");
         
         const IApplicationWindow& window = m_application.GetApplicationWindow();

@@ -1,6 +1,6 @@
 #include "Core/Application.h"
 #include "Platform/ApplicationWindow.h"
-#include "Renderer/RenderModule.h"
+#include "Rendering/RenderModule.h"
 
 namespace axiom
 {
