@@ -1,11 +1,15 @@
 #pragma once
 
+#include "Memory.h"
+
 #include <string>
 #include <string_view>
 #include <cstdint>
 #include <utility>
 #include <vector>
 #include <filesystem>
+#include <unordered_map>
+#include <typeindex>
 
 namespace axiom
 {
@@ -19,5 +23,12 @@ namespace axiom
     using uint8         = std::uint8_t;
 
     template<typename T>
-    using Vector     = std::vector<T>;
+    using Vector        = std::vector<T>;
+
+    template<typename V>
+    using TypeMap       = std::unordered_map<std::type_index, V>;
+
+    template<typename T>
+    constexpr std::type_index TypeID() { return std::type_index(typeid(T));};
+
 }

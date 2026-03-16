@@ -1,20 +1,18 @@
 #pragma once
 
-#include "Resources/Resource.h"
 #include "Core/Types.h"
-#include "Rendering/Vertex.h"
+#include "Vertex.h"
 
 namespace axiom
 {
-    class Mesh : public Resource
+    class Mesh
     {
     public:
         Mesh();
-        Mesh(const Path& path);
+        ~Mesh() = default;
+
     protected:
         Vector<Vertex> m_vertices;
         Vector<uint16> m_indices;
-
-        virtual void ParseData() override;
     };
 }

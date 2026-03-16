@@ -3,6 +3,8 @@
 #include "Core/FileSystem.h"
 #include "Core/Types.h"
 #include "Rendering/GLShader.h"
+#include "Scene/Entity.h"
+#include "Scene/MeshComponent.h"
 
 #include "Sandbox.h"
 #include "TriangleMesh.h"
@@ -40,5 +42,7 @@ void Sandbox::OnApplicationStart()
 
     // CubeMesh cube = CubeMesh();
 
-    TriangleMesh triangle = TriangleMesh();
+    // TriangleMesh triangle = TriangleMesh();
+    Entity testEntity = Entity();
+    MeshComponent& meshComponent = testEntity.AddComponent<MeshComponent>();
 }
