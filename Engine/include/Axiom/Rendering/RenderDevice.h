@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../Core/Types.h"
-#include "../Core/Memory.h"
-#include "../Platform/ApplicationWindow.h" // for IApplicationWindow
+#include "Axiom/Core/Types.h"
+#include "Axiom/Core/Memory.h"
+#include "Axiom/Platform/ApplicationWindow.h" // for IApplicationWindow
 #include <memory>
 
 namespace axiom
@@ -24,6 +24,7 @@ namespace axiom
         virtual bool Initialize(void* nativeWindowHandle) = 0;
         virtual void Shutdown() = 0;
         virtual void BeginFrame() = 0;
+        virtual void Draw() = 0;
         virtual void EndFrame() = 0;
         virtual void Resize(uint32 width, uint32 height) = 0;
     };

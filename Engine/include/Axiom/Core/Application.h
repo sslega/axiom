@@ -25,20 +25,22 @@ namespace axiom
 
         const RenderAPI GetRenderAPI() const ;
         const IApplicationWindow& GetApplicationWindow() const;
-
-    private:
+    protected:
+        
         AppConfig m_appConfig;
         
         UniquePtr<IApplicationWindow> m_applicationWindow;
 
         std::unordered_map<std::type_index, std::unique_ptr<EngineModule>> m_engineModules;
 
-        void PoolEvents();
-        void Update();
-        void Render();
+        virtual void OnApplicationStart();
 
-        void RegisterModules();
-        void InitializeModules();
+        virtual void PoolEvents();
+        virtual void Update();
+        virtual void Render();
+
+        virtual void RegisterModules();
+        virtual void InitializeModules();
 
         template<typename T>
         void RegisterModule();

@@ -1,6 +1,6 @@
-#include "Core/Application.h"
-#include "Platform/ApplicationWindow.h"
-#include "Rendering/RenderModule.h"
+#include "Axiom/Core/Application.h"
+#include "Axiom/Platform/ApplicationWindow.h"
+#include "Axiom/Rendering/RenderModule.h"
 
 namespace axiom
 {
@@ -18,6 +18,7 @@ namespace axiom
         
         RegisterModules();
         InitializeModules();
+        OnApplicationStart();
         
         while (!m_applicationWindow->ShouldClose())
         {
@@ -29,6 +30,10 @@ namespace axiom
         m_applicationWindow->CloseWindow();
 
         return 0;    
+    }
+
+    void Application::OnApplicationStart()
+    {
     }
 
     void Application::PoolEvents()

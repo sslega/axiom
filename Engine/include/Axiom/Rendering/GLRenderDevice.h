@@ -1,19 +1,21 @@
 #pragma once
 
-#include "Rendering/RenderDevice.h"
+#include "Axiom/Rendering/RenderDevice.h"
 
 namespace axiom
 {
-    class OpenGLRenderDevice : public IRenderDevice
+    class GLRenderDevice : public IRenderDevice
     {
     public:
-        ~OpenGLRenderDevice() override = default;
+        ~GLRenderDevice() override = default;
 
         bool Initialize(void* nativeWindowHandle) override;
         void Shutdown() override;
-        void BeginFrame() override;
-        void EndFrame() override;
         void Resize(uint32 width, uint32 height) override;
+        
+        void BeginFrame() override;
+        void Draw() override;
+        void EndFrame() override;
 
     private:
         // simple triangle data

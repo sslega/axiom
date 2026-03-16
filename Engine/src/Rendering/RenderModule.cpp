@@ -1,6 +1,6 @@
-#include "Rendering/RenderModule.h"
-#include "Rendering/RenderDevice.h"
-#include "Core/Application.h"
+#include "Axiom/Rendering/RenderModule.h"
+#include "Axiom/Rendering/RenderDevice.h"
+#include "Axiom/Core/Application.h"
 #include <iostream>
 #include <cassert>
 

@@ -1,4 +1,4 @@
-#include "Rendering/OpenGLRenderer.h"
+#include "Axiom/Rendering/GLRenderDevice.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -7,7 +7,7 @@
 
 namespace axiom
 {
-    bool OpenGLRenderDevice::Initialize(void* nativeWindowHandle)
+    bool GLRenderDevice::Initialize(void* nativeWindowHandle)
     {
         GLFWwindow* window = static_cast<GLFWwindow*>(nativeWindowHandle);
         assert(window);
@@ -42,7 +42,7 @@ namespace axiom
         return true;
     }
 
-    void OpenGLRenderDevice::Shutdown()
+    void GLRenderDevice::Shutdown()
     {
         if (m_ColorVBO)
         {
@@ -66,7 +66,7 @@ namespace axiom
         }
     }
 
-    void OpenGLRenderDevice::BeginFrame()
+    void GLRenderDevice::BeginFrame()
     {
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -74,23 +74,27 @@ namespace axiom
         glUseProgram(m_ShaderProgram);
         glBindVertexArray(m_VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
-        glBindVertexArray(0);
-        glUseProgram(0);
+        // glBindVertexArray(0);
+        // glUseProgram(0);
     }
 
-    void OpenGLRenderDevice::EndFrame()
+    void GLRenderDevice::Draw()
+    {
+    }
+    
+    void GLRenderDevice::EndFrame()
     {
         GLFWwindow* window = glfwGetCurrentContext();
         if (window)
             glfwSwapBuffers(window);
     }
 
-    void OpenGLRenderDevice::Resize(uint32 width, uint32 height)
+    void GLRenderDevice::Resize(uint32 width, uint32 height)
     {
         glViewport(0, 0, width, height);
     }
 
-    bool OpenGLRenderDevice::CompileShaders()
+    bool GLRenderDevice::CompileShaders()
     {
         const char* vertexShaderSrc = R"(
         #version 330 core
@@ -160,7 +164,7 @@ namespace axiom
         return true;
     }
 
-    bool OpenGLRenderDevice::SetupTriangle()
+    bool GLRenderDevice::SetupTriangle()
     {
         float vertices[] = {
             // positions

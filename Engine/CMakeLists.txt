@@ -10,10 +10,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-if(MSVC)
-    # the CACHE FORCE ensures it's set before any targets are created
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL" CACHE STRING "" FORCE)
-endif()
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
 
 # =========================================================
 # Dependencies – GLFW
@@ -43,9 +40,8 @@ add_library(glad
         external/glad/src/glad.c
 )
 
-target_include_directories(glad
-    PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/external/glad/include
+target_include_directories(glad PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/glad/include
 )
 
 # =========================================================
@@ -62,24 +58,22 @@ file(GLOB_RECURSE ENGINE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
 )
 
-target_sources(Engine
-    PRIVATE
-        ${ENGINE_SOURCES}
+target_sources(Engine PRIVATE
+    ${ENGINE_SOURCES}
 )
 
-target_include_directories(Engine
-    PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/include
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/Axiom
-        ${CMAKE_CURRENT_SOURCE_DIR}/src
+target_include_directories(Engine PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-target_link_libraries(Engine
-    PUBLIC
-        glad
-        glfw
-        OpenGL::GL
+target_include_directories(Engine PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
+target_link_libraries(Engine PUBLIC
+    glad
+    glfw
+    OpenGL::GL
 )
 
 # =========================================================

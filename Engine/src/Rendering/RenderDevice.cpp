@@ -1,5 +1,5 @@
-#include "Rendering/RenderDevice.h"
-#include "Rendering/OpenGLRenderer.h"
+#include "Axiom/Rendering/RenderDevice.h"
+#include "Axiom/Rendering/GLRenderDevice.h"
 
 namespace axiom
 {
@@ -8,7 +8,7 @@ namespace axiom
         switch (api)
         {
             case RenderAPI::OpenGL:
-                return MakeUnique<OpenGLRenderDevice>();
+                return MakeUnique<GLRenderDevice>();
             case RenderAPI::Vulkan:
                 return nullptr;
             case RenderAPI::DirectX11:

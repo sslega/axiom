@@ -1,10 +1,12 @@
+#include "Axiom/EntryPoint.h"
 #include "Axiom/Core/Application.h"
 #include "Axiom/Core/FileSystem.h"
 #include "Axiom/Core/Types.h"
-#include "Axiom/Resources/Shader.h"
-#include "Axiom/EntryPoint.h"
+#include "Axiom/Rendering/GLShader.h"
 
-#include "MyGame.h"
+
+#include "Sandbox.h"
+#include "TriangleMesh.h"
 
 using namespace axiom;
 
@@ -24,12 +26,20 @@ UniquePtr<Application> CreateApplication()
 
     appConfig.windowConfig = windowConfig;
     
-    return MakeUnique<MyGame>(appConfig);
+    return MakeUnique<Sandbox>(appConfig);
 };
 
-MyGame::MyGame(AppConfig appConfig)
+Sandbox::Sandbox(AppConfig appConfig)
 : Application(appConfig)
 {
-    // Shader shader = Shader(GetShaderPath("VertexColor.glsl"));
+}
+
+void Sandbox::OnApplicationStart()
+{
+    // GLShader shader = GLShader(GetShaderPath("VertexColor.glsl"));
     // bool loaded = shader.Load();
+
+    // CubeMesh cube = CubeMesh();
+
+    TriangleMesh triangle = TriangleMesh();
 }
