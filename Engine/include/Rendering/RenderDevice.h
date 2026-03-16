@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Axiom/Core/Types.h"
-#include "Axiom/Core/Memory.h"
-#include "Axiom/Platform/ApplicationWindow.h" // for IApplicationWindow
+#include "Core/Types.h"
+#include "Core/Memory.h"
+#include "Platform/ApplicationWindow.h" // for IApplicationWindow
 #include <memory>
 
 namespace axiom

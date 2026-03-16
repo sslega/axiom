@@ -56,18 +56,16 @@ target_compile_definitions(Engine PUBLIC ENGINE_ROOT_PATH="${ENGINE_ROOT}")
 file(GLOB_RECURSE ENGINE_SOURCES
     CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
 )
 
 target_sources(Engine PRIVATE
     ${ENGINE_SOURCES}
 )
 
-target_include_directories(Engine PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
-
-target_include_directories(Engine PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
+target_include_directories(Engine 
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/
 )
 
 target_link_libraries(Engine PUBLIC
@@ -81,3 +79,5 @@ target_link_libraries(Engine PUBLIC
 # =========================================================
 
 find_package(OpenGL REQUIRED)
+
+message(STATUS "Engine include path: ${CMAKE_CURRENT_SOURCE_DIR}/include/Axiom")

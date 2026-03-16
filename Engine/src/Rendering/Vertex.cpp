@@ -1,4 +1,4 @@
-#include "Axiom/Rendering/Vertex.h"
+#include "Rendering/Vertex.h"
 
 namespace axiom
 {

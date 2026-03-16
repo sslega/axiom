@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Shader.h"
-#include "Axiom/Core/Types.h"
-#include "Axiom/Resources/Resource.h"
+#include "Core/Types.h"
+#include "Resources/Resource.h"
 
 namespace axiom
 {

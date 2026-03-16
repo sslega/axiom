@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Core/Types.h"
-#include "../Core/Memory.h"
+#include "Core/Types.h"
+#include "Core/Memory.h"
 
 class GLFWwindow;
 

@@ -1,4 +1,4 @@
-#include "Axiom/Resources/Resource.h"
+#include "Resources/Resource.h"
 
 namespace axiom
 {

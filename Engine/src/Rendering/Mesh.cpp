@@ -1,4 +1,4 @@
-#include "Axiom/Rendering/Mesh.h"
+#include "Rendering/Mesh.h"
 
 namespace axiom
 {

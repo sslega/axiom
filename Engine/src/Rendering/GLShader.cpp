@@ -1,4 +1,4 @@
-#include "Axiom/Rendering/GLShader.h"
+#include "Rendering/GLShader.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 

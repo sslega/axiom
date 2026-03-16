@@ -1,9 +1,8 @@
-#include "Axiom/EntryPoint.h"
-#include "Axiom/Core/Application.h"
-#include "Axiom/Core/FileSystem.h"
-#include "Axiom/Core/Types.h"
-#include "Axiom/Rendering/GLShader.h"
-
+#include "EntryPoint.h"
+#include "Core/Application.h"
+#include "Core/FileSystem.h"
+#include "Core/Types.h"
+#include "Rendering/GLShader.h"
 
 #include "Sandbox.h"
 #include "TriangleMesh.h"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Axiom/Math/Vector.h"
+#include "Math/Vector.h"
 
 namespace axiom
 {

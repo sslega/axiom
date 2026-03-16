@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Axiom/Core/Types.h"
-#include "Axiom/Resources/Resource.h"
+#include "Resources/Resource.h"
+#include "Core/Types.h"
 
 namespace axiom
 {

@@ -1,4 +1,4 @@
-#include "Axiom/Rendering/Shader.h"
+#include "Rendering/Shader.h"
 
 namespace axiom
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Axiom/Core/EngineModule.h"
+#include "Core/EngineModule.h"
 #include "RenderDevice.h"
 
 namespace axiom

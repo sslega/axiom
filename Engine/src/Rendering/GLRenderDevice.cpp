@@ -1,4 +1,4 @@
-#include "Axiom/Rendering/GLRenderDevice.h"
+#include "Rendering/GLRenderDevice.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>

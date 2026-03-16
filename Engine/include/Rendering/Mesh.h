@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Axiom/Resources/Resource.h"
-#include "Axiom/Core/Types.h"
-#include "Axiom/Rendering/Vertex.h"
+#include "Resources/Resource.h"
+#include "Core/Types.h"
+#include "Rendering/Vertex.h"
 
 namespace axiom
 {

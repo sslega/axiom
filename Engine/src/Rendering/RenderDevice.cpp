@@ -1,5 +1,5 @@
-#include "Axiom/Rendering/RenderDevice.h"
-#include "Axiom/Rendering/GLRenderDevice.h"
+#include "Rendering/RenderDevice.h"
+#include "Rendering/GLRenderDevice.h"
 
 namespace axiom
 {

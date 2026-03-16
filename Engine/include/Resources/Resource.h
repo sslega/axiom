@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Axiom/Core/Types.h"
+#include "Core/Types.h"
 #include <vector>
 #include <fstream>
 #include <filesystem>

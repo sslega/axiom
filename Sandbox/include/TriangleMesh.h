@@ -1,5 +1,5 @@
 #pragma once
-#include "Axiom/Rendering/Mesh.h"
+#include "Rendering/Mesh.h"
 
 class TriangleMesh : public axiom::Mesh
 {

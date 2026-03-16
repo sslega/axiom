@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Axiom/Core/Application.h"
+#include "Core/Application.h"
 
 class Sandbox : public axiom::Application
 {
