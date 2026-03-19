@@ -28,6 +28,9 @@ namespace axiom
     template<typename V>
     using TypeMap       = std::unordered_map<std::type_index, V>;
 
+    template<typename V>
+    using StringMap       = std::unordered_map<String, V>;
+
     template<typename T>
     constexpr std::type_index TypeID() { return std::type_index(typeid(T));};
 

@@ -74,6 +74,14 @@ target_link_libraries(Engine PUBLIC
     OpenGL::GL
 )
 
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_compile_definitions(Axiom PRIVATE AX_DEBUG)
+elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+    target_compile_definitions(Axiom PRIVATE AX_RELEASE)
+elseif(CMAKE_BUILD_TYPE STREQUAL "Dist")
+    target_compile_definitions(Axiom PRIVATE AX_DIST)
+endif()
+
 # =========================================================
 # OpenGL
 # =========================================================

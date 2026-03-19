@@ -3,6 +3,7 @@
 #include "Core/FileSystem.h"
 #include "Core/Types.h"
 #include "Rendering/GLShader.h"
+#include "Resources/ResourceModule.h"
 #include "Scene/Entity.h"
 #include "Scene/MeshComponent.h"
 
@@ -37,12 +38,11 @@ Sandbox::Sandbox(AppConfig appConfig)
 
 void Sandbox::OnApplicationStart()
 {
-    // GLShader shader = GLShader(GetShaderPath("VertexColor.glsl"));
-    // bool loaded = shader.Load();
-
-    // CubeMesh cube = CubeMesh();
+    ResourceModule* resourceModule = GetModule<ResourceModule>();
+    SharedPtr<GLShader> shader = resourceModule->Load<GLShader>("Z:/YetAnotherGameEngine/Engine/Assets/Shaders/VertexColor.glsl");
+    
 
     // TriangleMesh triangle = TriangleMesh();
-    Entity testEntity = Entity();
-    MeshComponent& meshComponent = testEntity.AddComponent<MeshComponent>();
+    // Entity testEntity = Entity();
+    // MeshComponent& meshComponent = testEntity.AddComponent<MeshComponent>();
 }

@@ -4,11 +4,7 @@
 
 namespace axiom
 {
-    GLShader::GLShader(const GLShaderResource &resource)
-    {
-    }
-
-    GLShader::~GLShader()
+    GLShader::GLShader(StringView vertexShader, StringView fragmentShader)
     {
     }
 
@@ -17,10 +13,6 @@ namespace axiom
     }
 
     void GLShader::Unbind() const
-    {
-    }
-
-    void GLShader::Compile()
     {
     }
 

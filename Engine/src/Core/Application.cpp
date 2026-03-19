@@ -1,6 +1,8 @@
 #include "Core/Application.h"
 #include "Platform/ApplicationWindow.h"
 #include "Rendering/RenderModule.h"
+#include "Resources/ResourceModule.h"
+#include "Resources/GLShaderLoader.h"
 
 namespace axiom
 {
@@ -63,8 +65,11 @@ namespace axiom
     }
 
     void Application::RegisterModules()
-    {
-        RegisterModule<RenderModule>();
+    {   
+        ResourceModule* resourceModule = RegisterModule<ResourceModule>();
+        resourceModule->RegisterLoader(".glsl", MakeUnique<GLShaderLoader>());
+
+        RenderModule* renderModule = RegisterModule<RenderModule>();
     }
 
     void Application::InitializeModules()
@@ -75,19 +80,6 @@ namespace axiom
             printf("Initializing module: %s\n", type.name());
             module->Initialize();
         }
-    }
-
-    template <typename T>
-    void Application::RegisterModule()
-    {
-        printf("Registering module: %s\n", typeid(T).name());
-        m_engineModules[typeid(T)] = MakeUnique<T>(*this);
-    }
-
-    template <typename T>
-    void Application::UnregisterModule()
-    {
-        m_engineModules.erase(typeid(T));
     }
 
     const RenderAPI Application::GetRenderAPI() const

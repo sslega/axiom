@@ -1,9 +1,11 @@
 #pragma once
 
-#include "Platform/ApplicationWindow.h"
-#include "Rendering/RenderDevice.h"
+#include "Core.h"
 #include "Application.h"
 #include "EngineModule.h"
+#include "Platform/ApplicationWindow.h"
+#include "Rendering/RenderDevice.h"
+
 #include <unordered_map>
 #include <typeindex>
 
@@ -31,7 +33,7 @@ namespace axiom
         
         UniquePtr<IApplicationWindow> m_applicationWindow;
 
-        std::unordered_map<std::type_index, std::unique_ptr<EngineModule>> m_engineModules;
+        TypeMap<UniquePtr<EngineModule>> m_engineModules;
 
         virtual void OnApplicationStart();
 
@@ -42,10 +44,33 @@ namespace axiom
         virtual void RegisterModules();
         virtual void InitializeModules();
 
-        template<typename T>
-        void RegisterModule();
+        template <typename T>
+        T* RegisterModule()
+        {
+            printf("Registering module: %s\n", typeid(T).name());
+            UniquePtr<T> module = MakeUnique<T>(*this);
+            T* ptr = module.get(); 
+            m_engineModules[TypeID<T>()] = std::move(module);
+            return ptr;
+        }
 
-        template<typename T>
-        void UnregisterModule();
+        template <typename T>
+        void UnregisterModule()
+        {
+            m_engineModules.erase(typeid(T));
+        }
+
+        template <typename T>
+        T* GetModule()
+        {
+            auto it = m_engineModules.find(TypeID<T>());
+            if (it == m_engineModules.end())
+            {
+                return nullptr;
+            }
+            T* result = static_cast<T*>(it->second.get());
+            AX_ASSERT(result, "Module not registered.");
+            return result;
+        }
     };
 }

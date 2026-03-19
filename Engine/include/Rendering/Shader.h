@@ -5,9 +5,9 @@ namespace axiom
     {
     public:
         Shader();
+        ~Shader() = default;
 
-        virtual void Bind() const;
-        virtual void Unbind() const;
-        virtual void Compile();
+        virtual void Bind() const = 0;
+        virtual void Unbind() const = 0;
     };
 }
