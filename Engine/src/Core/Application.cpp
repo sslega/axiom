@@ -3,6 +3,7 @@
 #include "Rendering/RenderModule.h"
 #include "Resources/ResourceModule.h"
 #include "Resources/GLShaderLoader.h"
+#include "Core/FileSystemModule.h"
 
 namespace axiom
 {
@@ -19,8 +20,11 @@ namespace axiom
         printf("Starting Axiom Application...\n");
         
         RegisterModules();
+        OnRegisterModules();
         InitializeModules();
-        OnApplicationStart();
+        OnInitializeModules();
+
+        OnApplicationRun();
         
         while (!m_applicationWindow->ShouldClose())
         {
@@ -34,7 +38,7 @@ namespace axiom
         return 0;    
     }
 
-    void Application::OnApplicationStart()
+    void Application::OnApplicationRun()
     {
     }
 
@@ -66,10 +70,16 @@ namespace axiom
 
     void Application::RegisterModules()
     {   
+        FileSystemModule* fileSystemModule = RegisterModule<FileSystemModule>();
+
         ResourceModule* resourceModule = RegisterModule<ResourceModule>();
         resourceModule->RegisterLoader(".glsl", MakeUnique<GLShaderLoader>());
 
         RenderModule* renderModule = RegisterModule<RenderModule>();
+    }
+
+    void Application::OnRegisterModules()
+    {
     }
 
     void Application::InitializeModules()
@@ -80,6 +90,10 @@ namespace axiom
             printf("Initializing module: %s\n", type.name());
             module->Initialize();
         }
+    }
+
+    void Application::OnInitializeModules()
+    {
     }
 
     const RenderAPI Application::GetRenderAPI() const

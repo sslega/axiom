@@ -1,6 +1,6 @@
 #include "EntryPoint.h"
 #include "Core/Application.h"
-#include "Core/FileSystem.h"
+#include "Core/FileSystemModule.h"
 #include "Core/Types.h"
 #include "Rendering/GLShader.h"
 #include "Resources/ResourceModule.h"
@@ -36,7 +36,7 @@ Sandbox::Sandbox(AppConfig appConfig)
 {
 }
 
-void Sandbox::OnApplicationStart()
+void Sandbox::OnApplicationRun()
 {
     ResourceModule* resourceModule = GetModule<ResourceModule>();
     SharedPtr<GLShader> shader = resourceModule->Load<GLShader>("Z:/YetAnotherGameEngine/Engine/Assets/Shaders/VertexColor.glsl");
@@ -45,4 +45,11 @@ void Sandbox::OnApplicationStart()
     // TriangleMesh triangle = TriangleMesh();
     // Entity testEntity = Entity();
     // MeshComponent& meshComponent = testEntity.AddComponent<MeshComponent>();
+}
+
+void Sandbox::OnRegisterModules()
+{
+    FileSystemModule* fileSystemModule = GetModule<FileSystemModule>();
+    fileSystemModule->Mount("engine", AX_ENGINE_DIR);
+    fileSystemModule->Mount("project", AX_PROJECT_DIR);
 }

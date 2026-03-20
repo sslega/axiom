@@ -68,6 +68,10 @@ target_include_directories(Engine
         ${CMAKE_CURRENT_SOURCE_DIR}/include/
 )
 
+target_compile_definitions(Engine PUBLIC
+    AX_ENGINE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/Assets"
+)
+
 target_link_libraries(Engine PUBLIC
     glad
     glfw

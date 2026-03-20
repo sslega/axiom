@@ -35,14 +35,16 @@ namespace axiom
 
         TypeMap<UniquePtr<EngineModule>> m_engineModules;
 
-        virtual void OnApplicationStart();
+        virtual void OnApplicationRun();
 
         virtual void PoolEvents();
         virtual void Update();
         virtual void Render();
 
         virtual void RegisterModules();
+        virtual void OnRegisterModules();
         virtual void InitializeModules();
+        virtual void OnInitializeModules();
 
         template <typename T>
         T* RegisterModule()

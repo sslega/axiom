@@ -9,6 +9,7 @@ public:
     ~Sandbox() = default;
 
 protected:
-    virtual void OnApplicationStart() override;
+    virtual void OnApplicationRun() override;
+    virtual void OnRegisterModules() override;
 };
 

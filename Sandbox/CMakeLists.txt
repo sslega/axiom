@@ -11,4 +11,8 @@ target_include_directories(Sandbox
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
+target_compile_definitions(Sandbox PRIVATE
+    AX_PROJECT_DIR="${CMAKE_CURRENT_SOURCE_DIR}/Assets"
+)
+
 target_link_libraries(Sandbox PRIVATE Engine)
