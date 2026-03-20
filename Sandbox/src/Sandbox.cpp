@@ -36,10 +36,17 @@ Sandbox::Sandbox(AppConfig appConfig)
 {
 }
 
+void Sandbox::OnRegisterModules()
+{
+    FileSystemModule* fileSystemModule = GetModule<FileSystemModule>();
+    fileSystemModule->Mount("engine", AX_ENGINE_DIR);
+    fileSystemModule->Mount("project", AX_PROJECT_DIR);
+}
+
 void Sandbox::OnApplicationRun()
 {
     ResourceModule* resourceModule = GetModule<ResourceModule>();
-    SharedPtr<GLShader> shader = resourceModule->Load<GLShader>("Z:/YetAnotherGameEngine/Engine/Assets/Shaders/VertexColor.glsl");
+    SharedPtr<GLShader> shader = resourceModule->Load<GLShader>("engine://Shaders/VertexColor.glsl");
     
 
     // TriangleMesh triangle = TriangleMesh();
@@ -47,9 +54,4 @@ void Sandbox::OnApplicationRun()
     // MeshComponent& meshComponent = testEntity.AddComponent<MeshComponent>();
 }
 
-void Sandbox::OnRegisterModules()
-{
-    FileSystemModule* fileSystemModule = GetModule<FileSystemModule>();
-    fileSystemModule->Mount("engine", AX_ENGINE_DIR);
-    fileSystemModule->Mount("project", AX_PROJECT_DIR);
-}
+

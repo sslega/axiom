@@ -1,5 +1,6 @@
 #pragma once
 
+
 namespace axiom
 {
     class Application;
@@ -16,6 +17,7 @@ namespace axiom
         virtual void Shutdown();
         virtual void Update() ;
         virtual void Render();
+        Application& GetApp() const;
         
     protected:
         Application& m_application;

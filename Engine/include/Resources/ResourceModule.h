@@ -45,9 +45,9 @@ namespace axiom
         ~ResourceModule();
         
         template<typename T>
-        SharedPtr<T> Load(Path path)
+        SharedPtr<T> Load(const String& virtualPath)
         {
-            return std::static_pointer_cast<T>(LoadInternal(path));
+            return std::static_pointer_cast<T>(LoadInternal(virtualPath));
         }
         
 
@@ -64,7 +64,7 @@ namespace axiom
         StringMap<UniquePtr<ResourceLoader>> m_loaders;
         StringMap<SharedPtr<void>> m_resources;
 
-        ResourceLoader* GetLoader(Path path);
-        SharedPtr<void> LoadInternal(Path path);
+        ResourceLoader* GetLoader(Path physicalPath);
+        SharedPtr<void> LoadInternal(const String& virtualPath);
     };
 }

@@ -27,6 +27,19 @@ namespace axiom
 
         const RenderAPI GetRenderAPI() const ;
         const IApplicationWindow& GetApplicationWindow() const;
+
+        template <typename T>
+        T* GetModule()
+        {
+            auto it = m_engineModules.find(TypeID<T>());
+            if (it == m_engineModules.end())
+            {
+                return nullptr;
+            }
+            T* result = static_cast<T*>(it->second.get());
+            AX_ASSERT(result, "Module not registered.");
+            return result;
+        }
     protected:
         
         AppConfig m_appConfig;
@@ -60,19 +73,6 @@ namespace axiom
         void UnregisterModule()
         {
             m_engineModules.erase(typeid(T));
-        }
-
-        template <typename T>
-        T* GetModule()
-        {
-            auto it = m_engineModules.find(TypeID<T>());
-            if (it == m_engineModules.end())
-            {
-                return nullptr;
-            }
-            T* result = static_cast<T*>(it->second.get());
-            AX_ASSERT(result, "Module not registered.");
-            return result;
         }
     };
 }

@@ -1,5 +1,6 @@
 #include "Resources/ResourceLoader.h"
 #include "Core/Core.h"
+#include "Core/FileSystemModule.h"
 
 namespace axiom
 {
@@ -8,19 +9,19 @@ namespace axiom
     {
     }
 
-    SharedPtr<void> ResourceLoader::Load(const Path &path)
+    SharedPtr<void> ResourceLoader::Load(const Path& physicalPath)
     {
-        FileData data = ReadFile(path);
+        FileData data = ReadFile(physicalPath);
         return CreateResource(data);
     }
 
-    FileData ResourceLoader::ReadFile(const Path &path)
+    FileData ResourceLoader::ReadFile(const Path& physicalPath)
     {
-        std::ifstream file(path, std::ios::binary | std::ios::ate);
+        std::ifstream file(physicalPath, std::ios::binary | std::ios::ate);
         AX_ASSERT(file.is_open(), "Failed to open file");
 
         FileData data;
-        data.path = path;
+        data.path = physicalPath;
         data.buffer.resize(file.tellg());
         file.seekg(0, std::ios::beg);
         file.read(reinterpret_cast<char*>(data.buffer.data()),data.buffer.size());

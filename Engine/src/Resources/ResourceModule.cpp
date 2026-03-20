@@ -1,10 +1,12 @@
 #include "Resources/ResourceModule.h"
 #include "Core/Core.h"
+#include "Core/Application.h"
+#include "Core/FileSystemModule.h"
 
 namespace axiom
 {
-    ResourceModule::ResourceModule(Application& engine)
-    :EngineModule(engine)
+    ResourceModule::ResourceModule(Application& application)
+    :EngineModule(application)
     {
         
     }
@@ -49,18 +51,22 @@ namespace axiom
         m_loaders[fileExtension] = std::move(loader);
     }
 
-    SharedPtr<void> ResourceModule::LoadInternal(Path path)
+    SharedPtr<void> ResourceModule::LoadInternal(const String& virtualPath)
     {
-        auto it = m_resources.find(path.string());
+        auto it = m_resources.find(virtualPath);
         if (it != m_resources.end())
         {
             return it->second;
         }
-            
-        ResourceLoader* loader = GetLoader(path);
 
-        SharedPtr<void> resource = loader->Load(path);
-        m_resources[path.string()] = resource;
+        FileSystemModule* fileSystemModule = GetApp().GetModule<FileSystemModule>();
+        Path physicalPath = fileSystemModule->Resolve(virtualPath);
+        // Path physicalPath = 
+            
+        ResourceLoader* loader = GetLoader(physicalPath);
+
+        SharedPtr<void> resource = loader->Load(physicalPath);
+        m_resources[virtualPath] = resource;
         return resource;
     }
 

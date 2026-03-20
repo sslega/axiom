@@ -34,4 +34,11 @@ namespace axiom
     void EngineModule::Render()
     {
     }
+
+    Application& EngineModule::GetApp() const
+    {
+        return m_application;
+    }
+
 }
+
