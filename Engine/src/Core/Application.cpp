@@ -70,12 +70,12 @@ namespace axiom
 
     void Application::RegisterModules()
     {   
-        FileSystemModule* fileSystemModule = RegisterModule<FileSystemModule>();
+        RegisterModule<FileSystemModule>();
 
         ResourceModule* resourceModule = RegisterModule<ResourceModule>();
         resourceModule->RegisterLoader(".glsl", MakeUnique<GLShaderLoader>());
 
-        RenderModule* renderModule = RegisterModule<RenderModule>();
+        RegisterModule<RenderModule>();
     }
 
     void Application::OnRegisterModules()

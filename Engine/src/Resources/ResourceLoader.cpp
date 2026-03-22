@@ -1,5 +1,5 @@
 #include "Resources/ResourceLoader.h"
-#include "Core/Core.h"
+#include "Core/Assert.h"
 #include "Core/FileSystemModule.h"
 
 namespace axiom

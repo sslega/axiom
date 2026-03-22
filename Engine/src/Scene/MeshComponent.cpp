@@ -6,4 +6,13 @@ namespace axiom
     {
     }
 
+    void MeshComponent::SetMesh(const SharedPtr<Mesh>& mesh)
+    {
+        m_mesh = mesh;
+    }
+
+    const SharedPtr<Mesh>& MeshComponent::GetMesh() const
+    {
+        return m_mesh;
+    }
 }

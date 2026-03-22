@@ -11,7 +11,7 @@ namespace axiom
         Win32Window (AppWindowConfig desc);
         ~Win32Window () = default;
 
-        void PoolEvents();
+        void PoolEvents() override;
         void Update() override;
         void Render() override;
         bool ShouldClose() const override;

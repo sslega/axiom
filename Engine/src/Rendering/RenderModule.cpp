@@ -41,4 +41,17 @@ namespace axiom
         m_renderer->EndFrame();
     }
 
+    RenderMeshProxy *RenderModule::GetProxy(SharedPtr<Mesh> mesh)
+    {
+        return nullptr;
+    }
+
+    RenderMeshProxy *RenderModule::CreateProxy(SharedPtr<Mesh> mesh)
+    {
+        return nullptr;
+    }
+
+    void RenderModule::DestroyProxy(SharedPtr<Mesh> mesh)
+    {
+    }
 }

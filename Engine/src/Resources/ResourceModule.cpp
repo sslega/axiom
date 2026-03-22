@@ -1,5 +1,6 @@
 #include "Resources/ResourceModule.h"
-#include "Core/Core.h"
+#include "Core/Types.h"
+#include "Core/Assert.h"
 #include "Core/Application.h"
 #include "Core/FileSystemModule.h"
 

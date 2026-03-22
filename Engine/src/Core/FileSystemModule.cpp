@@ -1,4 +1,5 @@
 #include "Core/FileSystemModule.h"
+#include "Core/Assert.h"
 #include <filesystem>
 
 namespace axiom

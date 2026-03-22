@@ -1,5 +1,4 @@
 #pragma once
-#include "Types.h"
 
 #ifdef AX_DEBUG
     #define AX_ASSERT(condition, msg) \

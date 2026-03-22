@@ -9,6 +9,7 @@
 
 #include "Sandbox.h"
 #include "TriangleMesh.h"
+#include "Scene/Scene.h"
 
 using namespace axiom;
 
@@ -39,19 +40,26 @@ Sandbox::Sandbox(AppConfig appConfig)
 void Sandbox::OnRegisterModules()
 {
     FileSystemModule* fileSystemModule = GetModule<FileSystemModule>();
-    fileSystemModule->Mount("engine", AX_ENGINE_DIR);
-    fileSystemModule->Mount("project", AX_PROJECT_DIR);
+    fileSystemModule->Mount("Engine", AX_ENGINE_DIR);
+    fileSystemModule->Mount("Project", AX_PROJECT_DIR);
 }
 
 void Sandbox::OnApplicationRun()
 {
-    ResourceModule* resourceModule = GetModule<ResourceModule>();
-    SharedPtr<GLShader> shader = resourceModule->Load<GLShader>("engine://Shaders/VertexColor.glsl");
+    // ResourceModule* resourceModule = GetModule<ResourceModule>();
+    // SharedPtr<GLShader> shader = resourceModule->Load<GLShader>("Engine://Shaders/VertexColor.glsl");
+
+    SharedPtr<TriangleMesh> triangle = MakeShared<TriangleMesh>();
+
+    UniquePtr<Scene> scene = MakeUnique<Scene>();
+    Entity* entity = scene->CreateEntity();
+    MeshComponent* meshComponent = entity->CreateComponent<MeshComponent>();
+    meshComponent->SetMesh(triangle);
     
 
     // TriangleMesh triangle = TriangleMesh();
     // Entity testEntity = Entity();
-    // MeshComponent& meshComponent = testEntity.AddComponent<MeshComponent>();
+    // MeshComponent& meshComponent = testEntity.CreateComponent<MeshComponent>();
 }
 
 

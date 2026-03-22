@@ -1,9 +1,10 @@
 #pragma once
 
-#include "Core/Core.h"
 #include <vector>
 #include <fstream>
 #include <filesystem>
+
+#include "Core/Types.h"
 
 namespace axiom
 {

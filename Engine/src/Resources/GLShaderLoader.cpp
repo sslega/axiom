@@ -5,7 +5,7 @@ namespace axiom
 {
     SharedPtr<void> GLShaderLoader::CreateResource(const FileData &fileData)
     {
-        StringView shaderSource = String(fileData.buffer.begin(), fileData.buffer.end());
+        String shaderSource(fileData.buffer.begin(), fileData.buffer.end());
 
         String vertexShader;
         String fragmentShader;
@@ -28,11 +28,11 @@ namespace axiom
             }
 
             size_t begin = typePos + typeToken.size() + 1; // +1 for space
-            StringView stageStr = shaderSource.substr(begin, eol - begin);
+            String stageStr = shaderSource.substr(begin, eol - begin);
 
 
             size_t nextType = shaderSource.find(typeToken, eol);
-            StringView stageSource = shaderSource.substr(eol + 1, nextType - (eol + 1));
+            String stageSource = shaderSource.substr(eol + 1, nextType - (eol + 1));
 
             if(stageStr == "vertex")
             {

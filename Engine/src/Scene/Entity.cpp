@@ -3,6 +3,7 @@
 namespace axiom
 {
     Entity::Entity()
+    : id(nextId++)
     {
     }
 }

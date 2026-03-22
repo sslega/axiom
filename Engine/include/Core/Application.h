@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Core.h"
+#include "Core/Types.h"
+#include "Core/Assert.h"
 #include "Application.h"
 #include "EngineModule.h"
 #include "Platform/ApplicationWindow.h"
