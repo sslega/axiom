@@ -1,4 +1,4 @@
-#include "Rendering/GLShader.h"
+#include "Rendering/GL/GLShader.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 

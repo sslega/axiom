@@ -1,5 +1,5 @@
 #include "Resources/GLShaderLoader.h"
-#include "Rendering/GLShader.h"
+#include "Rendering/GL/GLShader.h"
 
 namespace axiom
 {

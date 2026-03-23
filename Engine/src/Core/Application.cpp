@@ -4,6 +4,7 @@
 #include "Resources/ResourceModule.h"
 #include "Resources/GLShaderLoader.h"
 #include "Core/FileSystemModule.h"
+#include "Scene/SceneModule.h"
 
 namespace axiom
 {
@@ -71,11 +72,11 @@ namespace axiom
     void Application::RegisterModules()
     {   
         RegisterModule<FileSystemModule>();
+        RegisterModule<RenderModule>();
+        RegisterModule<SceneModule>();
 
         ResourceModule* resourceModule = RegisterModule<ResourceModule>();
         resourceModule->RegisterLoader(".glsl", MakeUnique<GLShaderLoader>());
-
-        RegisterModule<RenderModule>();
     }
 
     void Application::OnRegisterModules()

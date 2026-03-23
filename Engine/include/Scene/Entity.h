@@ -29,7 +29,8 @@ namespace axiom
             }
 
             UniquePtr<T> component = MakeUnique<T>();
-            T* componentPtr = component.get();   
+            T* componentPtr = component.get();
+            componentPtr->m_entity = this;
             m_components[TypeID<T>()] = std::move(component);
             return componentPtr;
         }
@@ -44,7 +45,7 @@ namespace axiom
         T* GetComponent()
         {
             auto it = m_components.find(TypeID<T>());
-            if (it != m_components.end())
+            if (it == m_components.end())
             {
                 return nullptr;
             }

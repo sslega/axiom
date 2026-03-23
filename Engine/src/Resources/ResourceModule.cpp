@@ -7,7 +7,7 @@
 namespace axiom
 {
     ResourceModule::ResourceModule(Application& application)
-    :EngineModule(application)
+    :ApplicationModule(application)
     {
         
     }

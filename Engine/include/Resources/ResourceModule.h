@@ -1,15 +1,15 @@
 #pragma once
 
-#include "Core/EngineModule.h"
 #include "Core/Types.h"
+#include "Core/ApplicationModule.h"
 #include "Resources/ResourceLoader.h"
 
 namespace axiom
 {
-    enum class ResourceType  { Mesh, Texture, Shader };
+    enum class ResourceType  { MeshResource, Texture, RenderShader };
     enum class ResourceState { Unloaded, Loading, Ready, Failed };
 
-    class ResourceModule : public EngineModule
+    class ResourceModule : public ApplicationModule
     {
     public:
         ResourceModule(Application& engine);
@@ -38,4 +38,4 @@ namespace axiom
         ResourceLoader* GetLoader(Path physicalPath);
         SharedPtr<void> LoadInternal(const String& virtualPath);
     };
-}
+};

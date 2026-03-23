@@ -1,11 +1,11 @@
 #pragma once
 
 #include "Core/Types.h"
-#include "Core/EngineModule.h"
+#include "Core/ApplicationModule.h"
 
 namespace axiom
 {
-    class FileSystemModule : public EngineModule
+    class FileSystemModule : public ApplicationModule
     {
     public:
         FileSystemModule(Application& engine);

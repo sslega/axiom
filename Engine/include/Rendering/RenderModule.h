@@ -1,14 +1,17 @@
 #pragma once
 
 #include "RenderDevice.h"
-#include "Core/EngineModule.h"
+#include "Core/ApplicationModule.h"
 #include "Rendering/RenderTypes.h"
-#include "Rendering/RenderMeshProxy.h"
+#include "Rendering/RenderMesh.h"
 
 
 namespace axiom
 {
-    class RenderModule : public EngineModule
+    class SceneModule;
+    class MeshComponent;
+
+    class RenderModule : public ApplicationModule
     {
     public:
         RenderModule(Application& engine);
@@ -19,11 +22,15 @@ namespace axiom
         void Render() override;
 
     private:
-        UniquePtr<IRenderDevice> m_renderer;
-        RenderMeshProxy* GetProxy(SharedPtr<Mesh> mesh);
-        RenderMeshProxy* CreateProxy(SharedPtr<Mesh> mesh);
-        void DestroyProxy(SharedPtr<Mesh> mesh);
+        SceneModule* m_sceneModule;
 
-        std::unordered_map<SharedPtr<Mesh>, UniquePtr<RenderMeshProxy>> m_renderProxies;
+        Vector<MeshComponent*> m_meshComponents;
+        
+        UniquePtr<IRenderDevice> m_renderer;
+        RenderMesh* GetProxy(SharedPtr<MeshResource> mesh);
+        RenderMesh* CreateProxy(SharedPtr<MeshResource> mesh);
+        void DestroyProxy(SharedPtr<MeshResource> mesh);
+
+        std::unordered_map<SharedPtr<MeshResource>, UniquePtr<RenderMesh>> m_renderProxies;
     };
 }

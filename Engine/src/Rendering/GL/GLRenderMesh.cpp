@@ -1,4 +1,4 @@
-#include "GLRenderMeshProxy.h"
+#include "Rendering/GL/GLRenderMesh.h"
 
 namespace axiom
 {
@@ -6,7 +6,7 @@ namespace axiom
     {
     }
 
-    void GLRenderMeshProxy::Upload(const Mesh &mesh)
+    void GLRenderMeshProxy::Upload(const MeshResource &mesh)
     {
     }
 

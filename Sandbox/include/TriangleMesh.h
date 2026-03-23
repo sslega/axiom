@@ -1,7 +1,7 @@
 #pragma once
-#include "Rendering/Mesh.h"
+#include "Resources/MeshResource.h"
 
-class TriangleMesh : public axiom::Mesh
+class TriangleMesh : public axiom::MeshResource
 {
 public:
     TriangleMesh();

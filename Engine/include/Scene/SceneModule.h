@@ -1,0 +1,20 @@
+#pragma once
+#include "Core/ApplicationModule.h"
+#include "Core/Types.h"
+#include "Scene/Scene.h"
+
+namespace axiom
+{
+    class SceneModule: public ApplicationModule
+    {
+    public:
+        SceneModule(Application& application);
+
+        Scene* CreateScene(const String& name);
+        Scene* GetActiveScene() const;
+        bool HasActiveScene() const;
+
+    private:
+        UniquePtr<Scene>  m_activeScene;
+    };
+}

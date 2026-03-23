@@ -3,7 +3,7 @@
 #include "Core/Types.h"
 #include "Core/Assert.h"
 #include "Application.h"
-#include "EngineModule.h"
+#include "ApplicationModule.h"
 #include "Platform/ApplicationWindow.h"
 #include "Rendering/RenderDevice.h"
 
@@ -47,7 +47,7 @@ namespace axiom
         
         UniquePtr<IApplicationWindow> m_applicationWindow;
 
-        TypeMap<UniquePtr<EngineModule>> m_engineModules;
+        TypeMap<UniquePtr<ApplicationModule>> m_engineModules;
 
         virtual void OnApplicationRun();
 

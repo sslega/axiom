@@ -1,15 +1,14 @@
 #pragma once
 
-
 namespace axiom
 {
     class Application;
     
-    class EngineModule
+    class ApplicationModule
     {
     public:
-        EngineModule(Application& engine);
-        virtual ~EngineModule() = default;
+        ApplicationModule(Application& application);
+        virtual ~ApplicationModule() = default;
 
         virtual bool Initialize();
         virtual void OnRegister();

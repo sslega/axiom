@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RenderDevice.h"
+#include "Rendering/RenderDevice.h"
 
 namespace axiom
 {
@@ -19,12 +19,12 @@ namespace axiom
 
     private:
         // simple triangle data
-        uint32_t m_VAO = 0;
-        uint32_t m_VBO = 0;
-        uint32_t m_ColorVBO = 0;
-        uint32_t m_ShaderProgram = 0;
+        // uint32_t m_VAO = 0;
+        // uint32_t m_VBO = 0;
+        // uint32_t m_ColorVBO = 0;
+        // uint32_t m_ShaderProgram = 0;
 
-        bool SetupTriangle();
-        bool CompileShaders();
+        // bool SetupTriangle();
+        // bool CompileShaders();
     };
 }

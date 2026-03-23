@@ -1,12 +1,14 @@
 #pragma once
-#include "Rendering/RenderMeshProxy.h"
+
+#include "Rendering/RenderMesh.h"
+
 namespace axiom
 {
-    class GLRenderMeshProxy : public RenderMeshProxy
+    class GLRenderMeshProxy : public RenderMesh
     {
         ~GLRenderMeshProxy();
     public:
-        virtual void Upload(const Mesh& mesh) override;
+        virtual void Upload(const MeshResource& mesh) override;
         virtual void Bind() const override;
         virtual void Unbind() const override;
         virtual uint32 GetIndexCount() const override;

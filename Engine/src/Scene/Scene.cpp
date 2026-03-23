@@ -3,8 +3,9 @@
 namespace axiom
 {
  
-    Scene::Scene()
+    Scene::Scene(const String& name)
     {
+        m_name = name;
     }
 
     Entity* Scene::CreateEntity()
@@ -19,5 +20,9 @@ namespace axiom
     {
         m_entities.erase(entity->id);
     }
-   
+
+    const String &Scene::GetName() const
+    {
+        return m_name;
+    }
 }

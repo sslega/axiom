@@ -1,11 +1,11 @@
 #pragma once
 namespace axiom
 {
-    class Shader
+    class RenderShader
     {
     public:
-        Shader();
-        ~Shader() = default;
+        RenderShader();
+        ~RenderShader() = default;
 
         virtual void Bind() const = 0;
         virtual void Unbind() const = 0;

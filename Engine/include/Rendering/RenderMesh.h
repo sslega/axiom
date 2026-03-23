@@ -1,14 +1,15 @@
 #pragma once
 #include "Core/Types.h"
-#include "Rendering/Mesh.h"
+#include "Rendering/RenderMesh.h"
+#include "Resources/MeshResource.h"
 
 namespace axiom
 {
-    class RenderMeshProxy
+    class RenderMesh
     {
     public:
-        virtual ~RenderMeshProxy() = default;
-        virtual void Upload(const Mesh& mesh) = 0;
+        virtual ~RenderMesh() = default;
+        virtual void Upload(const MeshResource& mesh) = 0;
         virtual void Bind()   const = 0;
         virtual void Unbind() const = 0;
         virtual uint32 GetIndexCount() const = 0;

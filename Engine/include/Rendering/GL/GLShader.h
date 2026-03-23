@@ -1,11 +1,11 @@
 #pragma once
 
 #include "Core/Types.h"
-#include "Shader.h"
+#include "Rendering/RenderShader.h"
 
 namespace axiom
 {
-    class GLShader : public Shader
+    class GLShader : public RenderShader
     {
     public:
         GLShader(StringView vertexShader, StringView fragmentShader);
