@@ -3,6 +3,8 @@
 #include "Rendering/MeshComponent.h"
 #include "Rendering/RenderShader.h"
 #include "Rendering/Material.h"
+#include "Rendering/GL/GLRenderMesh.h"
+#include "Rendering/GL/GLRenderShader.h"
 #include "Core/Application.h"
 #include "Core/Assert.h"
 #include "Scene/SceneModule.h"
@@ -24,8 +26,8 @@ namespace axiom
         bool bInitialized = ApplicationModule::Initialize();
         assert(bInitialized && "ApplicationModule initialization failed!");
 
-        const RenderAPI renderAPI = m_application.GetRenderAPI();            
-        m_renderer = CreateRenderDevice(renderAPI);
+        m_renderApi = m_application.GetRenderAPI();            
+        m_renderer = CreateRenderDevice(m_renderApi);
         assert(m_renderer && "Failed to create renderer API");
         
         const IApplicationWindow& window = m_application.GetApplicationWindow();
@@ -57,19 +59,19 @@ namespace axiom
         {
             if(!meshComponent->IsVisible()) continue;
 
-            SharedPtr<MeshResource> mesh = meshComponent->GetMesh();
-            if(!mesh) continue;
+            SharedPtr<MeshResource> meshResource = meshComponent->GetMesh();
+            if(!meshResource) continue;
 
             SharedPtr<Material> material = meshComponent->GetMaterial();
             if(!material) continue;
 
-            RenderMesh* proxy = GetProxy(mesh);
-            SharedPtr<RenderShader> shader = material->shader;
+            RenderMesh* mesh = GetMesh(meshResource);
+            RenderShader* shader = GetShader(material->shader);
             
             shader->Bind();
-            proxy->Bind();
+            mesh->Bind();
             // Draw
-            proxy->Unbind();
+            mesh->Unbind();
             shader->Unbind();
 
         }
@@ -77,17 +79,68 @@ namespace axiom
         m_renderer->EndFrame();
     }
 
-    RenderMesh* RenderModule::GetProxy(SharedPtr<MeshResource> mesh)
+    RenderMesh* RenderModule::GetMesh(const SharedPtr<MeshResource> meshResource)
     {
-        return nullptr;
+        auto it = m_meshes.find(meshResource);
+        if(it != m_meshes.end())
+        {
+            return it->second.get();
+        }
+        UniquePtr<RenderMesh> mesh = CreateMesh(meshResource);
+        RenderMesh* meshPtr = mesh.get();
+        m_meshes[meshResource] = std::move(mesh);
+        return meshPtr;
     }
 
-    RenderMesh* RenderModule::CreateProxy(SharedPtr<MeshResource> mesh)
+    UniquePtr<RenderMesh> RenderModule::CreateMesh(const SharedPtr<MeshResource> meshResource)
     {
-        return nullptr;
+        UniquePtr<RenderMesh> mesh;
+        switch (m_renderApi)
+        {
+            case RenderAPI::OpenGL:
+                mesh = MakeUnique<GLRenderMesh>(*meshResource.get());
+                break;
+            default:
+                mesh = nullptr;
+                AX_FATAL("Unknown RenderAPI");
+        }
+        return mesh;
     }
 
-    void RenderModule::DestroyProxy(SharedPtr<MeshResource> mesh)
+    void RenderModule::DestroyMesh(SharedPtr<MeshResource> meshResource)
+    {
+    }
+
+    RenderShader* RenderModule::GetShader(const SharedPtr<ShaderResource> shaderResource)
+    {
+         auto it = m_shaders.find(shaderResource);
+        if(it != m_shaders.end())
+        {
+            return it->second.get();
+        }
+        UniquePtr<RenderShader> shader = CreateShader(shaderResource);
+        RenderShader* shaderPtr = shader.get();
+        m_shaders[shaderResource] = std::move(shader);
+        return shaderPtr;
+    }
+
+    UniquePtr<RenderShader> RenderModule::CreateShader(const SharedPtr<ShaderResource> shaderResource)
+    {
+        UniquePtr<RenderShader> shader;
+        switch (m_renderApi)
+        {
+            case RenderAPI::OpenGL:
+                shader = MakeUnique<GLRenderShader>(*shaderResource.get());
+                break;
+            default:
+                shader = nullptr;
+                AX_FATAL("Unknown RenderAPI");
+
+        }
+        return shader;
+    }
+
+    void RenderModule::DestroyShader(SharedPtr<ShaderResource> shaderResource)
     {
     }
 }

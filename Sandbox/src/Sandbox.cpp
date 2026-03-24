@@ -2,7 +2,7 @@
 #include "Core/Application.h"
 #include "Core/FileSystemModule.h"
 #include "Core/Types.h"
-#include "Rendering/GL/GLShader.h"
+#include "Rendering/GL/GLRenderShader.h"
 #include "Rendering/MeshComponent.h"
 #include "Rendering/Material.h"
 #include "Resources/ResourceModule.h"
@@ -51,9 +51,9 @@ void Sandbox::OnApplicationRun()
     SceneModule* sceneModule = GetModule<SceneModule>();
     ResourceModule* resourceModule = GetModule<ResourceModule>();
     
-    SharedPtr<GLShader> shader = resourceModule->Load<GLShader>("Engine://Shaders/VertexColor.glsl");
+    SharedPtr<ShaderResource> shaderResource = resourceModule->Load<ShaderResource>("Engine://Shaders/VertexColor.glsl");
     SharedPtr<Material> material = MakeShared<Material>();
-    material->shader = shader;
+    material->shader = shaderResource;
 
     SharedPtr<TriangleMesh> triangle = MakeShared<TriangleMesh>();
 

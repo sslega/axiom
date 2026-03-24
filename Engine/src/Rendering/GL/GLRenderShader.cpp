@@ -1,24 +1,28 @@
-#include "Rendering/GL/GLShader.h"
+#include "Rendering/GL/GLRenderShader.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 namespace axiom
 {
-    GLShader::GLShader(StringView vertexShader, StringView fragmentShader)
+    GLRenderShader::GLRenderShader(const ShaderResource &shaderResource)
     {
     }
 
-    void GLShader::Bind() const
+    GLRenderShader::GLRenderShader(StringView vertexShader, StringView fragmentShader)
     {
     }
 
-    void GLShader::Unbind() const
+    void GLRenderShader::Bind() const
+    {
+    }
+
+    void GLRenderShader::Unbind() const
     {
     }
 
     /*
     
-        GLShader::GLShader(const Path &path)
+        GLRenderShader::GLRenderShader(const Path &path)
         :ShaderResource(path)
         {
             Load();
@@ -26,33 +30,33 @@ namespace axiom
             Compile();
         }
 
-        GLShader::~GLShader()
+        GLRenderShader::~GLRenderShader()
         {
             glDeleteProgram(m_ID);
         }
 
-        void GLShader::Bind() const
+        void GLRenderShader::Bind() const
         {
             glUseProgram(m_ID);
         }
 
 
-        void GLShader::Unbind() const
+        void GLRenderShader::Unbind() const
         {
             glUseProgram(0);
         }
 
-        const char *GLShader::GetVertexShader()
+        const char *GLRenderShader::GetVertexShader()
         {
             return m_VertexShader;
         }
 
-        const char* GLShader::GetFragmentShader()
+        const char* GLRenderShader::GetFragmentShader()
         {
             return m_FragmentShader;
         }
 
-        void GLShader::ParseData()
+        void GLRenderShader::ParseData()
         {
             const String& shaderSource = GetRawData().data();
 
@@ -98,7 +102,7 @@ namespace axiom
             }
         }
 
-        void GLShader::Compile()
+        void GLRenderShader::Compile()
         {
             int success;
 

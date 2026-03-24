@@ -4,11 +4,14 @@
 
 namespace axiom
 {
-    class GLRenderMeshProxy : public RenderMesh
+    class MeshResource;
+
+    class GLRenderMesh : public RenderMesh
     {
-        ~GLRenderMeshProxy();
     public:
-        virtual void Upload(const MeshResource& mesh) override;
+        GLRenderMesh(const MeshResource& meshResource);
+        ~GLRenderMesh();
+
         virtual void Bind() const override;
         virtual void Unbind() const override;
         virtual uint32 GetIndexCount() const override;

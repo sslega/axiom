@@ -1,24 +1,26 @@
 #include "Rendering/GL/GLRenderMesh.h"
+#include "Resources/MeshResource.h"
 
 namespace axiom
 {
-    GLRenderMeshProxy::~GLRenderMeshProxy()
+    GLRenderMesh::GLRenderMesh(const MeshResource& meshResource)
+    {
+
+    }
+
+    GLRenderMesh::~GLRenderMesh()
     {
     }
 
-    void GLRenderMeshProxy::Upload(const MeshResource &mesh)
+    void GLRenderMesh::Bind() const
     {
     }
 
-    void GLRenderMeshProxy::Bind() const
+    void GLRenderMesh::Unbind() const
     {
     }
 
-    void GLRenderMeshProxy::Unbind() const
-    {
-    }
-
-    uint32 GLRenderMeshProxy::GetIndexCount() const
+    uint32 GLRenderMesh::GetIndexCount() const
     {
         return uint32();
     }

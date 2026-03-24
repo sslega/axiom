@@ -1,11 +1,11 @@
 #pragma once
 #include "Core/Types.h"
-#include "Rendering/RenderShader.h"
+#include "Resources/ShaderResource.h"
 
 namespace axiom
 {
     struct Material
     {
-        SharedPtr<RenderShader> shader;
+        SharedPtr<ShaderResource> shader;
     };
 } // namespace axiom

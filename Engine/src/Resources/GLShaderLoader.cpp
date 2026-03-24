@@ -1,5 +1,5 @@
 #include "Resources/GLShaderLoader.h"
-#include "Rendering/GL/GLShader.h"
+#include "Rendering/GL/GLRenderShader.h"
 
 namespace axiom
 {
@@ -10,37 +10,44 @@ namespace axiom
         String vertexShader;
         String fragmentShader;
 
+        ParseSource(shaderSource, vertexShader, fragmentShader);
+
+        return MakeShared<GLRenderShader>(vertexShader, fragmentShader);
+    }
+
+    void GLShaderLoader::ParseSource(const String &source, String &vertexSource, String &fragmentSource) const
+    {
         const String typeToken = "#type";
         size_t pos = 0;
 
         for(int i = 0; i < 3; ++i)
         {
-            size_t typePos = shaderSource.find(typeToken, pos);
+            size_t typePos = source.find(typeToken, pos);
             if (typePos == std::string::npos)
             {
                 break;
             }
 
-            size_t eol = shaderSource.find_first_of("\r\n", typePos);
+            size_t eol = source.find_first_of("\r\n", typePos);
             if (eol == std::string::npos)
             {
                 throw std::runtime_error("Syntax error: missing end of line after #type");
             }
 
             size_t begin = typePos + typeToken.size() + 1; // +1 for space
-            String stageStr = shaderSource.substr(begin, eol - begin);
+            String stageStr = source.substr(begin, eol - begin);
 
 
-            size_t nextType = shaderSource.find(typeToken, eol);
-            String stageSource = shaderSource.substr(eol + 1, nextType - (eol + 1));
+            size_t nextType = source.find(typeToken, eol);
+            String stageSource = source.substr(eol + 1, nextType - (eol + 1));
 
             if(stageStr == "vertex")
             {
-                vertexShader = std::move(stageSource);
+                vertexSource = std::move(stageSource);
             }
             else if(stageStr == "fragment")
             {
-                fragmentShader = std::move(stageSource);
+                fragmentSource = std::move(stageSource);
             }
             else
             {
@@ -49,7 +56,5 @@ namespace axiom
 
             pos = nextType;
         }
-
-        return MakeShared<GLShader>(vertexShader, fragmentShader);
     }
 }
