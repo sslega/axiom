@@ -13,7 +13,8 @@ namespace axiom
     : m_appConfig(appConfig)
     {
         m_appConfig = appConfig;
-        m_applicationWindow = IApplicationWindow::Create(m_appConfig.windowConfig);
+        // TODO: Make proper initialization based on config.backend
+        m_applicationWindow = MakeUnique<ApplicationWindow>(m_appConfig.windowConfig);
     }
 
     int Application::Run()
@@ -73,7 +74,7 @@ namespace axiom
     {   
         RegisterModule<FileSystemModule>();
         RegisterModule<RenderModule>();
-        RegisterModule<SceneModule>();
+        // RegisterModule<SceneModule>();
 
         ResourceModule* resourceModule = RegisterModule<ResourceModule>();
         resourceModule->RegisterLoader(".glsl", MakeUnique<GLShaderLoader>());
@@ -102,7 +103,7 @@ namespace axiom
         return m_appConfig.renderAPI;
     }
 
-    const IApplicationWindow& Application::GetApplicationWindow() const
+    const ApplicationWindow& Application::GetApplicationWindow() const
     {
         return *m_applicationWindow;
     }

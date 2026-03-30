@@ -5,7 +5,9 @@
 #include "Application.h"
 #include "ApplicationModule.h"
 #include "Platform/ApplicationWindow.h"
-#include "Rendering/RenderDevice.h"
+#include "Rendering/RenderTypes.h"
+// #include "Renderer/RendererAPI.h"
+// #include "Rendering/RenderDevice.h"
 
 #include <unordered_map>
 #include <typeindex>
@@ -27,7 +29,7 @@ namespace axiom
         int Run();
 
         const RenderAPI GetRenderAPI() const ;
-        const IApplicationWindow& GetApplicationWindow() const;
+        const ApplicationWindow& GetApplicationWindow() const;
 
         template <typename T>
         T* GetModule()
@@ -45,7 +47,7 @@ namespace axiom
         
         AppConfig m_appConfig;
         
-        UniquePtr<IApplicationWindow> m_applicationWindow;
+        UniquePtr<ApplicationWindow> m_applicationWindow;
 
         TypeMap<UniquePtr<ApplicationModule>> m_engineModules;
 

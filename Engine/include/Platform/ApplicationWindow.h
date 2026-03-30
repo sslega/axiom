@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/Types.h"
+// #include "Renderer/RenderContext.h"
 
 class GLFWwindow;
 
@@ -22,6 +23,7 @@ namespace axiom
         ApplicationWindowBackend backend = ApplicationWindowBackend::GLFW;
     };
 
+    // TODO: Remove IApplicationWindow, make ApplicationWindow base
     class IApplicationWindow
     {
     public:

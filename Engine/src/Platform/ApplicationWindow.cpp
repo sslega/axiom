@@ -30,9 +30,6 @@ namespace axiom
         {
             assert("Failed to create GLFW window");
         }
-
-        glfwMakeContextCurrent(m_window);
-        glfwSwapInterval(1);
     }
 
     ApplicationWindow::~ApplicationWindow()

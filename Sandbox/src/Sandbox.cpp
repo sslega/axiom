@@ -2,16 +2,17 @@
 #include "Core/Application.h"
 #include "Core/FileSystemModule.h"
 #include "Core/Types.h"
-#include "Rendering/GL/GLRenderShader.h"
-#include "Rendering/MeshComponent.h"
-#include "Rendering/Material.h"
-#include "Resources/ResourceModule.h"
-#include "Scene/SceneModule.h"
-#include "Scene/Entity.h"
+// #include "Rendering/MeshComponent.h"
+// #include "Rendering/Material.h"
+// #include "Resources/ResourceModule.h"
+// #include "Scene/SceneModule.h"
+// #include "Scene/Entity.h"
 
 #include "Sandbox.h"
-#include "TriangleMesh.h"
-#include "Scene/Scene.h"
+// #include "TriangleMesh.h"
+// #include "Scene/Scene.h"
+
+#include "Renderer/Buffer.h"
 
 using namespace axiom;
 
@@ -48,20 +49,21 @@ void Sandbox::OnRegisterModules()
 
 void Sandbox::OnApplicationRun()
 {
-    SceneModule* sceneModule = GetModule<SceneModule>();
-    ResourceModule* resourceModule = GetModule<ResourceModule>();
+
+    // SceneModule* sceneModule = GetModule<SceneModule>();
+    // ResourceModule* resourceModule = GetModule<ResourceModule>();
     
-    SharedPtr<ShaderResource> shaderResource = resourceModule->Load<ShaderResource>("Engine://Shaders/VertexColor.glsl");
-    SharedPtr<Material> material = MakeShared<Material>();
-    material->shader = shaderResource;
+    // SharedPtr<ShaderResource> shaderResource = resourceModule->Load<ShaderResource>("Engine://Shaders/VertexColor.glsl");
+    // SharedPtr<Material> material = MakeShared<Material>();
+    // material->shader = shaderResource;
 
-    SharedPtr<TriangleMesh> triangle = MakeShared<TriangleMesh>();
+    // SharedPtr<TriangleMesh> triangle = MakeShared<TriangleMesh>();
 
-    Scene* scene = sceneModule->CreateScene("SandboxScene");
-    Entity* entity = scene->CreateEntity();
-    MeshComponent* meshComponent = entity->CreateComponent<MeshComponent>();
-    meshComponent->SetMesh(triangle);
-    meshComponent->SetMaterial(material);
+    // Scene* scene = sceneModule->CreateScene("SandboxScene");
+    // Entity* entity = scene->CreateEntity();
+    // MeshComponent* meshComponent = entity->CreateComponent<MeshComponent>();
+    // meshComponent->SetMesh(triangle);
+    // meshComponent->SetMaterial(material);
     
 
     // TriangleMesh triangle = TriangleMesh();
