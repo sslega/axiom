@@ -93,24 +93,38 @@ namespace axiom
         void CalculateOffsetAndStride();
     };
 
-    class VertexBuffer
+    class Buffer
+    {
+    public:
+        virtual ~Buffer() {};
+        virtual void Bind() const = 0;
+        virtual void Unbind() const = 0;
+    };
+
+    class VertexBuffer : public Buffer
     {
     public:
         virtual ~VertexBuffer() {}
         
-        virtual void Bind() const = 0;
-        virtual void Unbind() const = 0;
         virtual const BufferLayout& GetLayout() const = 0;
         virtual void SetLayout(const BufferLayout& layout) = 0;
     };
 
-    class IndexBuffer
+    class IndexBuffer : public Buffer
     {
     public:
         virtual ~IndexBuffer() {}
 
-        virtual void Bind() const = 0;
-        virtual void Unbind() const = 0;
         virtual uint32 GetCount() const = 0;
+    };
+
+    // TODO: this is purely OpenGL concept - remove it later
+    class VertexArray : public Buffer
+    {
+    public:
+        virtual ~VertexArray() {}
+        
+        virtual void SetVertexBuffer(SharedPtr<VertexBuffer> vertexBuffer) = 0;
+        virtual void SetIndexBuffer(SharedPtr<IndexBuffer> indexBuffer) = 0;
     };
 }

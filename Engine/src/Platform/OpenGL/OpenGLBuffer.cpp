@@ -25,7 +25,7 @@ namespace axiom
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
-    const BufferLayout &OpenGLVertexBuffer::GetLayout() const
+    const BufferLayout& OpenGLVertexBuffer::GetLayout() const
     {
         return m_layout;
     }
@@ -50,7 +50,7 @@ namespace axiom
 
     void OpenGLIndexBuffer::Bind() const
     {
-         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_rendererID);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_rendererID); 
     }
 
     void OpenGLIndexBuffer::Unbind() const
@@ -63,4 +63,49 @@ namespace axiom
         return m_count;
     }
 
+    OpenGLVertexArray::OpenGLVertexArray()
+    {
+        glCreateVertexArrays(1, &m_rendererID);
+    }
+
+    OpenGLVertexArray::OpenGLVertexArray(const SharedPtr<VertexBuffer> &vertexBuffer, const SharedPtr<IndexBuffer> &indexBuffer)
+    {
+        glCreateVertexArrays(1, &m_rendererID);
+        SetVertexBuffer(vertexBuffer);
+        SetIndexBuffer(indexBuffer);
+    }
+
+    void OpenGLVertexArray::Bind() const
+    {
+        glBindVertexArray(m_rendererID);
+    }
+
+    void OpenGLVertexArray::Unbind() const
+    {
+        glBindVertexArray(0);
+    }
+
+    void OpenGLVertexArray::SetVertexBuffer(SharedPtr<VertexBuffer> vertexBuffer)
+    {
+        const BufferLayout& layout = vertexBuffer->GetLayout();
+        for(uint8 index = 0; index < layout.GetSize(); ++index)
+        {
+            auto& element = layout.GetElement(index);
+            glEnableVertexAttribArray(index);
+            glVertexAttribPointer(
+                index, 
+                element.GetComponentCount(), 
+                ShaderDataTypeToOpenGLBaseType(element.type), 
+                element.normalized ? GL_TRUE : GL_FALSE, 
+                layout.GetStride(), 
+                (const void*)element.offset
+            );
+        }
+        m_vertexBuffer = vertexBuffer;
+    }
+
+    void OpenGLVertexArray::SetIndexBuffer(SharedPtr<IndexBuffer> indexBuffer)
+    {
+        m_indexBuffer = indexBuffer;
+    }
 }

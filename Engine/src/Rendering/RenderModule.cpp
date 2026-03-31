@@ -32,51 +32,50 @@ namespace axiom
 
 
 
-        glGenVertexArrays(1, &m_vertexArray);
-        glBindVertexArray(m_vertexArray);
+        // glGenVertexArrays(1, &m_vertexArray);
+        // glBindVertexArray(m_vertexArray);
 
-        float vertices [3 * 3] =
+        float vertices [7 * 3] =
         {
-            -0.5f, -0.5f, 0.0f,
-            0.5f, -0.5f, 0.0f,
-            0.0f,  0.5f, 0.0f
+            -0.5f, -0.5f, 0.0f, 1.0f, 0.5f, 0.5f, 1.0f,
+            0.5f, -0.5f, 0.0f, 0.5f, 1.0f, 0.5f, 1.0f,
+            0.0f,  0.5f, 0.0f, 0.5f, 0.5f, 1.0f, 1.0f
         };
-
-        m_vertexbuffer = CreateVertexBuffer(vertices, sizeof(vertices));
-        m_vertexbuffer->Bind();
 
         BufferLayout layout = {
-            {ShaderDataType::Float3, "a_Position"}
+            {ShaderDataType::Float3, "a_Position"},
+            {ShaderDataType::Float4, "a_Color"}
         };
 
-        for(uint8 index = 0; index < layout.GetSize(); ++index)
-        {
-            auto& element = layout.GetElement(index);
-            glEnableVertexAttribArray(index);
-            glVertexAttribPointer(
-                index, 
-                element.GetComponentCount(), 
-                ShaderDataTypeToOpenGLBaseType(element.type), 
-                element.normalized ? GL_TRUE : GL_FALSE, 
-                layout.GetStride(), 
-                (const void*)element.offset
-            );
-        }
+        // VertexArrays should never be part of RenderModule - OpenGL leaking in here
+        m_vertexArray = CreateVertexArray();
+        m_vertexArray->Bind();
+
+        m_vertexBuffer = CreateVertexBuffer(vertices, sizeof(vertices));
+        m_vertexBuffer->SetLayout(layout);
+        m_vertexBuffer->Bind();
 
         uint32 indices[3] = {0, 1, 2};
         m_indexBuffer = CreateIndexBuffer(indices, 3);
         m_indexBuffer->Bind();
 
+        m_vertexArray->SetVertexBuffer(m_vertexBuffer);
+        m_vertexArray->SetIndexBuffer(m_indexBuffer);
+
+
         String vertexSrc = R"(
             #version 330 core
 
             layout(location = 0) in vec3 a_Position;
+            layout(location = 1) in vec4 a_Color;
 
             out vec3 v_Position;
+            out vec4 v_Color;
 
             void main()
             {
                 v_Position = a_Position;
+                v_Color = a_Color;
                 gl_Position = vec4(a_Position, 1.0);
             }
         )";
@@ -87,10 +86,12 @@ namespace axiom
             layout(location = 0) out vec4 color;
 
             in vec3 v_Position;
+            in vec4 v_Color;
 
             void main()
             {
-                color = vec4(v_Position * 0.5 + 0.5, 1.0);
+                //color = vec4(v_Position * 0.5 + 0.5, 1.0);
+                color = v_Color;
             }
         )";
 
@@ -129,10 +130,11 @@ namespace axiom
         glClearColor(0.5, 0.5, 0.5, 1.0);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // glBindVertexArray(m_vertexArray);
-        // m_shader->Bind();
-        // m_vertexbuffer->Bind();
-        // m_indexBuffer->Bind();
+        m_shader->Bind();
+        m_vertexArray->Bind();
+        m_vertexBuffer->Bind();
+        m_indexBuffer->Bind();
+        
         glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
 
         glfwSwapBuffers(static_cast<GLFWwindow*>(GetApp().GetApplicationWindow().GetNativeWindow()));
@@ -199,6 +201,17 @@ namespace axiom
         switch (renderAPI)
         {
             case RenderAPI::OpenGL: return MakeShared<OpenGLVertexBuffer>(vertices, size);
+            default: AX_ASSERT(false, "Unknown RenderAPI!");
+        }
+        return nullptr;
+    }
+
+    SharedPtr<VertexArray> RenderModule::CreateVertexArray()
+    {
+        RenderAPI renderAPI = GetRenderAPI();
+        switch (renderAPI)
+        {
+            case RenderAPI::OpenGL: return MakeShared<OpenGLVertexArray>();
             default: AX_ASSERT(false, "Unknown RenderAPI!");
         }
         return nullptr;

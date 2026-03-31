@@ -13,6 +13,7 @@ namespace axiom
 
     class IndexBuffer;
     class VertexBuffer;
+    class VertexArray;
     class Shader;
 
     class RenderModule : public ApplicationModule
@@ -32,14 +33,16 @@ namespace axiom
 
         UniquePtr<RHI> m_RHI;
         UniquePtr<SwapChain> m_swapChain;
-        uint32 m_vertexArray;
+        SharedPtr<VertexArray> m_vertexArray;
         SharedPtr<IndexBuffer> m_indexBuffer;
-        SharedPtr<VertexBuffer>  m_vertexbuffer;
+        SharedPtr<VertexBuffer>  m_vertexBuffer;
         SharedPtr<Shader> m_shader;
 
         SharedPtr<VertexBuffer> CreateVertexBuffer(float* vertices, uint32 size);
+        //TODO: This is OperGL method - hide it from RenderModule later
+        SharedPtr<VertexArray> CreateVertexArray();
         SharedPtr<IndexBuffer> CreateIndexBuffer(uint32* indices, uint32 count);
-        SharedPtr<Shader> CreateShader(const String &vertexSource, const String &fragmentSource);
+        SharedPtr<Shader> CreateShader(const String& vertexSource, const String& fragmentSource);
 
         UniquePtr<RHI> CreateRHI();
         UniquePtr<SwapChain> CreateSwapChain();

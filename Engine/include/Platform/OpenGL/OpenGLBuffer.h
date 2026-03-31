@@ -29,7 +29,7 @@ namespace axiom
     {
     public:
         OpenGLVertexBuffer(float* vertices, uint32 size);
-        virtual ~OpenGLVertexBuffer();
+        ~OpenGLVertexBuffer();
 
         virtual void Bind() const;
         virtual void Unbind() const;
@@ -44,7 +44,7 @@ namespace axiom
     {
     public:
         OpenGLIndexBuffer(uint32* indices, uint32 count);
-        virtual ~OpenGLIndexBuffer();
+        ~OpenGLIndexBuffer();
 
         virtual void Bind() const;
         virtual void Unbind() const;
@@ -52,5 +52,23 @@ namespace axiom
     private:
         uint32 m_rendererID;
         uint32 m_count;
+    };
+
+    class OpenGLVertexArray : public VertexArray
+    {
+    public:
+        OpenGLVertexArray();
+        OpenGLVertexArray(const SharedPtr<VertexBuffer>& vertxBuffer, const SharedPtr<IndexBuffer>& indexBuffer);
+        ~OpenGLVertexArray() {};
+
+        virtual void Bind() const override;
+        virtual void Unbind() const override;
+
+        virtual void SetVertexBuffer(SharedPtr<VertexBuffer> vertexBuffer) override;
+        virtual void SetIndexBuffer(SharedPtr<IndexBuffer> indexBuffer) override;
+    private:
+        SharedPtr<VertexBuffer> m_vertexBuffer;
+        SharedPtr<IndexBuffer> m_indexBuffer;
+        uint32 m_rendererID;
     };
 }
