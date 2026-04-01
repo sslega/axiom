@@ -108,4 +108,15 @@ namespace axiom
     {
         m_indexBuffer = indexBuffer;
     }
+
+    
+    SharedPtr<VertexBuffer> OpenGLVertexArray::GetVertexBuffer() const
+    {
+        return m_vertexBuffer;
+    }
+
+    SharedPtr<IndexBuffer> OpenGLVertexArray::GetIndexBuffer() const
+    {
+        return m_indexBuffer;
+    }
 }

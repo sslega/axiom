@@ -98,7 +98,7 @@ namespace axiom
     {
     }
 
-    const RenderAPI Application::GetRenderAPI() const
+    const GraphicsDevice::API Application::GetRenderAPI() const
     {
         return m_appConfig.renderAPI;
     }

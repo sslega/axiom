@@ -66,6 +66,10 @@ namespace axiom
 
         virtual void SetVertexBuffer(SharedPtr<VertexBuffer> vertexBuffer) override;
         virtual void SetIndexBuffer(SharedPtr<IndexBuffer> indexBuffer) override;
+
+        
+        virtual SharedPtr<VertexBuffer> GetVertexBuffer() const;
+        virtual SharedPtr<IndexBuffer> GetIndexBuffer() const;
     private:
         SharedPtr<VertexBuffer> m_vertexBuffer;
         SharedPtr<IndexBuffer> m_indexBuffer;

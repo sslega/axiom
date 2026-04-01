@@ -13,6 +13,7 @@
 // #include "Scene/Scene.h"
 
 #include "Renderer/Buffer.h"
+#include "Renderer/GraphicsDevice.h"
 
 using namespace axiom;
 
@@ -20,7 +21,7 @@ using namespace axiom;
 UniquePtr<Application> CreateApplication()
 {
     AppConfig appConfig;
-    appConfig.renderAPI = axiom::RenderAPI::OpenGL;
+    appConfig.renderAPI = GraphicsDevice::API::OpenGL;
     
     AppWindowConfig windowConfig;
     windowConfig.width = 800;

@@ -7,7 +7,7 @@
 #include "Platform/ApplicationWindow.h"
 #include "Rendering/RenderTypes.h"
 // #include "Renderer/RendererAPI.h"
-// #include "Rendering/RenderDevice.h"
+#include "Renderer/GraphicsDevice.h"
 
 #include <unordered_map>
 #include <typeindex>
@@ -16,7 +16,7 @@ namespace axiom
 {
     struct AppConfig
     {
-        RenderAPI renderAPI = RenderAPI::OpenGL;
+        GraphicsDevice::API renderAPI = GraphicsDevice::API::OpenGL;
         AppWindowConfig windowConfig;
     };
 
@@ -28,7 +28,7 @@ namespace axiom
         
         int Run();
 
-        const RenderAPI GetRenderAPI() const ;
+        const GraphicsDevice::API GetRenderAPI() const ;
         const ApplicationWindow& GetApplicationWindow() const;
 
         template <typename T>

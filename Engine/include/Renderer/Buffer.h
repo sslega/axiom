@@ -126,5 +126,8 @@ namespace axiom
         
         virtual void SetVertexBuffer(SharedPtr<VertexBuffer> vertexBuffer) = 0;
         virtual void SetIndexBuffer(SharedPtr<IndexBuffer> indexBuffer) = 0;
+
+        virtual SharedPtr<VertexBuffer> GetVertexBuffer() const = 0;
+        virtual SharedPtr<IndexBuffer> GetIndexBuffer() const = 0;
     };
 }

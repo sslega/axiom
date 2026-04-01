@@ -7,13 +7,13 @@
 #include "Resources/ShaderResource.h"
 #include "Renderer/RHI.h"
 #include "Renderer/SwapChain.h"
+#include "Renderer/GraphicsDevice.h"
 
 namespace axiom
 {
 
     class IndexBuffer;
     class VertexBuffer;
-    class VertexArray;
     class Shader;
 
     class RenderModule : public ApplicationModule
@@ -25,27 +25,29 @@ namespace axiom
         void Shutdown() override;
         void Update() override;
         void Render() override;
-        RenderAPI GetRenderAPI() const;
+
+        GraphicsDevice::API GetRenderAPI() const;
 
     private:
         // UniquePtr<RenderContext> m_renderContext;
         // UniquePtr<RendererAPI> m_renderAPI;
-
-        UniquePtr<RHI> m_RHI;
+        UniquePtr<GraphicsDevice> m_graphicsDevice;
         UniquePtr<SwapChain> m_swapChain;
-        SharedPtr<VertexArray> m_vertexArray;
-        SharedPtr<IndexBuffer> m_indexBuffer;
-        SharedPtr<VertexBuffer>  m_vertexBuffer;
+
+        SharedPtr<VertexBuffer> m_triangleVB;
+        SharedPtr<IndexBuffer>  m_triangleIB;
+        SharedPtr<VertexBuffer> m_rectangleVB;
+        SharedPtr<IndexBuffer>  m_rectangleIB;
         SharedPtr<Shader> m_shader;
 
         SharedPtr<VertexBuffer> CreateVertexBuffer(float* vertices, uint32 size);
-        //TODO: This is OperGL method - hide it from RenderModule later
-        SharedPtr<VertexArray> CreateVertexArray();
         SharedPtr<IndexBuffer> CreateIndexBuffer(uint32* indices, uint32 count);
         SharedPtr<Shader> CreateShader(const String& vertexSource, const String& fragmentSource);
 
-        UniquePtr<RHI> CreateRHI();
+        // UniquePtr<RHI> CreateRHI();
         UniquePtr<SwapChain> CreateSwapChain();
+        UniquePtr<GraphicsDevice> CreateGraphicsDevice();
+
         // SceneModule* m_sceneModule;
 
         // Vector<MeshComponent*> m_meshComponents;
