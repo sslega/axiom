@@ -1,11 +1,5 @@
 #include "Rendering/RenderModule.h"
-// #include "Rendering/MeshComponent.h"
-// #include "Rendering/RenderShader.h"
-// #include "Rendering/Material.h"
-// #include "Rendering/GL/GLRenderMesh.h"
-// #include"Rendering/GL/GLRenderShader.h"
 #include "Core/Assert.h"
-// #include "Scene/SceneModule.h"
 #include <iostream>
 #include <cassert>
 
@@ -14,9 +8,6 @@
 #include "Platform/OpenGL/OpenGLBuffer.h"
 #include "Platform/OpenGL/OpenGLShader.h"
 #include "Platform/OpenGL/OpenGLGraphicsDevice.h"
-#include "Platform/OpenGL/OpenGLSwapChain.h"
-#include "Platform/OpenGL/OpenGLRHI.h"
-#include "Renderer/RenderResourceFactory.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -29,11 +20,9 @@ namespace axiom
 
     bool RenderModule::Initialize()
     {    
-        m_swapChain = CreateSwapChain();
-
         auto API = GetRenderAPI();
-        m_graphicsDevice = GraphicsDevice::Create(API);
-        m_renderResourceFactory = RenderResourceFactory::Create(API);
+        auto& window = GetApp().GetApplicationWindow();
+        m_graphicsDevice = GraphicsDevice::Create(API, window);
 
 
         uint32 triangleIndices[3] = {0, 1, 2};
@@ -57,15 +46,15 @@ namespace axiom
             {ShaderDataType::Float4, "a_Color"}
         };
 
-        auto& RRF = *m_renderResourceFactory;
+        auto& GFX = *m_graphicsDevice;
 
-        m_triangleVB = RRF.CreateVertexBuffer(triangleVertices, sizeof(triangleVertices));
+        m_triangleVB = GFX.CreateVertexBuffer(triangleVertices, sizeof(triangleVertices));
         m_triangleVB->SetLayout(layout);
-        m_triangleIB = RRF.CreateIndexBuffer(triangleIndices, 3);
+        m_triangleIB = GFX.CreateIndexBuffer(triangleIndices, 3);
 
-        m_rectangleVB = RRF.CreateVertexBuffer(squareVertices, sizeof(squareVertices));
+        m_rectangleVB = GFX.CreateVertexBuffer(squareVertices, sizeof(squareVertices));
         m_rectangleVB->SetLayout(layout);
-        m_rectangleIB = RRF.CreateIndexBuffer(squareIndices, 6);
+        m_rectangleIB = GFX.CreateIndexBuffer(squareIndices, 6);
 
 
         String vertexSrc = R"(
@@ -100,7 +89,7 @@ namespace axiom
             }
         )";
 
-        m_shader = RRF.CreateShader(vertexSrc, fragmentSrc);
+        m_shader = GFX.CreateShader(vertexSrc, fragmentSrc);
         m_shader->Bind();
 
         // m_sceneModule = GetApp().GetModule<SceneModule>();
@@ -141,26 +130,12 @@ namespace axiom
         GFX.DrawIndexed(m_rectangleVB, m_rectangleIB);
         GFX.DrawIndexed(m_triangleVB, m_triangleIB);
 
-        m_swapChain->SwapBuffers();
+        GFX.Present();
     }
 
     GraphicsDevice::API RenderModule::GetRenderAPI() const
     {
         return GetApp().GetRenderAPI();
-    }
-
-    UniquePtr<SwapChain> RenderModule::CreateSwapChain()
-    {
-        GraphicsDevice::API renderAPI = GetRenderAPI();
-        auto& window = GetApp().GetApplicationWindow();
-
-        switch (renderAPI)
-        {
-            case GraphicsDevice::API::OpenGL: return MakeUnique<OpenGLSwapChain>(window);
-            case GraphicsDevice::API::Vulkan: AX_ASSERT(false, "Unknown RenderAPI!");
-        }
-        
-        return nullptr;        
     }
 
     // RenderMesh* RenderModule::GetMesh(const SharedPtr<MeshResource> meshResource)

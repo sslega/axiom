@@ -5,13 +5,10 @@
 #include "Rendering/RenderMesh.h"
 #include "Resources/MeshResource.h"
 #include "Resources/ShaderResource.h"
-#include "Renderer/RHI.h"
-#include "Renderer/SwapChain.h"
 #include "Renderer/GraphicsDevice.h"
 
 namespace axiom
 {
-
     class IndexBuffer;
     class VertexBuffer;
     class Shader;
@@ -30,19 +27,13 @@ namespace axiom
         GraphicsDevice::API GetRenderAPI() const;
 
     private:
-        // UniquePtr<RenderContext> m_renderContext;
-        // UniquePtr<RendererAPI> m_renderAPI;
         UniquePtr<GraphicsDevice> m_graphicsDevice;
-        UniquePtr<RenderResourceFactory> m_renderResourceFactory;
-        UniquePtr<SwapChain> m_swapChain;
-
+        
         SharedPtr<VertexBuffer> m_triangleVB;
         SharedPtr<IndexBuffer>  m_triangleIB;
         SharedPtr<VertexBuffer> m_rectangleVB;
         SharedPtr<IndexBuffer>  m_rectangleIB;
         SharedPtr<Shader> m_shader;
-
-        UniquePtr<SwapChain> CreateSwapChain();
 
         // SceneModule* m_sceneModule;
 
