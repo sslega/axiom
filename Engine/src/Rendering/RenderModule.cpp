@@ -16,6 +16,7 @@
 #include "Platform/OpenGL/OpenGLGraphicsDevice.h"
 #include "Platform/OpenGL/OpenGLSwapChain.h"
 #include "Platform/OpenGL/OpenGLRHI.h"
+#include "Renderer/RenderResourceFactory.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -28,10 +29,11 @@ namespace axiom
 
     bool RenderModule::Initialize()
     {    
-        // m_RHI = CreateRHI();
-        m_graphicsDevice = CreateGraphicsDevice();
         m_swapChain = CreateSwapChain();
 
+        auto API = GetRenderAPI();
+        m_graphicsDevice = GraphicsDevice::Create(API);
+        m_renderResourceFactory = RenderResourceFactory::Create(API);
 
 
         uint32 triangleIndices[3] = {0, 1, 2};
@@ -55,13 +57,15 @@ namespace axiom
             {ShaderDataType::Float4, "a_Color"}
         };
 
-        m_triangleVB = CreateVertexBuffer(triangleVertices, sizeof(triangleVertices));
-        m_triangleVB->SetLayout(layout);
-        m_triangleIB = CreateIndexBuffer(triangleIndices, 3);
+        auto& RRF = *m_renderResourceFactory;
 
-        m_rectangleVB = CreateVertexBuffer(squareVertices, sizeof(squareVertices));
+        m_triangleVB = RRF.CreateVertexBuffer(triangleVertices, sizeof(triangleVertices));
+        m_triangleVB->SetLayout(layout);
+        m_triangleIB = RRF.CreateIndexBuffer(triangleIndices, 3);
+
+        m_rectangleVB = RRF.CreateVertexBuffer(squareVertices, sizeof(squareVertices));
         m_rectangleVB->SetLayout(layout);
-        m_rectangleIB = CreateIndexBuffer(squareIndices, 6);
+        m_rectangleIB = RRF.CreateIndexBuffer(squareIndices, 6);
 
 
         String vertexSrc = R"(
@@ -96,7 +100,7 @@ namespace axiom
             }
         )";
 
-        m_shader = CreateShader(vertexSrc, fragmentSrc);
+        m_shader = RRF.CreateShader(vertexSrc, fragmentSrc);
         m_shader->Bind();
 
         // m_sceneModule = GetApp().GetModule<SceneModule>();
@@ -145,51 +149,6 @@ namespace axiom
         return GetApp().GetRenderAPI();
     }
 
-    SharedPtr<IndexBuffer> RenderModule::CreateIndexBuffer(uint32 *indices, uint32 count)
-    {
-        GraphicsDevice::API renderAPI = GetRenderAPI();
-        switch (renderAPI)
-        {
-            case GraphicsDevice::API::OpenGL: return MakeShared<OpenGLIndexBuffer>(indices, count);
-            default: AX_ASSERT(false, "Unknown RenderAPI!");
-        }
-        return nullptr;
-    }
-
-    SharedPtr<VertexBuffer> RenderModule::CreateVertexBuffer(float* vertices, uint32 size)
-    {
-        GraphicsDevice::API renderAPI = GetRenderAPI();
-        switch (renderAPI)
-        {
-            case GraphicsDevice::API::OpenGL: return MakeShared<OpenGLVertexBuffer>(vertices, size);
-            default: AX_ASSERT(false, "Unknown RenderAPI!");
-        }
-        return nullptr;
-    }
-
-    SharedPtr<Shader> RenderModule::CreateShader(const String &vertexSource, const String &fragmentSource)
-    {
-        GraphicsDevice::API renderAPI = GetRenderAPI();
-        switch (renderAPI)
-        {
-            case GraphicsDevice::API::OpenGL: return MakeShared<OpenGLShader>(vertexSource, fragmentSource);
-            default: AX_ASSERT(false, "Unknown RenderAPI!");
-        }
-        return nullptr;
-    }
-
-    // UniquePtr<RHI> RenderModule::CreateRHI()
-    // {
-    //     RenderAPI renderAPI = GetRenderAPI();
-
-    //     switch (renderAPI)
-    //     {
-    //         case RenderAPI::OpenGL: return MakeUnique<OpenGLRHI>();
-    //         default: AX_ASSERT(false, "Unknown RenderAPI!");
-    //     }
-    //     return nullptr;
-    // }
-
     UniquePtr<SwapChain> RenderModule::CreateSwapChain()
     {
         GraphicsDevice::API renderAPI = GetRenderAPI();
@@ -202,21 +161,6 @@ namespace axiom
         }
         
         return nullptr;        
-    }
-
-
-    UniquePtr<GraphicsDevice> RenderModule::CreateGraphicsDevice()
-    {
-        GraphicsDevice::API renderAPI = GetRenderAPI();
-        auto& window = GetApp().GetApplicationWindow();
-
-        switch (renderAPI)
-        {
-            case GraphicsDevice::API::OpenGL: return MakeUnique<OpenGLGraphicsDevice>();
-            case GraphicsDevice::API::Vulkan: AX_ASSERT(false, "Unknown RenderAPI!");
-        }
-
-        return nullptr;   
     }
 
     // RenderMesh* RenderModule::GetMesh(const SharedPtr<MeshResource> meshResource)

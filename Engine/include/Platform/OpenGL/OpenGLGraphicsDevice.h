@@ -1,5 +1,6 @@
 #pragma once
 #include "Renderer/GraphicsDevice.h"
+#include "Core/Types.h"
 #include <unordered_map>
 
 namespace axiom
@@ -15,6 +16,6 @@ namespace axiom
 
     private:
         uint32 GetOrCreateVAO(const SharedPtr<VertexBuffer>& vertexBuffer);
-        std::unordered_map<VertexBuffer*, uint32> m_vaoCache;
+        UnorderedMap<VertexBuffer*, uint32> m_vaoCache;
     };
 }

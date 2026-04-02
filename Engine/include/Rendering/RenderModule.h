@@ -15,6 +15,7 @@ namespace axiom
     class IndexBuffer;
     class VertexBuffer;
     class Shader;
+    class RenderResourceFactory;
 
     class RenderModule : public ApplicationModule
     {
@@ -32,6 +33,7 @@ namespace axiom
         // UniquePtr<RenderContext> m_renderContext;
         // UniquePtr<RendererAPI> m_renderAPI;
         UniquePtr<GraphicsDevice> m_graphicsDevice;
+        UniquePtr<RenderResourceFactory> m_renderResourceFactory;
         UniquePtr<SwapChain> m_swapChain;
 
         SharedPtr<VertexBuffer> m_triangleVB;
@@ -40,13 +42,7 @@ namespace axiom
         SharedPtr<IndexBuffer>  m_rectangleIB;
         SharedPtr<Shader> m_shader;
 
-        SharedPtr<VertexBuffer> CreateVertexBuffer(float* vertices, uint32 size);
-        SharedPtr<IndexBuffer> CreateIndexBuffer(uint32* indices, uint32 count);
-        SharedPtr<Shader> CreateShader(const String& vertexSource, const String& fragmentSource);
-
-        // UniquePtr<RHI> CreateRHI();
         UniquePtr<SwapChain> CreateSwapChain();
-        UniquePtr<GraphicsDevice> CreateGraphicsDevice();
 
         // SceneModule* m_sceneModule;
 

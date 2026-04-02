@@ -18,7 +18,7 @@ namespace axiom
             Vulkan,
             DX12
         };
-            
+        static UniquePtr<GraphicsDevice> Create(GraphicsDevice::API api);
 
         virtual void SetClearColor(const Vector4& color) = 0;
         virtual void Clear() = 0;
