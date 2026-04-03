@@ -8,14 +8,14 @@ namespace axiom
     {
     public:
         Vertex();
-        Vertex(Vector3 position);
-        Vertex(Vector3 position, Vector3 normal);
-        Vertex(Vector3 position, Vector3 normal, Vector2 uv);
-        Vertex(Vector3 position, Vector3 normal, Vector2 uv, Vector4 color);
+        Vertex(Vec3 position);
+        Vertex(Vec3 position, Vec3 normal);
+        Vertex(Vec3 position, Vec3 normal, Vec2 uv);
+        Vertex(Vec3 position, Vec3 normal, Vec2 uv, Vec4 color);
 
-        Vector3 m_position;
-        Vector3 m_normal;
-        Vector2 m_uv;
-        Vector4 m_color;
+        Vec3 m_position;
+        Vec3 m_normal;
+        Vec2 m_uv;
+        Vec4 m_color;
     };
 }

@@ -6,6 +6,7 @@
 #include "Resources/MeshResource.h"
 #include "Resources/ShaderResource.h"
 #include "Renderer/GraphicsDevice.h"
+#include "Renderer/Camera.h"
 
 namespace axiom
 {
@@ -24,16 +25,29 @@ namespace axiom
         void Update() override;
         void Render() override;
 
+        void BeginScene(const OrtographicCamera& camera);
+        void EndScene();
+        void Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Shader>& shader);
+
         GraphicsDevice::API GetRenderAPI() const;
 
     private:
+        struct SceneData
+        {
+            Matrix4 viewProjectionMatrix;
+        };
+
         UniquePtr<GraphicsDevice> m_graphicsDevice;
-        
+        SceneData m_sceneData;
+
         SharedPtr<VertexBuffer> m_triangleVB;
         SharedPtr<IndexBuffer>  m_triangleIB;
         SharedPtr<VertexBuffer> m_rectangleVB;
         SharedPtr<IndexBuffer>  m_rectangleIB;
         SharedPtr<Shader> m_shader;
+
+        // TODO: move to scene when scene system exists
+        OrtographicCamera m_camera;
 
         // SceneModule* m_sceneModule;
 

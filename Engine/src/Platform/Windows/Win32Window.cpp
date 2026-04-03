@@ -91,6 +91,11 @@ namespace axiom
         return m_desc.height;
     }
 
+    float Win32Window::AspectRatio() const
+    {
+        return float(m_desc.width) / float(m_desc.height);
+    }
+
     StringView Win32Window::Title() const
     {
         return m_desc.title;

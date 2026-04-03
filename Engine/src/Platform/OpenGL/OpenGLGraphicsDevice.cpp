@@ -31,7 +31,7 @@ namespace axiom
             glDeleteVertexArrays(1, &vao);
     }
 
-    void OpenGLGraphicsDevice::SetClearColor(const Vector4 &color)
+    void OpenGLGraphicsDevice::SetClearColor(const Vec4 &color)
     {
         glClearColor(color.x, color.y, color.z, color.w);
     }

@@ -1,25 +1,51 @@
 #pragma once
+#include <cmath>
 
 namespace axiom
 {
-    struct Vector2
+    struct Vec2
     {
         float x, y;
-        Vector2() : x(0), y(0) {}
-        Vector2(float _x, float _y) : x(_x), y(_y) {}
+        Vec2() : x(0), y(0) {}
+        Vec2(float _x, float _y) : x(_x), y(_y) {}
     };
 
-     struct Vector3
+    struct Vec3
     {
         float x, y, z;
-        Vector3() : x(0), y(0), z(0) {}
-        Vector3(float _x, float _y, float _z) : x(_x), y(_y), z(_z){}
+        Vec3() : x(0), y(0), z(0) {}
+        Vec3(float _x, float _y, float _z) : x(_x), y(_y), z(_z) {}
     };
 
-    struct Vector4
+    struct Vec4
     {
         float x, y, z, w;
-        Vector4() : x(0), y(0), z(0), w(0) {}
-        Vector4(float _x, float _y, float _z, float _w) : x(_x), y(_y), z(_z), w(_w){}
+        Vec4() : x(0), y(0), z(0), w(0) {}
+        Vec4(float _x, float _y, float _z, float _w) : x(_x), y(_y), z(_z), w(_w) {}
     };
+
+    inline float Dot(Vec3 a, Vec3 b)
+    {
+        return a.x * b.x + a.y * b.y + a.z * b.z;
+    }
+
+    inline Vec3 Cross(Vec3 a, Vec3 b)
+    {
+        return Vec3(
+            a.y * b.z - a.z * b.y,
+            a.z * b.x - a.x * b.z,
+            a.x * b.y - a.y * b.x
+        );
+    }
+
+    inline float Length(Vec3 v)
+    {
+        return std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+    }
+
+    inline Vec3 Normalize(Vec3 v)
+    {
+        float len = Length(v);
+        return Vec3(v.x / len, v.y / len, v.z / len);
+    }
 }

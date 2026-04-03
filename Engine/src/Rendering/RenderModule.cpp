@@ -8,6 +8,8 @@
 #include "Platform/OpenGL/OpenGLBuffer.h"
 #include "Platform/OpenGL/OpenGLShader.h"
 #include "Platform/OpenGL/OpenGLGraphicsDevice.h"
+#include "Renderer/Camera.h"
+#include "Math/Math.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -23,6 +25,11 @@ namespace axiom
         auto API = GetRenderAPI();
         auto& window = GetApp().GetApplicationWindow();
         m_graphicsDevice = GraphicsDevice::Create(API, window);
+
+        float ratio = GetApp().GetApplicationWindow().AspectRatio();
+
+        m_camera = OrtographicCamera(-2.0f, 2.0f, -2.0f / ratio, 2.0f / ratio);
+        m_camera.SetRotation(ToRadians(45.0f));
 
 
         uint32 triangleIndices[3] = {0, 1, 2};
@@ -63,6 +70,8 @@ namespace axiom
             layout(location = 0) in vec3 a_Position;
             layout(location = 1) in vec4 a_Color;
 
+            uniform mat4 u_ViewProjection;
+
             out vec3 v_Position;
             out vec4 v_Color;
 
@@ -70,7 +79,7 @@ namespace axiom
             {
                 v_Position = a_Position;
                 v_Color = a_Color;
-                gl_Position = vec4(a_Position, 1.0);
+                gl_Position = u_ViewProjection * vec4(a_Position, 1.0);
             }
         )";
 
@@ -118,19 +127,32 @@ namespace axiom
         // nothing for now
     }
 
+    //TODO: Temporary untill proper scene is created
     void RenderModule::Render()
     {
-        auto& GFX = *m_graphicsDevice;
+        BeginScene(m_camera);
+        Submit(m_rectangleVB, m_rectangleIB, m_shader);
+        Submit(m_triangleVB,  m_triangleIB,  m_shader);
+        EndScene();
+    }
 
-        GFX.SetClearColor(Vector4(0.5, 0.5, 0.5, 1.0));
-        GFX.Clear();
+    void RenderModule::BeginScene(const OrtographicCamera& camera)
+    {
+        m_sceneData.viewProjectionMatrix = camera.GetViewProjectionMatrix();
+        m_graphicsDevice->SetClearColor(Vec4(0.5f, 0.5f, 0.5f, 1.0f));
+        m_graphicsDevice->Clear();
+    }
 
-        m_shader->Bind();
+    void RenderModule::EndScene()
+    {
+        m_graphicsDevice->Present();
+    }
 
-        GFX.DrawIndexed(m_rectangleVB, m_rectangleIB);
-        GFX.DrawIndexed(m_triangleVB, m_triangleIB);
-
-        GFX.Present();
+    void RenderModule::Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Shader>& shader)
+    {
+        shader->Bind();
+        shader->UploadUniformMat4("u_ViewProjection", m_sceneData.viewProjectionMatrix);
+        m_graphicsDevice->DrawIndexed(vb, ib);
     }
 
     GraphicsDevice::API RenderModule::GetRenderAPI() const

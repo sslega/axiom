@@ -126,6 +126,11 @@ namespace axiom
     {
         glUseProgram(0);
     }
+
+    void OpenGLShader::UploadUniformMat4(const String &name, const Matrix4& matrix)
+    {
+        GLint location = glGetUniformLocation(m_rendererID, name.c_str());
+        //TODO: add check if it exist
+        glUniformMatrix4fv(location, 1, GL_FALSE, matrix.data);
+    }
 }
-
-

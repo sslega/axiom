@@ -6,25 +6,25 @@ namespace axiom
     {
     }
     
-    Vertex::Vertex(Vector3 position)
+    Vertex::Vertex(Vec3 position)
     {
         m_position = position;
     }
-    
-    Vertex::Vertex(Vector3 position, Vector3 normal)
+
+    Vertex::Vertex(Vec3 position, Vec3 normal)
     {
         m_position = position;
         m_normal = normal;
     }
 
-    Vertex::Vertex(Vector3 position, Vector3 normal, Vector2 uv)
+    Vertex::Vertex(Vec3 position, Vec3 normal, Vec2 uv)
     {
         m_position = position;
         m_normal = normal;
         m_uv = uv;
     }
 
-    Vertex::Vertex(Vector3 position, Vector3 normal, Vector2 uv, Vector4 color)
+    Vertex::Vertex(Vec3 position, Vec3 normal, Vec2 uv, Vec4 color)
     {
         m_position = position;
         m_normal = normal;

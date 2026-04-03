@@ -1,4 +1,5 @@
 #include "Renderer/Shader.h"
+#include "Math/Matrix4.h"
 
 namespace axiom
 {
@@ -9,6 +10,8 @@ namespace axiom
         ~OpenGLShader();
         virtual void Bind() const override;
         virtual void Unbind() const override;
+
+        virtual void UploadUniformMat4(const String& name,const Matrix4& matrix) override;
     
     private:
         uint32 m_rendererID;

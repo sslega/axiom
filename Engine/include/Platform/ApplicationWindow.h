@@ -36,6 +36,7 @@ namespace axiom
 
         virtual uint32 Width()  const = 0;
         virtual uint32 Height() const = 0;
+        virtual float AspectRatio() const = 0;
         virtual StringView Title() const = 0;
 
         virtual void* GetNativeWindow() const = 0;
@@ -57,6 +58,7 @@ namespace axiom
 
         uint32 Width() const override;
         uint32 Height() const override;
+        float AspectRatio() const override;
         StringView Title() const override;
 
         void* GetNativeWindow() const override;

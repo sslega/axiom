@@ -29,7 +29,7 @@ namespace axiom
         virtual SharedPtr<Shader> CreateShader(const String& vertexSource, const String& fragmentSource) = 0;
 
         // Draw commands
-        virtual void SetClearColor(const Vector4& color) = 0;
+        virtual void SetClearColor(const Vec4& color) = 0;
         virtual void Clear() = 0;
         virtual void DrawIndexed(const SharedPtr<VertexBuffer>& vertexBuffer, const SharedPtr<IndexBuffer>& indexBuffer) = 0;
         virtual void Present() = 0; 
