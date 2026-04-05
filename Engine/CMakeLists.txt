@@ -72,6 +72,10 @@ target_compile_definitions(Engine PUBLIC
     AX_ENGINE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/Assets"
 )
 
+target_precompile_headers(Engine PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/pch.h
+)
+
 target_link_libraries(Engine PUBLIC
     glad
     glfw
