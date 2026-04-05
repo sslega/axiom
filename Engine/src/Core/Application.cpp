@@ -68,6 +68,12 @@ namespace axiom
         {
             module->Render();
         }
+
+        OnRender();
+    }
+
+    void Application::OnRender()
+    {
     }
 
     void Application::RegisterModules()

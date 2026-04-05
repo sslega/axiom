@@ -1,19 +1,11 @@
 #include "EntryPoint.h"
 #include "Core/Application.h"
 #include "Core/FileSystemModule.h"
-#include "Core/Types.h"
-// #include "Rendering/MeshComponent.h"
-// #include "Rendering/Material.h"
-// #include "Resources/ResourceModule.h"
-// #include "Scene/SceneModule.h"
-// #include "Scene/Entity.h"
+#include "Rendering/RenderModule.h"
+#include "Renderer/GraphicsDevice.h"
+#include "Renderer/Shader.h"
 
 #include "Sandbox.h"
-// #include "TriangleMesh.h"
-// #include "Scene/Scene.h"
-
-#include "Renderer/Buffer.h"
-#include "Renderer/GraphicsDevice.h"
 
 using namespace axiom;
 
@@ -50,26 +42,85 @@ void Sandbox::OnRegisterModules()
 
 void Sandbox::OnApplicationRun()
 {
+    RenderModule* renderModule = GetModule<RenderModule>();
+    GraphicsDevice& GFX = renderModule->GetGraphicsDevice();
 
-    // SceneModule* sceneModule = GetModule<SceneModule>();
-    // ResourceModule* resourceModule = GetModule<ResourceModule>();
-    
-    // SharedPtr<ShaderResource> shaderResource = resourceModule->Load<ShaderResource>("Engine://Shaders/VertexColor.glsl");
-    // SharedPtr<Material> material = MakeShared<Material>();
-    // material->shader = shaderResource;
+    float ratio = GetApplicationWindow().AspectRatio();
+    m_camera = OrtographicCamera(-2.0f, 2.0f, -2.0f / ratio, 2.0f / ratio);
 
-    // SharedPtr<TriangleMesh> triangle = MakeShared<TriangleMesh>();
+    uint32 triangleIndices[3] = {0, 1, 2};
+    float triangleVertices[7 * 3] =
+    {
+        -0.5f, -0.5f, 0.0f, 1.0f, 0.5f, 0.5f, 1.0f,
+         0.5f, -0.5f, 0.0f, 0.5f, 1.0f, 0.5f, 1.0f,
+         0.0f,  0.5f, 0.0f, 0.5f, 0.5f, 1.0f, 1.0f
+    };
 
-    // Scene* scene = sceneModule->CreateScene("SandboxScene");
-    // Entity* entity = scene->CreateEntity();
-    // MeshComponent* meshComponent = entity->CreateComponent<MeshComponent>();
-    // meshComponent->SetMesh(triangle);
-    // meshComponent->SetMaterial(material);
-    
+    uint32 squareIndices[6] = {0, 1, 2, 2, 3, 0};
+    float squareVertices[7 * 4] =
+    {
+        -0.75f, -0.75f, 0.0f, 0.5f, 0.5f, 0.75f, 1.0f,
+         0.75f, -0.75f, 0.0f, 0.5f, 0.5f, 0.75f, 1.0f,
+         0.75f,  0.75f, 0.0f, 0.5f, 0.5f, 0.75f, 1.0f,
+        -0.75f,  0.75f, 0.0f, 0.5f, 0.5f, 0.75f, 1.0f
+    };
 
-    // TriangleMesh triangle = TriangleMesh();
-    // Entity testEntity = Entity();
-    // MeshComponent& meshComponent = testEntity.CreateComponent<MeshComponent>();
+    BufferLayout layout = {
+        {ShaderDataType::Float3, "a_Position"},
+        {ShaderDataType::Float4, "a_Color"}
+    };
+
+    m_triangleVB = GFX.CreateVertexBuffer(triangleVertices, sizeof(triangleVertices));
+    m_triangleVB->SetLayout(layout);
+    m_triangleIB = GFX.CreateIndexBuffer(triangleIndices, 3);
+
+    m_rectangleVB = GFX.CreateVertexBuffer(squareVertices, sizeof(squareVertices));
+    m_rectangleVB->SetLayout(layout);
+    m_rectangleIB = GFX.CreateIndexBuffer(squareIndices, 6);
+
+    String vertexSrc = R"(
+        #version 330 core
+
+        layout(location = 0) in vec3 a_Position;
+        layout(location = 1) in vec4 a_Color;
+
+        uniform mat4 u_ViewProjection;
+
+        out vec3 v_Position;
+        out vec4 v_Color;
+
+        void main()
+        {
+            v_Position = a_Position;
+            v_Color = a_Color;
+            gl_Position = u_ViewProjection * vec4(a_Position, 1.0);
+        }
+    )";
+
+    String fragmentSrc = R"(
+        #version 330 core
+
+        layout(location = 0) out vec4 color;
+
+        in vec3 v_Position;
+        in vec4 v_Color;
+
+        void main()
+        {
+            color = v_Color;
+        }
+    )";
+
+    m_shader = GFX.CreateShader(vertexSrc, fragmentSrc);
+}
+
+void Sandbox::OnRender()
+{
+    RenderModule* renderModule = GetModule<RenderModule>();
+    renderModule->BeginScene(m_camera);
+    renderModule->Submit(m_rectangleVB, m_rectangleIB, m_shader);
+    renderModule->Submit(m_triangleVB,  m_triangleIB,  m_shader);
+    renderModule->EndScene();
 }
 
 

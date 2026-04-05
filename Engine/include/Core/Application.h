@@ -56,6 +56,7 @@ namespace axiom
         virtual void PoolEvents();
         virtual void Update();
         virtual void Render();
+        virtual void OnRender();
 
         virtual void RegisterModules();
         virtual void OnRegisterModules();

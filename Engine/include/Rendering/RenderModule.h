@@ -29,6 +29,7 @@ namespace axiom
         void EndScene();
         void Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Shader>& shader);
 
+        GraphicsDevice& GetGraphicsDevice() const;
         GraphicsDevice::API GetRenderAPI() const;
 
     private:
@@ -39,15 +40,6 @@ namespace axiom
 
         UniquePtr<GraphicsDevice> m_graphicsDevice;
         SceneData m_sceneData;
-
-        SharedPtr<VertexBuffer> m_triangleVB;
-        SharedPtr<IndexBuffer>  m_triangleIB;
-        SharedPtr<VertexBuffer> m_rectangleVB;
-        SharedPtr<IndexBuffer>  m_rectangleIB;
-        SharedPtr<Shader> m_shader;
-
-        // TODO: move to scene when scene system exists
-        OrtographicCamera m_camera;
 
         // SceneModule* m_sceneModule;
 
