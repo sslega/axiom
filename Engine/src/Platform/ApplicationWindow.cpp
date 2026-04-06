@@ -37,10 +37,10 @@ namespace axiom
         glfwSetWindowSizeCallback(m_window, [](GLFWwindow* window, int width, int height)
         {
             auto* self = static_cast<GLFWWindow*>(glfwGetWindowUserPointer(window));
-            WindowEvent windowEvent(WindowEvent::RESIZE);
-            windowEvent.m_newWidth = width;
-            windowEvent.m_newHeight = height;
-            self->DispatchEvent(windowEvent);
+            WindowResizeEvent e;
+            e.m_newWidth = width;
+            e.m_newHeight = height;
+            self->DispatchEvent(e);
         });
     }
 

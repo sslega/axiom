@@ -5,12 +5,11 @@
 #include "Renderer/Camera.h"
 #include "Core/Types.h"
 #include "Event/Event.h"
+#include "Event/WindowEvent.h"
 
-
-namespace axiom 
+namespace axiom
 {
     class Shader;
-    class Event;
 }
 
 class Sandbox : public axiom::Application
@@ -18,7 +17,7 @@ class Sandbox : public axiom::Application
 public:
     Sandbox(axiom::AppConfig appConfig);
     ~Sandbox() = default;
-    void OnResize(const axiom::Event& event);
+    void OnResize(const axiom::WindowResizeEvent& event);
 
 protected:
     void OnRegisterModules() override;

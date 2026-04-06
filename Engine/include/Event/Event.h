@@ -5,20 +5,16 @@
 
 namespace axiom
 {
-    #define AX_EVENT_FN(fn) [this](const axiom::Event& e) { fn(e); }
-
     class Event
     {
     public:
-        Event(StringView type);
+        Event() = default;
         virtual ~Event() = default;
-        const StringView GetType() const { return m_type; }
         const bool GetCancelable() const { return m_cancelable; }
 
     private:
-        String m_type;
-        bool m_cancelable;
-        void* m_target;
+        bool m_cancelable = true;
+        void* m_target = nullptr;
         
         friend class EventDispatcher;
     };
@@ -26,16 +22,34 @@ namespace axiom
     struct EventListener
     {
         uint32 id;
-        String type;
+        std::type_index type;
         std::function<void(const Event&)> fn;
     };
 
     class EventDispatchable
     {
     public:
-        virtual EventListener AddEventListener(StringView type, std::function<void(const Event&)> fn) = 0;
+        virtual ~EventDispatchable() = default;
+
+        template<typename T, typename Obj>
+        EventListener AddEventListener(void(Obj::*method)(const T&), Obj* instance)
+        {
+            return AddEventListener(typeid(T), [instance, method](const Event& e) {
+                (instance->*method)(static_cast<const T&>(e));
+            });
+        }
+
+        template<typename T>
+        EventListener AddEventListener(std::function<void(const T&)> fn)
+        {
+            return AddEventListener(typeid(T), [fn](const Event& e) {
+                fn(static_cast<const T&>(e));
+            });
+        }
+
+        virtual EventListener AddEventListener(std::type_index type, std::function<void(const Event&)> fn) = 0;
         virtual void RemoveEventListener(const EventListener& listener) = 0;
-        virtual bool WillTrigger(StringView type) = 0;
+        virtual bool WillTrigger(std::type_index type) = 0;
         virtual void DispatchEvent(const Event& event) = 0;
     };
 
@@ -44,14 +58,16 @@ namespace axiom
     public:
         EventDispatcher();
         EventDispatcher(EventDispatchable& eventDispatchable);
-        virtual EventListener AddEventListener(StringView type, std::function<void(const Event&)> fn) override;
+
+        using EventDispatchable::AddEventListener;
+        virtual EventListener AddEventListener(std::type_index type, std::function<void(const Event&)> fn) override;
         virtual void RemoveEventListener(const EventListener& listener) override;
-        virtual bool WillTrigger(StringView type) override;
+        virtual bool WillTrigger(std::type_index type) override;
         virtual void DispatchEvent(const Event& event) override;
 
     private:
         uint32 m_nextId = 0;
         EventDispatchable& m_target;
-        StringMap<Vector<EventListener>> m_listeners;
+        TypeMap<Vector<EventListener>> m_listeners;
     };
 }

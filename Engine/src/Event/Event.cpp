@@ -2,25 +2,20 @@
 
 namespace axiom
 {
-    Event::Event(StringView type)
-    : m_type(type)
-    {
-    }
-
-    axiom::EventDispatcher::EventDispatcher()
+    EventDispatcher::EventDispatcher()
     : m_target(*this)
     {
     }
 
-    EventDispatcher::EventDispatcher(EventDispatchable &eventDispatchable)
+    EventDispatcher::EventDispatcher(EventDispatchable& eventDispatchable)
     : m_target(eventDispatchable)
     {
     }
-    
-    EventListener EventDispatcher::AddEventListener(StringView type, std::function<void(const Event&)> fn)
+
+    EventListener EventDispatcher::AddEventListener(std::type_index type, std::function<void(const Event&)> fn)
     {
-        EventListener listener { m_nextId++, String(type), fn };
-        m_listeners[String(type)].push_back(listener);
+        EventListener listener { m_nextId++, type, fn };
+        m_listeners[type].push_back(listener);
         return listener;
     }
 
@@ -35,14 +30,15 @@ namespace axiom
             vec.end());
     }
 
-    bool EventDispatcher::WillTrigger(StringView type)
+    bool EventDispatcher::WillTrigger(std::type_index type)
     {
-        return false;
+        auto it = m_listeners.find(type);
+        return it != m_listeners.end() && !it->second.empty();
     }
 
     void EventDispatcher::DispatchEvent(const Event& event)
     {
-        auto it = m_listeners.find(String(event.GetType()));
+        auto it = m_listeners.find(typeid(event));
         if (it == m_listeners.end()) return;
 
         const_cast<Event&>(event).m_target = &m_target;
@@ -50,5 +46,4 @@ namespace axiom
         for (const auto& entry : it->second)
             entry.fn(event);
     }
-
 }

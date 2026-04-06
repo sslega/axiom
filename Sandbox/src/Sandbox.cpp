@@ -115,13 +115,12 @@ void Sandbox::OnApplicationRun()
 
     m_shader = GFX.CreateShader(vertexSrc, fragmentSrc);
 
-    GetApplicationWindow().AddEventListener(WindowEvent::RESIZE, AX_EVENT_FN(OnResize));
+    GetApplicationWindow().AddEventListener(&Sandbox::OnResize, this);
 }
 
-void Sandbox::OnResize(const axiom::Event &event)
+void Sandbox::OnResize(const WindowResizeEvent& event)
 {
-    const WindowEvent& windowEvent = static_cast<const WindowEvent&>(event);
-    printf("Window width: %d, window height: %d\n,", windowEvent.m_newWidth, windowEvent.m_newHeight);
+    printf("Window width: %d, window height: %d\n", event.m_newWidth, event.m_newHeight);
 }
 
 void Sandbox::OnRender()

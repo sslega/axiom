@@ -4,16 +4,14 @@
 
 namespace axiom
 {
-    class WindowEvent : public Event
+    class WindowResizeEvent : public Event
     {
     public:
-        static inline const String RESIZE = "WindowEvent::Resize";
-
-        WindowEvent(StringView type) : Event(type) {}
-
-        uint16 m_oldWidth;
-        uint16 m_oldHeight;
-        uint16 m_newWidth;
-        uint16 m_newHeight;
+        uint16 m_oldWidth  = 0;
+        uint16 m_oldHeight = 0;
+        uint16 m_newWidth  = 0;
+        uint16 m_newHeight = 0;
     };
+
+    class WindowCloseEvent : public Event {};
 }
