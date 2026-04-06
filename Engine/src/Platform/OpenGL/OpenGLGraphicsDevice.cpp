@@ -8,7 +8,7 @@
 
 namespace axiom
 {
-    OpenGLGraphicsDevice::OpenGLGraphicsDevice(const ApplicationWindow& window)
+    OpenGLGraphicsDevice::OpenGLGraphicsDevice(const GLFWWindow& window)
     {
         m_windowHandle = static_cast<GLFWwindow*>(window.GetNativeWindow());
         AX_ASSERT(m_windowHandle, "WindowHandle is null!");

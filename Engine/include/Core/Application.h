@@ -8,6 +8,7 @@
 #include "Rendering/RenderTypes.h"
 // #include "Renderer/RendererAPI.h"
 #include "Renderer/GraphicsDevice.h"
+#include "Event/Event.h"
 
 #include <unordered_map>
 #include <typeindex>
@@ -20,7 +21,7 @@ namespace axiom
         AppWindowConfig windowConfig;
     };
 
-    class Application
+    class Application : public EventDispatcher
     {
     public:
         Application(AppConfig appConfig);
@@ -29,7 +30,7 @@ namespace axiom
         int Run();
 
         const GraphicsDevice::API GetRenderAPI() const ;
-        const ApplicationWindow& GetApplicationWindow() const;
+        GLFWWindow& GetApplicationWindow();
 
         template <typename T>
         T* GetModule()
@@ -47,7 +48,7 @@ namespace axiom
         
         AppConfig m_appConfig;
         
-        UniquePtr<ApplicationWindow> m_applicationWindow;
+        UniquePtr<GLFWWindow> m_applicationWindow;
 
         TypeMap<UniquePtr<ApplicationModule>> m_engineModules;
 

@@ -6,7 +6,7 @@
 
 namespace axiom
 {
-    UniquePtr<GraphicsDevice> GraphicsDevice::Create(GraphicsDevice::API api, const ApplicationWindow &window)
+    UniquePtr<GraphicsDevice> GraphicsDevice::Create(GraphicsDevice::API api, const GLFWWindow &window)
     {
         switch (api)
         {

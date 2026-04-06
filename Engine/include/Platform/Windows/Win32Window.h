@@ -5,7 +5,7 @@
 
 namespace axiom
 {
-    class Win32Window : public IApplicationWindow
+    class Win32Window : public ApplicationWindow
     {
     public:
         Win32Window (AppWindowConfig desc);

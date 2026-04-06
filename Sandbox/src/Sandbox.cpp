@@ -7,6 +7,8 @@
 
 #include "Sandbox.h"
 
+#include "Event/WindowEvent.h"
+
 using namespace axiom;
 
 
@@ -112,6 +114,14 @@ void Sandbox::OnApplicationRun()
     )";
 
     m_shader = GFX.CreateShader(vertexSrc, fragmentSrc);
+
+    GetApplicationWindow().AddEventListener(WindowEvent::RESIZE, AX_EVENT_FN(OnResize));
+}
+
+void Sandbox::OnResize(const axiom::Event &event)
+{
+    const WindowEvent& windowEvent = static_cast<const WindowEvent&>(event);
+    printf("Window width: %d, window height: %d\n,", windowEvent.m_newWidth, windowEvent.m_newHeight);
 }
 
 void Sandbox::OnRender()

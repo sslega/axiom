@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Types.h"
-// #include "Renderer/RenderContext.h"
+#include "Event/Event.h"
 
 class GLFWwindow;
 
@@ -23,11 +23,10 @@ namespace axiom
         ApplicationWindowBackend backend = ApplicationWindowBackend::GLFW;
     };
 
-    // TODO: Remove IApplicationWindow, make ApplicationWindow base
-    class IApplicationWindow
+    class ApplicationWindow : public EventDispatcher
     {
     public:
-        virtual ~IApplicationWindow() = default;
+        virtual ~ApplicationWindow() = default;
         virtual void PoolEvents() = 0;
         virtual void Update() = 0;
         virtual void Render() = 0;
@@ -41,14 +40,14 @@ namespace axiom
 
         virtual void* GetNativeWindow() const = 0;
 
-        static UniquePtr<IApplicationWindow> Create(const AppWindowConfig& desc);
+        static UniquePtr<ApplicationWindow> Create(const AppWindowConfig& desc);
     };
 
-    class ApplicationWindow : public IApplicationWindow
+    class GLFWWindow :public ApplicationWindow
     {
         public:  
-        ApplicationWindow(const AppWindowConfig& desc);
-        ~ApplicationWindow();
+        GLFWWindow(const AppWindowConfig& desc);
+        ~GLFWWindow();
 
         void PoolEvents() override;
         void Update() override;

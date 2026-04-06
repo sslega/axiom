@@ -12,9 +12,12 @@ namespace axiom
     Application::Application(AppConfig appConfig)
     : m_appConfig(appConfig)
     {
+        // forces each printf to flush immediately.
+        // TODO: Remove after adding proper logging
+        setvbuf(stdout, NULL, _IONBF, 0);
         m_appConfig = appConfig;
         // TODO: Make proper initialization based on config.backend
-        m_applicationWindow = MakeUnique<ApplicationWindow>(m_appConfig.windowConfig);
+        m_applicationWindow = MakeUnique<GLFWWindow>(m_appConfig.windowConfig);
     }
 
     int Application::Run()
@@ -109,7 +112,7 @@ namespace axiom
         return m_appConfig.renderAPI;
     }
 
-    const ApplicationWindow& Application::GetApplicationWindow() const
+    GLFWWindow& Application::GetApplicationWindow()
     {
         return *m_applicationWindow;
     }

@@ -3,7 +3,7 @@
 #include "Renderer/GraphicsDevice.h"
 #include "Core/Types.h"
 #include <unordered_map>
-class ApplicationWindow;
+class GLFWWindow;
 struct GLFWwindow;
 
 namespace axiom
@@ -11,7 +11,7 @@ namespace axiom
     class OpenGLGraphicsDevice : public GraphicsDevice
     {
     public:
-        OpenGLGraphicsDevice(const ApplicationWindow& window);
+        OpenGLGraphicsDevice(const GLFWWindow& window);
         ~OpenGLGraphicsDevice();
 
         virtual void SetClearColor(const Vec4& color) override;
