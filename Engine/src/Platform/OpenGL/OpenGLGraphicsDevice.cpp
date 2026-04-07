@@ -1,7 +1,7 @@
 #include "Platform/OpenGL/OpenGLGraphicsDevice.h"
 #include "Platform/OpenGL/OpenGLBuffer.h"
 #include "Platform/OpenGL/OpenGLShader.h"
-#include "Platform/ApplicationWindow.h"
+#include "Platform/GLFW/GLFWWindow.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 

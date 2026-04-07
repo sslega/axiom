@@ -6,12 +6,18 @@ namespace axiom
 {
     class KeyboardEvent : public Event
     {
+
     public:
-        static inline const String KEY_DOWN = "KeyboardEvent::KeyDown";
-        static inline const String KEY_UP = "KeyboardEvent::KeyUp";
+        enum Action
+        {
+            RELEASE,
+            PRESS,
+            REPEAT
+        };
 
         uint16 m_keyCode;
         uint16 m_charCode;
+        Action m_action;
         bool m_altKey;
         bool m_controlKey;
         bool m_shiftKey;

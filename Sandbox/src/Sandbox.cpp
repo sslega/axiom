@@ -8,6 +8,7 @@
 #include "Sandbox.h"
 
 #include "Event/WindowEvent.h"
+#include "Event/KeyboardEvent.h"
 
 using namespace axiom;
 
@@ -116,11 +117,17 @@ void Sandbox::OnApplicationRun()
     m_shader = GFX.CreateShader(vertexSrc, fragmentSrc);
 
     GetApplicationWindow().AddEventListener(&Sandbox::OnResize, this);
+    GetApplicationWindow().AddEventListener(&Sandbox::OnKey, this);
 }
 
 void Sandbox::OnResize(const WindowResizeEvent& event)
 {
     printf("Window width: %d, window height: %d\n", event.m_newWidth, event.m_newHeight);
+}
+
+void Sandbox::OnKey(const KeyboardEvent& event)
+{
+    printf("Key %s : %d\n", event.m_action == KeyboardEvent::Action::RELEASE ? "released" : "pressed", event.m_keyCode);
 }
 
 void Sandbox::OnRender()

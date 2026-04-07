@@ -3,16 +3,16 @@
 namespace axiom
 {
     EventDispatcher::EventDispatcher()
-    : m_target(*this)
+    : m_target(nullptr)
     {
     }
 
-    EventDispatcher::EventDispatcher(EventDispatchable& eventDispatchable)
-    : m_target(eventDispatchable)
+    EventDispatcher::EventDispatcher(EventDispatcher& target)
+    : m_target(&target)
     {
     }
 
-    EventListener EventDispatcher::AddEventListener(std::type_index type, std::function<void(const Event&)> fn)
+    EventListener EventDispatcher::AddEventListenerInternal(std::type_index type, std::function<void(const Event&)> fn)
     {
         EventListener listener { m_nextId++, type, fn };
         m_listeners[type].push_back(listener);
@@ -41,7 +41,8 @@ namespace axiom
         auto it = m_listeners.find(typeid(event));
         if (it == m_listeners.end()) return;
 
-        const_cast<Event&>(event).m_target = &m_target;
+        EventDispatcher* target = m_target ? m_target : this;
+        const_cast<Event&>(event).m_target = target;
 
         for (const auto& entry : it->second)
             entry.fn(event);
