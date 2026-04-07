@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Event/Event.h"
+#include "Input/Keyboard.h"
 
 namespace axiom
 {
@@ -15,7 +16,7 @@ namespace axiom
             REPEAT
         };
 
-        uint16 m_keyCode;
+        KeyCode m_keyCode;
         uint16 m_charCode;
         Action m_action;
         bool m_altKey;

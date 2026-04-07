@@ -3,6 +3,7 @@
 #include <assert.h>
 #include "Event/WindowEvent.h"
 #include "Event/KeyboardEvent.h"
+#include "Input/Keyboard.h"
 
 namespace axiom
 {
@@ -37,7 +38,7 @@ namespace axiom
 
             auto* self = static_cast<GLFWWindow*>(glfwGetWindowUserPointer(window));
             KeyboardEvent e;
-            e.m_keyCode    = static_cast<uint16>(key);
+            e.m_keyCode    = static_cast<KeyCode>(key);
             e.m_charCode   = static_cast<uint16>(scancode);
             e.m_altKey     = mods & GLFW_MOD_ALT;
             e.m_controlKey = mods & GLFW_MOD_CONTROL;

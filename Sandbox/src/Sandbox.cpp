@@ -128,6 +128,11 @@ void Sandbox::OnResize(const WindowResizeEvent& event)
 void Sandbox::OnKey(const KeyboardEvent& event)
 {
     printf("Key %s : %d\n", event.m_action == KeyboardEvent::Action::RELEASE ? "released" : "pressed", event.m_keyCode);
+    float rotationSpeed = 0.05f;
+    if(event.m_keyCode == KeyCode::Right)
+        m_camera.SetRotation(m_camera.GetRotation() + rotationSpeed);
+    if(event.m_keyCode == KeyCode::Left)
+        m_camera.SetRotation(m_camera.GetRotation() - rotationSpeed);
 }
 
 void Sandbox::OnRender()
