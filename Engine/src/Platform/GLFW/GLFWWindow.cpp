@@ -7,14 +7,14 @@
 
 namespace axiom
 {
-    GLFWWindow::GLFWWindow(const AppWindowConfig& desc)
+    GLFWWindow::GLFWWindow(const AppWindowConfig& config)
+    : ApplicationWindow(config)
     {
-        m_desc = desc;
 
         if (!glfwInit())
             assert("Failed to initialize GLFW");
 
-        m_window = glfwCreateWindow(m_desc.width, m_desc.height, m_desc.title.c_str(), NULL, NULL);
+        m_window = glfwCreateWindow(GetConfig().width, GetConfig().height, GetConfig().title.c_str(), NULL, NULL);
         if (!m_window)
         {
             assert("Failed to create GLFW window");
@@ -90,21 +90,21 @@ namespace axiom
 
     uint32 GLFWWindow::Width() const
     {
-        return m_desc.width;
+        return GetConfig().width;
     }
 
     uint32 GLFWWindow::Height() const
     {
-        return m_desc.height;
+        return GetConfig().height;
     }
 
     float GLFWWindow::AspectRatio() const
     {
-        return float(m_desc.width) / float(m_desc.height);
+        return float(GetConfig().width) / float(GetConfig().height);
     }
 
     StringView GLFWWindow::Title() const
     {
-        return m_desc.title;
+        return GetConfig().title;
     }
 }

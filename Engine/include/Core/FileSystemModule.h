@@ -8,7 +8,7 @@ namespace axiom
     class FileSystemModule : public ApplicationModule
     {
     public:
-        FileSystemModule(Application& engine);
+        FileSystemModule(Application& application);
         ~FileSystemModule() = default;
 
         void Mount(const String& virtualPath, const Path& physicalPath);

@@ -1,14 +1,13 @@
 #include "Platform/OpenGL/OpenGLGraphicsDevice.h"
 #include "Platform/OpenGL/OpenGLBuffer.h"
 #include "Platform/OpenGL/OpenGLShader.h"
-#include "Platform/GLFW/GLFWWindow.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 
 namespace axiom
 {
-    OpenGLGraphicsDevice::OpenGLGraphicsDevice(const GLFWWindow& window)
+    OpenGLGraphicsDevice::OpenGLGraphicsDevice(const ApplicationWindow& window)
     {
         m_windowHandle = static_cast<GLFWwindow*>(window.GetNativeWindow());
         AX_ASSERT(m_windowHandle, "WindowHandle is null!");

@@ -3,9 +3,9 @@
 
 namespace axiom
 {
-    Win32Window::Win32Window(AppWindowConfig desc)
+    Win32Window::Win32Window(AppWindowConfig config)
+    : ApplicationWindow(config)
     {
-        m_desc = desc;
 
         const char* CLASS_NAME = "AxiomWin32WindowClass";
 
@@ -23,13 +23,13 @@ namespace axiom
 
         DWORD style = WS_OVERLAPPEDWINDOW;
 
-        RECT rect = { 0, 0, (LONG)desc.width, (LONG)desc.height };
+        RECT rect = { 0, 0, (LONG)GetConfig().width, (LONG)GetConfig().height };
         AdjustWindowRect(&rect, style, FALSE);
 
         m_hwnd = CreateWindowEx(
             0,
             CLASS_NAME,
-            desc.title.c_str(),
+            GetConfig().title.c_str(),
             style,
             CW_USEDEFAULT,
             CW_USEDEFAULT,
@@ -83,22 +83,22 @@ namespace axiom
 
     uint32 Win32Window::Width() const
     {
-        return m_desc.width;
+        return GetConfig().width;
     }
 
     uint32 Win32Window::Height() const
     {
-        return m_desc.height;
+        return GetConfig().height;
     }
 
     float Win32Window::AspectRatio() const
     {
-        return float(m_desc.width) / float(m_desc.height);
+        return float(GetConfig().width) / float(GetConfig().height);
     }
 
     StringView Win32Window::Title() const
     {
-        return m_desc.title;
+        return GetConfig().title;
     }
 
     LRESULT CALLBACK Win32Window::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)

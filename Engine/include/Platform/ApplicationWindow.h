@@ -24,6 +24,7 @@ namespace axiom
     class ApplicationWindow : public EventDispatcher
     {
     public:
+        ApplicationWindow(AppWindowConfig config);
         virtual ~ApplicationWindow() = default;
         virtual void PoolEvents() = 0;
         virtual void Update() = 0;
@@ -38,6 +39,11 @@ namespace axiom
 
         virtual void* GetNativeWindow() const = 0;
 
+        inline const AppWindowConfig GetConfig() const { return m_windowConfig; }
+        inline const ApplicationWindowBackend GetBackend() const { return m_windowConfig.backend; }
+
         static UniquePtr<ApplicationWindow> Create(const AppWindowConfig& desc);
+    private:
+        AppWindowConfig m_windowConfig;
     };
 }

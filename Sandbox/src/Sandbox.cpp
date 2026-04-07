@@ -4,11 +4,11 @@
 #include "Rendering/RenderModule.h"
 #include "Renderer/GraphicsDevice.h"
 #include "Renderer/Shader.h"
-
-#include "Sandbox.h"
-
 #include "Event/WindowEvent.h"
 #include "Event/KeyboardEvent.h"
+#include "Input/InputModule.h"
+
+#include "Sandbox.h"
 
 using namespace axiom;
 
@@ -117,7 +117,7 @@ void Sandbox::OnApplicationRun()
     m_shader = GFX.CreateShader(vertexSrc, fragmentSrc);
 
     GetApplicationWindow().AddEventListener(&Sandbox::OnResize, this);
-    GetApplicationWindow().AddEventListener(&Sandbox::OnKey, this);
+    // GetApplicationWindow().AddEventListener(&Sandbox::OnKey, this);
 }
 
 void Sandbox::OnResize(const WindowResizeEvent& event)
@@ -144,4 +144,12 @@ void Sandbox::OnRender()
     renderModule->EndScene();
 }
 
-
+void Sandbox::OnUpdate()
+{
+    InputModule* inputModule = GetModule<InputModule>();
+    bool leftDown = inputModule->IsKeyPressed(KeyCode::Left);
+    if(leftDown)
+    {
+        printf("KeyCode::Left pressed\n");
+    }
+}

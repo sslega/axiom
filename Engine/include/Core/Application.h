@@ -4,7 +4,7 @@
 #include "Core/Assert.h"
 #include "Application.h"
 #include "ApplicationModule.h"
-#include "Platform/GLFW/GLFWWindow.h"
+#include "Platform/ApplicationWindow.h"
 #include "Rendering/RenderTypes.h"
 #include "Renderer/GraphicsDevice.h"
 #include "Event/Event.h"
@@ -29,7 +29,7 @@ namespace axiom
         int Run();
 
         const GraphicsDevice::API GetRenderAPI() const ;
-        GLFWWindow& GetApplicationWindow();
+        ApplicationWindow& GetApplicationWindow();
 
         template <typename T>
         T* GetModule()
@@ -47,7 +47,7 @@ namespace axiom
         
         AppConfig m_appConfig;
         
-        UniquePtr<GLFWWindow> m_applicationWindow;
+        UniquePtr<ApplicationWindow> m_applicationWindow;
 
         TypeMap<UniquePtr<ApplicationModule>> m_engineModules;
 
@@ -55,6 +55,7 @@ namespace axiom
 
         virtual void PoolEvents();
         virtual void Update();
+        virtual void OnUpdate();
         virtual void Render();
         virtual void OnRender();
 

@@ -8,7 +8,7 @@ namespace axiom
     class IndexBuffer;
     class VertexBuffer;
     class Shader;
-    class GLFWWindow;
+    class ApplicationWindow;
 
     class GraphicsDevice 
     {
@@ -20,7 +20,7 @@ namespace axiom
             Vulkan,
             DX12
         };
-        static UniquePtr<GraphicsDevice> Create(GraphicsDevice::API api, const GLFWWindow &window);
+        static UniquePtr<GraphicsDevice> Create(GraphicsDevice::API api, const ApplicationWindow &window);
 
         // Resource creation
         // virtual UniquePtr<GraphicsDevice> CreateGraphicsDevice() = 0;

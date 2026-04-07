@@ -24,6 +24,7 @@ protected:
     void OnRegisterModules() override;
     void OnApplicationRun() override;
     void OnRender() override;
+    void OnUpdate() override;
 
 private:
     axiom::SharedPtr<axiom::VertexBuffer> m_triangleVB;

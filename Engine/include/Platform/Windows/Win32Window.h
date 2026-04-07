@@ -27,7 +27,7 @@ namespace axiom
 
     private:
         HWND m_hwnd = nullptr;
-        AppWindowConfig m_desc;
+        AppWindowConfig m_windowConfig;
         bool m_shouldClose = false;
         
         

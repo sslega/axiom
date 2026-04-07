@@ -5,6 +5,7 @@
 #include "Resources/GLShaderLoader.h"
 #include "Core/FileSystemModule.h"
 #include "Scene/SceneModule.h"
+#include "Input/InputModule.h"
 
 namespace axiom
 {
@@ -16,8 +17,7 @@ namespace axiom
         // TODO: Remove after adding proper logging
         setvbuf(stdout, NULL, _IONBF, 0);
         m_appConfig = appConfig;
-        // TODO: Make proper initialization based on config.backend
-        m_applicationWindow = MakeUnique<GLFWWindow>(m_appConfig.windowConfig);
+        m_applicationWindow = ApplicationWindow::Create(m_appConfig.windowConfig);
     }
 
     int Application::Run()
@@ -60,7 +60,11 @@ namespace axiom
         {
             module->Update();
         }
-        
+        OnUpdate();
+    }
+
+    void Application::OnUpdate()
+    {
     }
 
     void Application::Render()
@@ -81,6 +85,7 @@ namespace axiom
 
     void Application::RegisterModules()
     {   
+        RegisterModule<InputModule>();
         RegisterModule<FileSystemModule>();
         RegisterModule<RenderModule>();
         // RegisterModule<SceneModule>();
@@ -112,7 +117,7 @@ namespace axiom
         return m_appConfig.renderAPI;
     }
 
-    GLFWWindow& Application::GetApplicationWindow()
+    ApplicationWindow& Application::GetApplicationWindow()
     {
         return *m_applicationWindow;
     }

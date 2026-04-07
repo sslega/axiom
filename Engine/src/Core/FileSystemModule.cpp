@@ -4,8 +4,8 @@
 
 namespace axiom
 {
-    FileSystemModule::FileSystemModule(Application& engine)
-    :ApplicationModule(engine)
+    FileSystemModule::FileSystemModule(Application& application)
+    :ApplicationModule(application)
     {
 
     };

@@ -1,17 +1,18 @@
 #pragma once
 
 #include "Renderer/GraphicsDevice.h"
+#include "Platform/ApplicationWindow.h"
 #include "Core/Types.h"
 #include <unordered_map>
-class GLFWWindow;
-struct GLFWwindow;
+
+class GLFWwindow;
 
 namespace axiom
 {
     class OpenGLGraphicsDevice : public GraphicsDevice
     {
     public:
-        OpenGLGraphicsDevice(const GLFWWindow& window);
+        OpenGLGraphicsDevice(const ApplicationWindow& window);
         ~OpenGLGraphicsDevice();
 
         virtual void SetClearColor(const Vec4& color) override;

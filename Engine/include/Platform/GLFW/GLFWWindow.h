@@ -26,6 +26,5 @@ namespace axiom
         void* GetNativeWindow() const override;
 
         GLFWwindow* m_window;
-        AppWindowConfig m_desc;
     };
 }
