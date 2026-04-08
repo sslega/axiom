@@ -110,22 +110,11 @@ void Sandbox::OnApplicationRun()
     m_shader = GFX.CreateShader(vertexSrc, fragmentSrc);
 
     GetApplicationWindow().AddEventListener(&Sandbox::OnResize, this);
-    // GetApplicationWindow().AddEventListener(&Sandbox::OnKey, this);
 }
 
 void Sandbox::OnResize(const WindowResizeEvent& event)
 {
     printf("Window width: %d, window height: %d\n", event.m_newWidth, event.m_newHeight);
-}
-
-void Sandbox::OnKey(const KeyboardEvent& event)
-{
-    printf("Key %s : %d\n", event.m_action == KeyboardEvent::Action::RELEASE ? "released" : "pressed", event.m_keyCode);
-    float rotationSpeed = 0.05f;
-    if(event.m_keyCode == KeyCode::Right)
-        m_camera.SetRotation(m_camera.GetRotation() + rotationSpeed);
-    if(event.m_keyCode == KeyCode::Left)
-        m_camera.SetRotation(m_camera.GetRotation() - rotationSpeed);
 }
 
 void Sandbox::OnRender()
@@ -137,17 +126,17 @@ void Sandbox::OnRender()
     renderModule->EndScene();
 }
 
-void Sandbox::OnUpdate()
+void Sandbox::OnUpdate(axiom::Timestep delta)
 {
-    float rotationSpeed = 0.05f;
+    float rotationSpeed = 1.0f; // degrees per second
 
     if(Input::IsKeyPressed(KeyCode::Left))
     {
-         m_camera.SetRotation(m_camera.GetRotation() - rotationSpeed);
+         m_camera.SetRotation(m_camera.GetRotation() - rotationSpeed * delta);
     }
 
     if(Input::IsKeyPressed(KeyCode::Right))
     {
-         m_camera.SetRotation(m_camera.GetRotation() + rotationSpeed);
+         m_camera.SetRotation(m_camera.GetRotation() + rotationSpeed * delta);
     }
 }

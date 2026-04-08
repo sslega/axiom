@@ -31,6 +31,7 @@ namespace axiom
         m_applicationWindow = ApplicationWindow::Create(m_appConfig.windowConfig);
 
         m_input = Input::Create(*m_applicationWindow);
+        m_lastFrameTime = std::chrono::steady_clock::now();
     }
 
     Application::~Application()
@@ -72,16 +73,20 @@ namespace axiom
 
     void Application::Update()
     {
+        auto now = std::chrono::steady_clock::now();
+        Timestep ts = std::chrono::duration<float>(now - m_lastFrameTime).count();
+        m_lastFrameTime = now;
+
         m_applicationWindow->Update();
 
         for (auto& [type, module] : m_engineModules)
         {
             module->Update();
         }
-        OnUpdate();
+        OnUpdate(ts);
     }
 
-    void Application::OnUpdate()
+    void Application::OnUpdate(Timestep ts)
     {
     }
 

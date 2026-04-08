@@ -15,13 +15,12 @@ public:
     Sandbox(axiom::AppConfig appConfig);
     ~Sandbox() = default;
     void OnResize(const axiom::WindowResizeEvent& event);
-    void OnKey(const axiom::KeyboardEvent& event);
 
 protected:
     void OnRegisterModules() override;
     void OnApplicationRun() override;
     void OnRender() override;
-    void OnUpdate() override;
+    void OnUpdate(axiom::Timestep delta) override;
 
 private:
     axiom::SharedPtr<axiom::VertexBuffer> m_triangleVB;

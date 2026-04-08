@@ -9,6 +9,8 @@
 #include "Renderer/GraphicsDevice.h"
 #include "Event/Event.h"
 
+#include "Core/Timestep.h"
+
 #include <unordered_map>
 #include <typeindex>
 
@@ -68,7 +70,7 @@ namespace axiom
 
         virtual void PoolEvents();
         virtual void Update();
-        virtual void OnUpdate();
+        virtual void OnUpdate(Timestep delta);
         virtual void Render();
         virtual void OnRender();
 
@@ -95,5 +97,6 @@ namespace axiom
 
     private:
         static Application* s_instance;
+        TimePoint m_lastFrameTime;
     };
 }
