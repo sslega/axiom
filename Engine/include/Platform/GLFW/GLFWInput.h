@@ -11,6 +11,8 @@ namespace axiom
     public:
         GLFWInput(const ApplicationWindow& window);
 
-        virtual bool IsKeyPressed(KeyCode key) const override;
+    protected:
+        virtual bool IsKeyPressed_(KeyCode key) override;
+        
     };
 }

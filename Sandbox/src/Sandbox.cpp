@@ -1,14 +1,7 @@
-#include "EntryPoint.h"
-#include "Core/Application.h"
-#include "Core/FileSystemModule.h"
-#include "Rendering/RenderModule.h"
-#include "Renderer/GraphicsDevice.h"
-#include "Renderer/Shader.h"
-#include "Event/WindowEvent.h"
-#include "Event/KeyboardEvent.h"
-#include "Input/InputModule.h"
-
 #include "Sandbox.h"
+#include "EntryPoint.h"
+#include "AxiomEngine.h"
+#include "Renderer/Buffer.h"
 
 using namespace axiom;
 
@@ -146,10 +139,15 @@ void Sandbox::OnRender()
 
 void Sandbox::OnUpdate()
 {
-    InputModule* inputModule = GetModule<InputModule>();
-    bool leftDown = inputModule->IsKeyPressed(KeyCode::Left);
-    if(leftDown)
+    float rotationSpeed = 0.05f;
+
+    if(Input::IsKeyPressed(KeyCode::Left))
     {
-        printf("KeyCode::Left pressed\n");
+         m_camera.SetRotation(m_camera.GetRotation() - rotationSpeed);
+    }
+
+    if(Input::IsKeyPressed(KeyCode::Right))
+    {
+         m_camera.SetRotation(m_camera.GetRotation() + rotationSpeed);
     }
 }

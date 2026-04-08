@@ -5,19 +5,37 @@
 #include "Resources/GLShaderLoader.h"
 #include "Core/FileSystemModule.h"
 #include "Scene/SceneModule.h"
-#include "Input/InputModule.h"
+#include "Input/Input.h"
 
 namespace axiom
 {
 
+    Application* Application::s_instance = nullptr;
+
     Application::Application(AppConfig appConfig)
     : m_appConfig(appConfig)
     {
+        if(!s_instance)
+        {
+            s_instance = this;
+        }
+        else
+        {
+            AX_ASSERT(false, "Application instance already exists!");
+        }
+
         // forces each printf to flush immediately.
         // TODO: Remove after adding proper logging
         setvbuf(stdout, NULL, _IONBF, 0);
         m_appConfig = appConfig;
         m_applicationWindow = ApplicationWindow::Create(m_appConfig.windowConfig);
+
+        m_input = Input::Create(*m_applicationWindow);
+    }
+
+    Application::~Application()
+    {
+        s_instance = nullptr;
     }
 
     int Application::Run()
@@ -85,7 +103,6 @@ namespace axiom
 
     void Application::RegisterModules()
     {   
-        RegisterModule<InputModule>();
         RegisterModule<FileSystemModule>();
         RegisterModule<RenderModule>();
         // RegisterModule<SceneModule>();

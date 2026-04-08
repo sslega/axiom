@@ -14,6 +14,8 @@
 
 namespace axiom
 {
+    class Input;
+    
     struct AppConfig
     {
         GraphicsDevice::API renderAPI = GraphicsDevice::API::OpenGL;
@@ -24,25 +26,33 @@ namespace axiom
     {
     public:
         Application(AppConfig appConfig);
-        ~Application() = default;
+        ~Application();
+
+        Application(const Application&) = delete;
+        Application& operator=(const Application&) = delete;
         
         int Run();
 
         const GraphicsDevice::API GetRenderAPI() const ;
         ApplicationWindow& GetApplicationWindow();
 
+        static const inline Application& Get() { return *s_instance; };
+
         template <typename T>
         T* GetModule()
         {
+            return const_cast<T*>(std::as_const(*this).GetModule<T>());
+        }
+
+        template <typename T>
+        const T* GetModule() const
+        {
             auto it = m_engineModules.find(TypeID<T>());
             if (it == m_engineModules.end())
-            {
                 return nullptr;
-            }
-            T* result = static_cast<T*>(it->second.get());
-            AX_ASSERT(result, "Module not registered.");
-            return result;
+            return static_cast<const T*>(it->second.get());
         }
+
     protected:
         
         AppConfig m_appConfig;
@@ -50,6 +60,9 @@ namespace axiom
         UniquePtr<ApplicationWindow> m_applicationWindow;
 
         TypeMap<UniquePtr<ApplicationModule>> m_engineModules;
+
+        UniquePtr<Input> m_input;
+
 
         virtual void OnApplicationRun();
 
@@ -79,5 +92,8 @@ namespace axiom
         {
             m_engineModules.erase(typeid(T));
         }
+
+    private:
+        static Application* s_instance;
     };
 }

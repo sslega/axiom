@@ -1,9 +1,6 @@
 #pragma once
 
-#include "Core/Application.h"
-#include "Renderer/Buffer.h"
-#include "Renderer/Camera.h"
-#include "Core/Types.h"
+#include "AxiomEngine.h"
 
 namespace axiom
 {
