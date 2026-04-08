@@ -3,6 +3,7 @@
 #include "Platform/OpenGL/OpenGLShader.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include "Core/Log.h"
 
 
 namespace axiom
@@ -20,8 +21,8 @@ namespace axiom
         int width, height;
         glfwGetFramebufferSize(m_windowHandle, &width, &height);
         glViewport(0, 0, width, height);
-
-        printf("OpenGLSwapChain initialized\n");
+        
+        Log::Info("OpenGLGraphicsDevice initialized");
     }
 
     OpenGLGraphicsDevice::~OpenGLGraphicsDevice()

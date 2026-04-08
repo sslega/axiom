@@ -8,6 +8,7 @@ using namespace axiom;
 
 UniquePtr<Application> CreateApplication()
 {
+
     AppConfig appConfig;
     appConfig.renderAPI = GraphicsDevice::API::OpenGL;
     
@@ -81,6 +82,7 @@ void Sandbox::OnApplicationRun()
         layout(location = 1) in vec4 a_Color;
 
         uniform mat4 u_ViewProjection;
+        uniform mat4 u_Transform;
 
         out vec3 v_Position;
         out vec4 v_Color;
@@ -89,7 +91,7 @@ void Sandbox::OnApplicationRun()
         {
             v_Position = a_Position;
             v_Color = a_Color;
-            gl_Position = u_ViewProjection * vec4(a_Position, 1.0);
+            gl_Position = u_ViewProjection * u_Transform * vec4(a_Position, 1.0);
         }
     )";
 
@@ -121,22 +123,54 @@ void Sandbox::OnRender()
 {
     RenderModule* renderModule = GetModule<RenderModule>();
     renderModule->BeginScene(m_camera);
-    renderModule->Submit(m_rectangleVB, m_rectangleIB, m_shader);
-    renderModule->Submit(m_triangleVB,  m_triangleIB,  m_shader);
+    
+    renderModule->Submit(m_rectangleVB, m_rectangleIB, m_shader, Matrix4::Identity());
+
+    Matrix4 triangleTransform = Matrix4::Translate(m_trianglePosition);
+    renderModule->Submit(m_triangleVB,  m_triangleIB,  m_shader, triangleTransform);
+    
     renderModule->EndScene();
 }
 
 void Sandbox::OnUpdate(axiom::Timestep delta)
 {
-    float rotationSpeed = 1.0f; // degrees per second
+    
 
-    if(Input::IsKeyPressed(KeyCode::Left))
+    if(Input::IsKeyPressed(KeyCode::LeftShift))
     {
-         m_camera.SetRotation(m_camera.GetRotation() - rotationSpeed * delta);
-    }
+        float translationSpeed = 1.0f * delta; // degrees per second
+        if(Input::IsKeyPressed(KeyCode::Left))
+        {
+            m_trianglePosition.x -= translationSpeed;
+        }
 
-    if(Input::IsKeyPressed(KeyCode::Right))
-    {
-         m_camera.SetRotation(m_camera.GetRotation() + rotationSpeed * delta);
+        if(Input::IsKeyPressed(KeyCode::Right))
+        {
+            m_trianglePosition.x += translationSpeed;
+        }
+        if(Input::IsKeyPressed(KeyCode::Up))
+        {
+            m_trianglePosition.y += translationSpeed;
+        }
+        if(Input::IsKeyPressed(KeyCode::Down))
+        {
+            m_trianglePosition.y -= translationSpeed;
+        }
     }
+    else
+    {
+        float rotationSpeed = 1.0f * delta; // degrees per second
+        if(Input::IsKeyPressed(KeyCode::Left))
+        {
+            m_camera.SetRotation(m_camera.GetRotation() - rotationSpeed);
+        }
+
+        if(Input::IsKeyPressed(KeyCode::Right))
+        {
+            m_camera.SetRotation(m_camera.GetRotation() + rotationSpeed);
+        }
+    }
+    
+
+    
 }

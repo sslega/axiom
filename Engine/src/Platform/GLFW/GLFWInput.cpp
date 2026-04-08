@@ -10,7 +10,7 @@ namespace axiom
     {
     }
 
-    bool GLFWInput::IsKeyPressed_(KeyCode key)
+    bool GLFWInput::IsKeyPressedInternal(KeyCode key) const
     {
         auto* window = static_cast<GLFWwindow*>(m_window.GetNativeWindow());
         return glfwGetKey(window, static_cast<int>(key)) == GLFW_PRESS;

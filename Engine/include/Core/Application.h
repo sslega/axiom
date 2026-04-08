@@ -17,6 +17,7 @@
 namespace axiom
 {
     class Input;
+    class Log;
     
     struct AppConfig
     {
@@ -38,7 +39,10 @@ namespace axiom
         const GraphicsDevice::API GetRenderAPI() const ;
         ApplicationWindow& GetApplicationWindow();
 
-        static const inline Application& Get() { return *s_instance; };
+        static inline Application& Get() { return *s_instance; };
+
+        Input& GetInput() const { return *m_input; };
+        Log& GetLog() const { return *m_log; };
 
         template <typename T>
         T* GetModule()
@@ -64,6 +68,7 @@ namespace axiom
         TypeMap<UniquePtr<ApplicationModule>> m_engineModules;
 
         UniquePtr<Input> m_input;
+        UniquePtr<Log> m_log;
 
 
         virtual void OnApplicationRun();
@@ -82,7 +87,7 @@ namespace axiom
         template <typename T>
         T* RegisterModule()
         {
-            printf("Registering module: %s\n", typeid(T).name());
+            Log::Info("Registering module: {}", typeid(T).name());
             UniquePtr<T> module = MakeUnique<T>(*this);
             T* ptr = module.get(); 
             m_engineModules[TypeID<T>()] = std::move(module);

@@ -6,6 +6,7 @@
 #include "Core/FileSystemModule.h"
 #include "Scene/SceneModule.h"
 #include "Input/Input.h"
+#include "Core/Log.h"
 
 namespace axiom
 {
@@ -31,6 +32,7 @@ namespace axiom
         m_applicationWindow = ApplicationWindow::Create(m_appConfig.windowConfig);
 
         m_input = Input::Create(*m_applicationWindow);
+        m_log = MakeUnique<ConsoleLog>();
         m_lastFrameTime = std::chrono::steady_clock::now();
     }
 
@@ -41,7 +43,8 @@ namespace axiom
 
     int Application::Run()
     {
-        printf("Starting Axiom Application...\n");
+        Log::Info("Starting Axiom Application...");
+        
         
         RegisterModules();
         OnRegisterModules();
@@ -122,10 +125,10 @@ namespace axiom
 
     void Application::InitializeModules()
     {
-        printf("Initializing engine modules...\n");
+        Log::Info("Initializing engine modules...");
         for (auto& [type, module] : m_engineModules)
         {
-            printf("Initializing module: %s\n", type.name());
+            Log::Info("Initializing module: {}", type.name());
             module->Initialize();
         }
     }

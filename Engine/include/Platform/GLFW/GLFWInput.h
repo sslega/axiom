@@ -12,7 +12,7 @@ namespace axiom
         GLFWInput(const ApplicationWindow& window);
 
     protected:
-        virtual bool IsKeyPressed_(KeyCode key) override;
+        virtual bool IsKeyPressedInternal(KeyCode key) const override;
         
     };
 }

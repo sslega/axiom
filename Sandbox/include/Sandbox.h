@@ -2,6 +2,8 @@
 
 #include "AxiomEngine.h"
 
+using namespace axiom;
+
 namespace axiom
 {
     class Shader;
@@ -9,25 +11,27 @@ namespace axiom
     class KeyboardEvent;
 }
 
-class Sandbox : public axiom::Application
+class Sandbox : public Application
 {
 public:
-    Sandbox(axiom::AppConfig appConfig);
+    Sandbox(AppConfig appConfig);
     ~Sandbox() = default;
-    void OnResize(const axiom::WindowResizeEvent& event);
+    void OnResize(const WindowResizeEvent& event);
 
 protected:
     void OnRegisterModules() override;
     void OnApplicationRun() override;
     void OnRender() override;
-    void OnUpdate(axiom::Timestep delta) override;
+    void OnUpdate(Timestep delta) override;
 
 private:
-    axiom::SharedPtr<axiom::VertexBuffer> m_triangleVB;
-    axiom::SharedPtr<axiom::IndexBuffer>  m_triangleIB;
-    axiom::SharedPtr<axiom::VertexBuffer> m_rectangleVB;
-    axiom::SharedPtr<axiom::IndexBuffer>  m_rectangleIB;
-    axiom::SharedPtr<axiom::Shader>       m_shader;
-    axiom::OrtographicCamera              m_camera;
+    SharedPtr<VertexBuffer> m_triangleVB;
+    SharedPtr<IndexBuffer>  m_triangleIB;
+    SharedPtr<VertexBuffer> m_rectangleVB;
+    SharedPtr<IndexBuffer>  m_rectangleIB;
+    SharedPtr<Shader>       m_shader;
+    OrtographicCamera       m_camera;
+
+    Vec3 m_trianglePosition;
 };
 

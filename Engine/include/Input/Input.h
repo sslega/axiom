@@ -12,30 +12,16 @@ namespace axiom
     {
     public:
         Input(const ApplicationWindow& window);
-        
+
         static UniquePtr<Input> Create(const ApplicationWindow& window);
-        static bool IsKeyPressed(KeyCode key);
-    
+        static bool IsKeyPressed(KeyCode key)
+        {
+            return Application::Get().GetInput().IsKeyPressedInternal(key);
+        }
+
+        
     protected:
         const ApplicationWindow& m_window;
-        static Input* s_instance;
-        virtual bool IsKeyPressed_(KeyCode key) = 0;
+        virtual bool IsKeyPressedInternal(KeyCode key) const = 0;
     };
-
-    // class Input
-    // {
-    // public:
-    //     Input(const ApplicationWindow& window);
-
-    //     static UniquePtr<Input> Create(const ApplicationWindow& window);
-
-    //     virtual bool IsKeyPressed(KeyCode key) const = 0;
-    // protected:
-    //     const ApplicationWindow& m_window;
-    // };
-
-    // inline bool IsKeyPressed(KeyCode key)
-    // {
-    //     return Application::Get().GetModule<InputModule>()->IsKeyPressed(key);
-    // }
 }

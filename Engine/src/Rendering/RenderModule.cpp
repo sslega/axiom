@@ -50,10 +50,11 @@ namespace axiom
         m_graphicsDevice->Present();
     }
 
-    void RenderModule::Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Shader>& shader)
+    void RenderModule::Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Shader>& shader, const Matrix4& transform)
     {
         shader->Bind();
         shader->UploadUniformMat4("u_ViewProjection", m_sceneData.viewProjectionMatrix);
+        shader->UploadUniformMat4("u_Transform", transform);
         m_graphicsDevice->DrawIndexed(vb, ib);
     }
 

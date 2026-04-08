@@ -27,7 +27,7 @@ namespace axiom
 
         void BeginScene(const OrtographicCamera& camera);
         void EndScene();
-        void Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Shader>& shader);
+        void Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Shader>& shader, const Matrix4& transform);
 
         GraphicsDevice& GetGraphicsDevice() const;
         GraphicsDevice::API GetRenderAPI() const;
