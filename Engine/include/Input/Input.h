@@ -16,10 +16,8 @@ namespace axiom
         static UniquePtr<Input> Create(const ApplicationWindow& window);
         static bool IsKeyPressed(KeyCode key)
         {
-            return Application::Get().GetInput().IsKeyPressedInternal(key);
+            return Application::Get().m_input->IsKeyPressedInternal(key);
         }
-
-        
     protected:
         const ApplicationWindow& m_window;
         virtual bool IsKeyPressedInternal(KeyCode key) const = 0;

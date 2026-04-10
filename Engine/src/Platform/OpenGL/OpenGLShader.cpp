@@ -133,4 +133,10 @@ namespace axiom
         //TODO: add check if it exist
         glUniformMatrix4fv(location, 1, GL_FALSE, matrix.data);
     }
+
+    void OpenGLShader::UploadUniformVec4(const String &name, const Vec4 &vec4)
+    {
+        GLint location = glGetUniformLocation(m_rendererID, name.c_str());
+        glUniform4f(location, vec4.x, vec4.y, vec4.z, vec4.w);
+    }
 }

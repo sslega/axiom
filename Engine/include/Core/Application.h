@@ -27,6 +27,9 @@ namespace axiom
 
     class Application : public EventDispatcher
     {
+        friend class Input;
+        friend class Log;
+
     public:
         Application(AppConfig appConfig);
         ~Application();
@@ -40,9 +43,6 @@ namespace axiom
         ApplicationWindow& GetApplicationWindow();
 
         static inline Application& Get() { return *s_instance; };
-
-        Input& GetInput() const { return *m_input; };
-        Log& GetLog() const { return *m_log; };
 
         template <typename T>
         T* GetModule()

@@ -2,6 +2,7 @@
 #include "EntryPoint.h"
 #include "AxiomEngine.h"
 #include "Renderer/Buffer.h"
+#include "Renderer/Shader.h"
 
 using namespace axiom;
 
@@ -21,7 +22,6 @@ UniquePtr<Application> CreateApplication()
     windowConfig.backend = ApplicationWindowBackend::GLFW;
 
     appConfig.windowConfig = windowConfig;
-    
     return MakeUnique<Sandbox>(appConfig);
 };
 
@@ -56,10 +56,10 @@ void Sandbox::OnApplicationRun()
     uint32 squareIndices[6] = {0, 1, 2, 2, 3, 0};
     float squareVertices[7 * 4] =
     {
-        -0.75f, -0.75f, 0.0f, 0.5f, 0.5f, 0.75f, 1.0f,
-         0.75f, -0.75f, 0.0f, 0.5f, 0.5f, 0.75f, 1.0f,
-         0.75f,  0.75f, 0.0f, 0.5f, 0.5f, 0.75f, 1.0f,
-        -0.75f,  0.75f, 0.0f, 0.5f, 0.5f, 0.75f, 1.0f
+        -0.15f, -0.15f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+         0.15f, -0.15f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+         0.15f,  0.15f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+        -0.15f,  0.15f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f
     };
 
     BufferLayout layout = {
@@ -103,9 +103,11 @@ void Sandbox::OnApplicationRun()
         in vec3 v_Position;
         in vec4 v_Color;
 
+        uniform vec4 u_Color;
+
         void main()
         {
-            color = v_Color;
+            color = v_Color * u_Color;
         }
     )";
 
@@ -123,8 +125,17 @@ void Sandbox::OnRender()
 {
     RenderModule* renderModule = GetModule<RenderModule>();
     renderModule->BeginScene(m_camera);
-    
-    renderModule->Submit(m_rectangleVB, m_rectangleIB, m_shader, Matrix4::Identity());
+    for(int y = -2; y <= 2; y++)
+    {
+        for(int x = -2; x <= 2; x++)
+        {
+            Vec3 position = Vec3(x * 0.5, y * 0.5, 0.0f);
+            Matrix4 transform = Matrix4::Translate(position);
+            Vec4 color = Vec4((x + 2.0f) / 5.0f, (y + 2.0f) / 5.0f, 0, 1.0f);
+            m_shader->UploadUniformVec4("u_Color", color);
+            renderModule->Submit(m_rectangleVB, m_rectangleIB, m_shader, transform);
+        }
+    }
 
     Matrix4 triangleTransform = Matrix4::Translate(m_trianglePosition);
     renderModule->Submit(m_triangleVB,  m_triangleIB,  m_shader, triangleTransform);

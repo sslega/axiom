@@ -14,6 +14,7 @@ namespace axiom
         virtual void Unbind() const = 0;
         
         virtual void UploadUniformMat4(const String& name, const Matrix4& matrix) = 0;
+        virtual void UploadUniformVec4(const String& name, const Vec4& vec4) = 0;
     private:
         uint32 m_rendererID;
     };
