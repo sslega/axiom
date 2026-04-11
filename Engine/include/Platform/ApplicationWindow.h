@@ -26,9 +26,7 @@ namespace axiom
     public:
         ApplicationWindow(AppWindowConfig config);
         virtual ~ApplicationWindow() = default;
-        virtual void PoolEvents() = 0;
-        virtual void Update() = 0;
-        virtual void Render() = 0;
+
         virtual bool ShouldClose() const = 0;
         virtual void CloseWindow() = 0;
 
@@ -43,7 +41,22 @@ namespace axiom
         inline const ApplicationWindowBackend GetBackend() const { return m_windowConfig.backend; }
 
         static UniquePtr<ApplicationWindow> Create(const AppWindowConfig& desc);
+
+    protected:
+        // Lifecycle hooks for platform implementations
+        virtual void OnPollEvents() {};
+        virtual void OnUpdate() {};
+        virtual void OnBeginFrame() {}
+        virtual void OnEndFrame() {}
+        virtual void OnModulesInitialized() {}
+
     private:
+        friend class Application;
+        void PollEvents()      { OnPollEvents(); }
+        void Update()          { OnUpdate(); }
+        void BeginFrame() { OnBeginFrame(); }
+        void EndFrame()   { OnEndFrame(); }
+
         AppWindowConfig m_windowConfig;
     };
 }

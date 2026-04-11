@@ -17,34 +17,28 @@ namespace axiom
         
     }
 
-    bool ResourceModule::Initialize()
-{
-        return true;
+    void ResourceModule::OnInitialize()
+    {
     }
-    
+
     void ResourceModule::OnRegister()
     {
-        
     }
-    
+
     void ResourceModule::OnUnregister()
     {
-        
-    }
-    
-    void ResourceModule::Shutdown()
-    {
-        
     }
 
-    void ResourceModule::Update()
+    void ResourceModule::OnShutdown()
     {
-        
     }
 
-    void ResourceModule::Render()
+    void ResourceModule::OnUpdate()
     {
-        
+    }
+
+    void ResourceModule::OnRender()
+    {
     }
 
     void ResourceModule::RegisterLoader(const String & fileExtension, UniquePtr<ResourceLoader> loader)

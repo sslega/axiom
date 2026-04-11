@@ -1,4 +1,7 @@
 #include "Platform/GLFW/GLFWWindow.h"
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 #include <GLFW/glfw3.h>
 #include <assert.h>
 #include "Event/WindowEvent.h"
@@ -21,6 +24,14 @@ namespace axiom
         }
 
         glfwSetWindowUserPointer(m_window, this);
+
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGuiIO& io = ImGui::GetIO();
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+        ImGui::StyleColorsDark();
+        ImGui_ImplGlfw_InitForOpenGL(m_window, true);
 
         glfwSetWindowSizeCallback(m_window, [](GLFWwindow* window, int width, int height)
         {
@@ -52,6 +63,10 @@ namespace axiom
 
     GLFWWindow::~GLFWWindow()
     {
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext();
+
         if (m_window)
         {
             glfwDestroyWindow(m_window);
@@ -60,7 +75,7 @@ namespace axiom
         glfwTerminate();
     }
 
-    void GLFWWindow::PoolEvents()
+    void GLFWWindow::OnPollEvents()
     {
         glfwPollEvents();
     }
@@ -70,12 +85,27 @@ namespace axiom
         return m_window;
     }
 
-    void GLFWWindow::Update()
+    void GLFWWindow::OnUpdate()
     {
     }
 
-    void GLFWWindow::Render()
+    void GLFWWindow::OnModulesInitialized()
     {
+        ImGui_ImplOpenGL3_Init("#version 330");
+    }
+
+    void GLFWWindow::OnBeginFrame()
+    {
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+    }
+
+    void GLFWWindow::OnEndFrame()
+    {
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        glfwSwapBuffers(m_window);
     }
 
     bool GLFWWindow::ShouldClose() const

@@ -23,6 +23,7 @@ protected:
     void OnApplicationRun() override;
     void OnRender() override;
     void OnUpdate(Timestep delta) override;
+    void OnImGuiRender() override;
 
 private:
     SharedPtr<VertexBuffer> m_triangleVB;

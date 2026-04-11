@@ -41,11 +41,10 @@ namespace axiom
         return it->second / relativePath;
     }
 
-    bool FileSystemModule::Initialize()
+    void FileSystemModule::OnInitialize()
     {
         AX_ASSERT(MountExists("engine"), "Engine folder not mount.");
         AX_ASSERT(MountExists("project"), "Project folder not mount.");
-        return true;
     }
 
     String FileSystemModule::ToLower(const String& str) const

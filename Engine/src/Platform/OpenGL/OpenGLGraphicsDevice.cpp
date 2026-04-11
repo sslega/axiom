@@ -14,14 +14,14 @@ namespace axiom
         AX_ASSERT(m_windowHandle, "WindowHandle is null!");
 
         glfwMakeContextCurrent(m_windowHandle);
-        
+
         int gladStatus = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
         AX_ASSERT(gladStatus, "Failed to initialize Glad!");
 
         int width, height;
         glfwGetFramebufferSize(m_windowHandle, &width, &height);
         glViewport(0, 0, width, height);
-        
+
         Log::Info("OpenGLGraphicsDevice initialized");
     }
 

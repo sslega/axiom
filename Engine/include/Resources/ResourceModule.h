@@ -24,12 +24,14 @@ namespace axiom
 
         void RegisterLoader(const String& fileExtension, UniquePtr<ResourceLoader> loader);
 
-        virtual bool Initialize() override;
-        virtual void OnRegister() override;
-        virtual void OnUnregister() override;
-        virtual void Shutdown() override;
-        virtual void Update() override;
-        virtual void Render() override;
+        void OnRegister() override;
+        void OnUnregister() override;
+
+    protected:
+        void OnInitialize() override;
+        void OnShutdown() override;
+        void OnUpdate() override;
+        void OnRender() override;
     private:
 
         StringMap<UniquePtr<ResourceLoader>> m_loaders;

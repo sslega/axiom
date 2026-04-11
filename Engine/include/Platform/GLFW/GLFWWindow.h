@@ -2,7 +2,7 @@
 
 #include "Platform/ApplicationWindow.h"
 
-class GLFWwindow;
+struct GLFWwindow;
 
 namespace axiom
 {
@@ -12,9 +12,6 @@ namespace axiom
         GLFWWindow(const AppWindowConfig& desc);
         ~GLFWWindow();
 
-        void PoolEvents() override;
-        void Update() override;
-        void Render() override;
         bool ShouldClose() const override;
         void CloseWindow() override;
 
@@ -25,6 +22,13 @@ namespace axiom
 
         void* GetNativeWindow() const override;
 
+    protected:
         GLFWwindow* m_window;
+        
+        void OnPollEvents() override;
+        void OnUpdate() override;
+        void OnModulesInitialized() override;
+        void OnBeginFrame() override;
+        void OnEndFrame() override;
     };
 }

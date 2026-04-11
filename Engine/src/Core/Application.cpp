@@ -65,13 +65,9 @@ namespace axiom
         return 0;    
     }
 
-    void Application::OnApplicationRun()
-    {
-    }
-
     void Application::PoolEvents()
     {
-        m_applicationWindow->PoolEvents();
+        m_applicationWindow->PollEvents();
     }
 
     void Application::Update()
@@ -89,13 +85,9 @@ namespace axiom
         OnUpdate(ts);
     }
 
-    void Application::OnUpdate(Timestep ts)
-    {
-    }
-
     void Application::Render()
     {
-        m_applicationWindow->Render();
+        m_applicationWindow->BeginFrame();
 
         for (auto& [type, module] : m_engineModules)
         {
@@ -103,24 +95,19 @@ namespace axiom
         }
 
         OnRender();
-    }
+        OnImGuiRender();
 
-    void Application::OnRender()
-    {
+        m_applicationWindow->EndFrame();
     }
 
     void Application::RegisterModules()
-    {   
+    {
         RegisterModule<FileSystemModule>();
         RegisterModule<RenderModule>();
         // RegisterModule<SceneModule>();
 
         ResourceModule* resourceModule = RegisterModule<ResourceModule>();
         resourceModule->RegisterLoader(".glsl", MakeUnique<GLShaderLoader>());
-    }
-
-    void Application::OnRegisterModules()
-    {
     }
 
     void Application::InitializeModules()
@@ -131,10 +118,7 @@ namespace axiom
             Log::Info("Initializing module: {}", type.name());
             module->Initialize();
         }
-    }
-
-    void Application::OnInitializeModules()
-    {
+        m_applicationWindow->OnModulesInitialized();
     }
 
     const GraphicsDevice::API Application::GetRenderAPI() const

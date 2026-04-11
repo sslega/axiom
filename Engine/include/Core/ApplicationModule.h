@@ -3,22 +3,33 @@
 namespace axiom
 {
     class Application;
-    
+
     class ApplicationModule
     {
     public:
         ApplicationModule(Application& application);
         virtual ~ApplicationModule() = default;
 
-        virtual bool Initialize();
+        // Non-virtual public entry points — called by the engine
+        void Initialize();
+        void Shutdown();
+
         virtual void OnRegister();
         virtual void OnUnregister();
-        virtual void Shutdown();
-        virtual void Update() ;
-        virtual void Render();
+
         Application& GetApp() const;
-        
+
     protected:
+        virtual void OnInitialize() {}
+        virtual void OnShutdown()   {}
+        virtual void OnUpdate()     {}
+        virtual void OnRender()     {}
+
         Application& m_application;
+
+    private:
+        friend class Application;
+        void Update() { OnUpdate(); }
+        void Render() { OnRender(); }
     };
 }

@@ -10,26 +10,22 @@ namespace axiom
     {
     }
 
-    bool RenderModule::Initialize()
+    void RenderModule::OnInitialize()
     {
         auto API = GetRenderAPI();
         auto& window = GetApp().GetApplicationWindow();
         m_graphicsDevice = GraphicsDevice::Create(API, window);
-        return true;
     }
 
-    void RenderModule::Shutdown()
+    void RenderModule::OnShutdown()
     {
-        // m_renderer->Shutdown();
-        // m_renderer.reset();
     }
 
-    void RenderModule::Update()
+    void RenderModule::OnUpdate()
     {
-        // nothing for now
     }
 
-    void RenderModule::Render()
+    void RenderModule::OnRender()
     {
     }
 
@@ -47,7 +43,6 @@ namespace axiom
 
     void RenderModule::EndScene()
     {
-        m_graphicsDevice->Present();
     }
 
     void RenderModule::Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Shader>& shader, const Matrix4& transform)

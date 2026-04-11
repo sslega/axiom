@@ -18,7 +18,7 @@ namespace axiom
 {
     class Input;
     class Log;
-    
+
     struct AppConfig
     {
         GraphicsDevice::API renderAPI = GraphicsDevice::API::OpenGL;
@@ -36,13 +36,13 @@ namespace axiom
 
         Application(const Application&) = delete;
         Application& operator=(const Application&) = delete;
-        
+
         int Run();
 
-        const GraphicsDevice::API GetRenderAPI() const ;
+        const GraphicsDevice::API GetRenderAPI() const;
         ApplicationWindow& GetApplicationWindow();
 
-        static inline Application& Get() { return *s_instance; };
+        static inline Application& Get() { return *s_instance; }
 
         template <typename T>
         T* GetModule()
@@ -60,36 +60,26 @@ namespace axiom
         }
 
     protected:
-        
         AppConfig m_appConfig;
-        
         UniquePtr<ApplicationWindow> m_applicationWindow;
-
         TypeMap<UniquePtr<ApplicationModule>> m_engineModules;
-
         UniquePtr<Input> m_input;
         UniquePtr<Log> m_log;
 
-
-        virtual void OnApplicationRun();
-
-        virtual void PoolEvents();
-        virtual void Update();
-        virtual void OnUpdate(Timestep delta);
-        virtual void Render();
-        virtual void OnRender();
-
-        virtual void RegisterModules();
-        virtual void OnRegisterModules();
-        virtual void InitializeModules();
-        virtual void OnInitializeModules();
+        // User override hooks — override these in your Application subclass
+        virtual void OnApplicationRun()  {}
+        virtual void OnUpdate(Timestep delta) {}
+        virtual void OnRender()          {}
+        virtual void OnImGuiRender()     {}
+        virtual void OnRegisterModules() {}
+        virtual void OnInitializeModules() {}
 
         template <typename T>
         T* RegisterModule()
         {
             Log::Info("Registering module: {}", typeid(T).name());
             UniquePtr<T> module = MakeUnique<T>(*this);
-            T* ptr = module.get(); 
+            T* ptr = module.get();
             m_engineModules[TypeID<T>()] = std::move(module);
             return ptr;
         }
@@ -101,6 +91,13 @@ namespace axiom
         }
 
     private:
+        // Engine loop drivers — sealed, not overridable
+        void PoolEvents();
+        void Update();
+        void Render();
+        void RegisterModules();
+        void InitializeModules();
+
         static Application* s_instance;
         TimePoint m_lastFrameTime;
     };

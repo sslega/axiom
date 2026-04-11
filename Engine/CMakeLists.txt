@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.28)
 
 project(Engine LANGUAGES CXX)
 
@@ -32,10 +32,52 @@ set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(glfw)
 
 # =========================================================
+# Dependencies – ImGui
+# =========================================================
+
+FetchContent_Declare(imgui
+    GIT_REPOSITORY  https://github.com/ocornut/imgui.git
+    GIT_TAG         docking
+    GIT_SHALLOW     TRUE
+    GIT_PROGRESS    TRUE
+    DOWNLOAD_ONLY   YES
+)
+FetchContent_MakeAvailable(imgui)
+
+# =========================================================
+# OpenGL (must come before imgui target which uses OpenGL::GL)
+# =========================================================
+
+find_package(OpenGL REQUIRED)
+
+# =========================================================
+# ImGui – manual static target (ImGui has no CMakeLists.txt)
+# =========================================================
+
+add_library(imgui STATIC
+    ${imgui_SOURCE_DIR}/imgui.cpp
+    ${imgui_SOURCE_DIR}/imgui_draw.cpp
+    ${imgui_SOURCE_DIR}/imgui_tables.cpp
+    ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+    ${imgui_SOURCE_DIR}/imgui_demo.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
+)
+
+target_include_directories(imgui PUBLIC
+    ${imgui_SOURCE_DIR}
+    ${imgui_SOURCE_DIR}/backends
+)
+
+target_link_libraries(imgui PUBLIC glfw OpenGL::GL)
+
+set_target_properties(imgui PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
+
+# =========================================================
 # GLAD
 # =========================================================
 
-add_library(glad 
+add_library(glad
     STATIC
         external/glad/src/glad.c
 )
@@ -79,6 +121,7 @@ target_precompile_headers(Engine PRIVATE
 target_link_libraries(Engine PUBLIC
     glad
     glfw
+    imgui
     OpenGL::GL
 )
 
@@ -89,11 +132,5 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
 elseif(CMAKE_BUILD_TYPE STREQUAL "Dist")
     target_compile_definitions(Axiom PRIVATE AX_DIST)
 endif()
-
-# =========================================================
-# OpenGL
-# =========================================================
-
-find_package(OpenGL REQUIRED)
 
 message(STATUS "Engine include path: ${CMAKE_CURRENT_SOURCE_DIR}/include/Axiom")

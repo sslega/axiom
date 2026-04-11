@@ -54,17 +54,18 @@ void Sandbox::OnApplicationRun()
     };
 
     uint32 squareIndices[6] = {0, 1, 2, 2, 3, 0};
-    float squareVertices[7 * 4] =
+    float squareVertices[9 * 4] =
     {
-        -0.15f, -0.15f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-         0.15f, -0.15f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-         0.15f,  0.15f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-        -0.15f,  0.15f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f
+        -1.0f, -1.0f, 0.0f,     1.0f, 1.0f, 1.0f, 1.0f,     0.0f, 0.0f,
+         1.0f, -1.0f, 0.0f,     1.0f, 1.0f, 1.0f, 1.0f,     1.0f, 0.0f,
+         1.0f,  1.0f, 0.0f,     1.0f, 1.0f, 1.0f, 1.0f,     1.0f, 1.0f,
+        -1.0f,  1.0f, 0.0f,     1.0f, 1.0f, 1.0f, 1.0f,     0.0f, 1.0f
     };
 
     BufferLayout layout = {
         {ShaderDataType::Float3, "a_Position"},
-        {ShaderDataType::Float4, "a_Color"}
+        {ShaderDataType::Float4, "a_Color"},
+        {ShaderDataType::Float2, "a_TexCoord"}
     };
 
     m_triangleVB = GFX.CreateVertexBuffer(triangleVertices, sizeof(triangleVertices));
@@ -80,17 +81,20 @@ void Sandbox::OnApplicationRun()
 
         layout(location = 0) in vec3 a_Position;
         layout(location = 1) in vec4 a_Color;
+        layout(location = 2) in vec2 a_TexCoord;
 
         uniform mat4 u_ViewProjection;
         uniform mat4 u_Transform;
 
         out vec3 v_Position;
         out vec4 v_Color;
+        out vec2 v_TexCoord;
 
         void main()
         {
             v_Position = a_Position;
             v_Color = a_Color;
+            v_TexCoord = a_TexCoord;
             gl_Position = u_ViewProjection * u_Transform * vec4(a_Position, 1.0);
         }
     )";
@@ -102,12 +106,14 @@ void Sandbox::OnApplicationRun()
 
         in vec3 v_Position;
         in vec4 v_Color;
+        in vec2 v_TexCoord;
 
         uniform vec4 u_Color;
 
         void main()
         {
-            color = v_Color * u_Color;
+            // color = v_Color * u_Color;
+            color = vec4(v_TexCoord.x, v_TexCoord.y, 0.0f, 1.0f);
         }
     )";
 
@@ -125,12 +131,14 @@ void Sandbox::OnRender()
 {
     RenderModule* renderModule = GetModule<RenderModule>();
     renderModule->BeginScene(m_camera);
+    float scale = 0.1f;
+    Matrix4 scaleMatrix = Matrix4::Scale(Vec3(scale, scale, scale));
     for(int y = -2; y <= 2; y++)
     {
         for(int x = -2; x <= 2; x++)
         {
             Vec3 position = Vec3(x * 0.5, y * 0.5, 0.0f);
-            Matrix4 transform = Matrix4::Translate(position);
+            Matrix4 transform = Matrix4::Translate(position) * scaleMatrix;
             Vec4 color = Vec4((x + 2.0f) / 5.0f, (y + 2.0f) / 5.0f, 0, 1.0f);
             m_shader->UploadUniformVec4("u_Color", color);
             renderModule->Submit(m_rectangleVB, m_rectangleIB, m_shader, transform);
@@ -138,9 +146,19 @@ void Sandbox::OnRender()
     }
 
     Matrix4 triangleTransform = Matrix4::Translate(m_trianglePosition);
-    renderModule->Submit(m_triangleVB,  m_triangleIB,  m_shader, triangleTransform);
+    renderModule->Submit(m_rectangleVB, m_rectangleIB, m_shader, triangleTransform);
+
+    // Matrix4 triangleTransform = Matrix4::Translate(m_trianglePosition);
+    // renderModule->Submit(m_triangleVB,  m_triangleIB,  m_shader, triangleTransform);
     
     renderModule->EndScene();
+}
+
+void Sandbox::OnImGuiRender()
+{
+    ImGui::Begin("Hello World");
+    ImGui::Text("Welcome to Yet Another Game Engine!");
+    ImGui::End();
 }
 
 void Sandbox::OnUpdate(axiom::Timestep delta)

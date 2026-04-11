@@ -20,7 +20,7 @@ namespace axiom
             Vulkan,
             DX12
         };
-        static UniquePtr<GraphicsDevice> Create(GraphicsDevice::API api, const ApplicationWindow &window);
+        static UniquePtr<GraphicsDevice> Create(GraphicsDevice::API api, const ApplicationWindow& window);
 
         // Resource creation
         // virtual UniquePtr<GraphicsDevice> CreateGraphicsDevice() = 0;

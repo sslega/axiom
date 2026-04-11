@@ -48,7 +48,7 @@ namespace axiom
         UpdateWindow(m_hwnd);
     }
 
-    void Win32Window::PoolEvents()
+    void Win32Window::OnPollEvents()
     {
         MSG msg;
         while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
@@ -58,11 +58,7 @@ namespace axiom
         }
     }
 
-    void Win32Window::Update()
-    {
-    }
-
-    void Win32Window::Render()
+    void Win32Window::OnUpdate()
     {
     }
 

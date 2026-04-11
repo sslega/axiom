@@ -15,7 +15,8 @@ namespace axiom
         bool MountExists(const String &mountPoint) const;
         Path Resolve(const String& virtualPath) const;
 
-        virtual bool Initialize() override;
+    protected:
+        void OnInitialize() override;
     private:
         StringMap<Path> m_mountPoints;
         String ToLower(const String& str) const;

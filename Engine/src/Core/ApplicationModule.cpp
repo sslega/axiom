@@ -1,6 +1,5 @@
 #include "Core/ApplicationModule.h"
-#include <cstdio>
-#include <typeinfo>
+#include "Core/Application.h"
 
 namespace axiom
 {
@@ -9,29 +8,21 @@ namespace axiom
     {
     }
 
-    bool ApplicationModule::Initialize()
+    void ApplicationModule::Initialize()
     {
-        return true;
-    }
-
-    void ApplicationModule::OnRegister()
-    {
-        printf("Module registered: %s\n", typeid(*this).name());
-    }
-
-    void ApplicationModule::OnUnregister()
-    {
+        OnInitialize();
     }
 
     void ApplicationModule::Shutdown()
     {
+        OnShutdown();
     }
 
-    void ApplicationModule::Update()
+    void ApplicationModule::OnRegister()
     {
     }
 
-    void ApplicationModule::Render()
+    void ApplicationModule::OnUnregister()
     {
     }
 
@@ -39,6 +30,4 @@ namespace axiom
     {
         return m_application;
     }
-
 }
-
