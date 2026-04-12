@@ -43,19 +43,13 @@ namespace axiom
         static UniquePtr<ApplicationWindow> Create(const AppWindowConfig& desc);
 
     protected:
-        // Lifecycle hooks for platform implementations
-        virtual void OnPollEvents() {};
-        virtual void OnUpdate() {};
-        virtual void OnBeginFrame() {}
-        virtual void OnEndFrame() {}
-        virtual void OnModulesInitialized() {}
+        virtual void OnPollEvents() {}
+        virtual void OnUpdate() {}
 
     private:
         friend class Application;
-        void PollEvents()      { OnPollEvents(); }
-        void Update()          { OnUpdate(); }
-        void BeginFrame() { OnBeginFrame(); }
-        void EndFrame()   { OnEndFrame(); }
+        void PollEvents() { OnPollEvents(); }
+        void Update()     { OnUpdate(); }
 
         AppWindowConfig m_windowConfig;
     };

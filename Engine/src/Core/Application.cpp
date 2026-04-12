@@ -5,6 +5,7 @@
 #include "Resources/GLShaderLoader.h"
 #include "Core/FileSystemModule.h"
 #include "Scene/SceneModule.h"
+#include "ImGui/ImGuiModule.h"
 #include "Input/Input.h"
 #include "Core/Log.h"
 
@@ -44,25 +45,25 @@ namespace axiom
     int Application::Run()
     {
         Log::Info("Starting Axiom Application...");
-        
-        
+
         RegisterModules();
         OnRegisterModules();
         InitializeModules();
         OnInitializeModules();
 
         OnApplicationRun();
-        
+
         while (!m_applicationWindow->ShouldClose())
         {
             PoolEvents();
             Update();
-            Render(); 
+            Render();
         }
 
+        ShutdownModules();
         m_applicationWindow->CloseWindow();
 
-        return 0;    
+        return 0;
     }
 
     void Application::PoolEvents()
@@ -78,32 +79,34 @@ namespace axiom
 
         m_applicationWindow->Update();
 
-        for (auto& [type, module] : m_engineModules)
+        for (auto& id : m_moduleOrder)
         {
-            module->Update();
+            m_engineModules[id]->Update();
         }
         OnUpdate(ts);
     }
 
     void Application::Render()
     {
-        m_applicationWindow->BeginFrame();
+        for (auto& id : m_moduleOrder)
+            m_engineModules[id]->BeginFrame();
 
-        for (auto& [type, module] : m_engineModules)
-        {
-            module->Render();
-        }
+        for (auto& id : m_moduleOrder)
+            m_engineModules[id]->Render();
 
         OnRender();
-        OnImGuiRender();
 
-        m_applicationWindow->EndFrame();
+        for (auto& id : m_moduleOrder)
+            m_engineModules[id]->EndFrame();
+
+        GetModule<RenderModule>()->GetGraphicsDevice().Present();
     }
 
     void Application::RegisterModules()
     {
         RegisterModule<FileSystemModule>();
-        RegisterModule<RenderModule>();
+        RegisterModule<RenderModule>();    // creates GL context
+        RegisterModule<ImGuiModule>();     // must come after RenderModule
         // RegisterModule<SceneModule>();
 
         ResourceModule* resourceModule = RegisterModule<ResourceModule>();
@@ -113,12 +116,21 @@ namespace axiom
     void Application::InitializeModules()
     {
         Log::Info("Initializing engine modules...");
-        for (auto& [type, module] : m_engineModules)
+        for (auto& id : m_moduleOrder)
         {
-            Log::Info("Initializing module: {}", type.name());
-            module->Initialize();
+            Log::Info("Initializing module: {}", id.name());
+            m_engineModules[id]->Initialize();
         }
-        m_applicationWindow->OnModulesInitialized();
+    }
+
+    void Application::ShutdownModules()
+    {
+        Log::Info("Shutting down engine modules...");
+        for (auto it = m_moduleOrder.rbegin(); it != m_moduleOrder.rend(); ++it)
+        {
+            Log::Info("Shutting down module: {}", it->name());
+            m_engineModules[*it]->Shutdown();
+        }
     }
 
     const GraphicsDevice::API Application::GetRenderAPI() const

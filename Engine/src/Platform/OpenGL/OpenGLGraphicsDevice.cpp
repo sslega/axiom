@@ -3,6 +3,8 @@
 #include "Platform/OpenGL/OpenGLShader.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <imgui.h>
+#include <imgui_impl_opengl3.h>
 #include "Core/Log.h"
 
 
@@ -53,6 +55,26 @@ namespace axiom
     {
         glfwSwapBuffers(m_windowHandle);
     }
+
+    // void OpenGLGraphicsDevice::InitImGuiRenderer()
+    // {
+    //     ImGui_ImplOpenGL3_Init("#version 330");
+    // }
+
+    // void OpenGLGraphicsDevice::ShutdownImGuiRenderer()
+    // {
+    //     ImGui_ImplOpenGL3_Shutdown();
+    // }
+
+    // void OpenGLGraphicsDevice::BeginImGuiRendererFrame()
+    // {
+    //     ImGui_ImplOpenGL3_NewFrame();
+    // }
+
+    // void OpenGLGraphicsDevice::EndImGuiFrame()
+    // {
+    //     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    // }
 
     SharedPtr<VertexBuffer> OpenGLGraphicsDevice::CreateVertexBuffer(float* vertices, uint32 size)
     {

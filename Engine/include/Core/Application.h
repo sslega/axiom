@@ -63,15 +63,15 @@ namespace axiom
         AppConfig m_appConfig;
         UniquePtr<ApplicationWindow> m_applicationWindow;
         TypeMap<UniquePtr<ApplicationModule>> m_engineModules;
+        Vector<std::type_index> m_moduleOrder; // tracks registration order
         UniquePtr<Input> m_input;
         UniquePtr<Log> m_log;
 
         // User override hooks — override these in your Application subclass
-        virtual void OnApplicationRun()  {}
+        virtual void OnApplicationRun()    {}
         virtual void OnUpdate(Timestep delta) {}
-        virtual void OnRender()          {}
-        virtual void OnImGuiRender()     {}
-        virtual void OnRegisterModules() {}
+        virtual void OnRender()            {}
+        virtual void OnRegisterModules()   {}
         virtual void OnInitializeModules() {}
 
         template <typename T>
@@ -80,14 +80,21 @@ namespace axiom
             Log::Info("Registering module: {}", typeid(T).name());
             UniquePtr<T> module = MakeUnique<T>(*this);
             T* ptr = module.get();
-            m_engineModules[TypeID<T>()] = std::move(module);
+            std::type_index id = TypeID<T>();
+            m_engineModules[id] = std::move(module);
+            m_moduleOrder.push_back(id);
             return ptr;
         }
 
         template <typename T>
         void UnregisterModule()
         {
-            m_engineModules.erase(typeid(T));
+            std::type_index id = TypeID<T>();
+            m_engineModules.erase(id);
+            m_moduleOrder.erase(
+                std::remove(m_moduleOrder.begin(), m_moduleOrder.end(), id),
+                m_moduleOrder.end()
+            );
         }
 
     private:
@@ -97,6 +104,7 @@ namespace axiom
         void Render();
         void RegisterModules();
         void InitializeModules();
+        void ShutdownModules();
 
         static Application* s_instance;
         TimePoint m_lastFrameTime;

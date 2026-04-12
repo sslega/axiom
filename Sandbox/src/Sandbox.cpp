@@ -46,11 +46,11 @@ void Sandbox::OnApplicationRun()
     m_camera = OrtographicCamera(-2.0f, 2.0f, -2.0f / ratio, 2.0f / ratio);
 
     uint32 triangleIndices[3] = {0, 1, 2};
-    float triangleVertices[7 * 3] =
+    float triangleVertices[9 * 3] =
     {
-        -0.5f, -0.5f, 0.0f, 1.0f, 0.5f, 0.5f, 1.0f,
-         0.5f, -0.5f, 0.0f, 0.5f, 1.0f, 0.5f, 1.0f,
-         0.0f,  0.5f, 0.0f, 0.5f, 0.5f, 1.0f, 1.0f
+        -0.5f, -0.5f, 0.0f, 1.0f, 0.5f, 0.5f, 1.0f,     0.0f, 0.0f,
+         0.5f, -0.5f, 0.0f, 0.5f, 1.0f, 0.5f, 1.0f,     1.0f, 0.0f,
+         0.0f,  0.5f, 0.0f, 0.5f, 0.5f, 1.0f, 1.0f,     0.5f, 1.0f
     };
 
     uint32 squareIndices[6] = {0, 1, 2, 2, 3, 0};
@@ -113,7 +113,8 @@ void Sandbox::OnApplicationRun()
         void main()
         {
             // color = v_Color * u_Color;
-            color = vec4(v_TexCoord.x, v_TexCoord.y, 0.0f, 1.0f);
+            vec3 uvColor = vec3(v_TexCoord.x, v_TexCoord.y, 0.0f);
+            color = vec4(mix(u_Color.rgb, uvColor, u_Color.a), 1.0f);
         }
     )";
 
@@ -131,6 +132,7 @@ void Sandbox::OnRender()
 {
     RenderModule* renderModule = GetModule<RenderModule>();
     renderModule->BeginScene(m_camera);
+   
     float scale = 0.1f;
     Matrix4 scaleMatrix = Matrix4::Scale(Vec3(scale, scale, scale));
     for(int y = -2; y <= 2; y++)
@@ -145,19 +147,18 @@ void Sandbox::OnRender()
         }
     }
 
-    Matrix4 triangleTransform = Matrix4::Translate(m_trianglePosition);
-    renderModule->Submit(m_rectangleVB, m_rectangleIB, m_shader, triangleTransform);
+    // Matrix4 triangleTransform = Matrix4::Translate(m_trianglePosition);    
+    // renderModule->Submit(m_rectangleVB, m_rectangleIB, m_shader, triangleTransform);
 
-    // Matrix4 triangleTransform = Matrix4::Translate(m_trianglePosition);
-    // renderModule->Submit(m_triangleVB,  m_triangleIB,  m_shader, triangleTransform);
+    Matrix4 triangleTransform = Matrix4::Translate(m_trianglePosition);
+    m_shader->UploadUniformVec4("u_Color", m_triangleColor);
+    renderModule->Submit(m_triangleVB,  m_triangleIB,  m_shader, triangleTransform);
     
     renderModule->EndScene();
-}
 
-void Sandbox::OnImGuiRender()
-{
     ImGui::Begin("Hello World");
     ImGui::Text("Welcome to Yet Another Game Engine!");
+    ImGui::ColorEdit4("Triangle Color", &m_triangleColor.x);
     ImGui::End();
 }
 

@@ -20,16 +20,20 @@ namespace axiom
         Application& GetApp() const;
 
     protected:
-        virtual void OnInitialize() {}
-        virtual void OnShutdown()   {}
-        virtual void OnUpdate()     {}
-        virtual void OnRender()     {}
+        virtual void OnInitialize()  {}
+        virtual void OnShutdown()    {}
+        virtual void OnUpdate()      {}
+        virtual void OnBeginFrame()  {}
+        virtual void OnRender()      {}
+        virtual void OnEndFrame()    {}
 
         Application& m_application;
 
     private:
         friend class Application;
-        void Update() { OnUpdate(); }
-        void Render() { OnRender(); }
+        void Update()     { OnUpdate(); }
+        void BeginFrame() { OnBeginFrame(); }
+        void Render()     { OnRender(); }
+        void EndFrame()   { OnEndFrame(); }
     };
 }

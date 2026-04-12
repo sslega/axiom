@@ -32,7 +32,13 @@ namespace axiom
         virtual void SetClearColor(const Vec4& color) = 0;
         virtual void Clear() = 0;
         virtual void DrawIndexed(const SharedPtr<VertexBuffer>& vertexBuffer, const SharedPtr<IndexBuffer>& indexBuffer) = 0;
-        virtual void Present() = 0; 
+        virtual void Present() = 0;
+
+        // ImGui renderer backend — implemented per graphics API
+        // virtual void InitImGuiRenderer()       {}
+        // virtual void ShutdownImGuiRenderer()   {}
+        // virtual void BeginImGuiRendererFrame() {}
+        // virtual void EndImGuiFrame()           {}
 
         inline API GetAPI() { return m_API; };
     

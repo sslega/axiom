@@ -24,11 +24,8 @@ namespace axiom
 
     protected:
         GLFWwindow* m_window;
-        
+
         void OnPollEvents() override;
         void OnUpdate() override;
-        void OnModulesInitialized() override;
-        void OnBeginFrame() override;
-        void OnEndFrame() override;
     };
 }

@@ -15,10 +15,15 @@ namespace axiom
         OpenGLGraphicsDevice(const ApplicationWindow& window);
         ~OpenGLGraphicsDevice();
 
-        virtual void SetClearColor(const Vec4& color) override;
-        virtual void Clear() override;
-        virtual void DrawIndexed(const SharedPtr<VertexBuffer>& vertexBuffer, const SharedPtr<IndexBuffer>& indexBuffer) override;
-        virtual void Present() override; 
+        void SetClearColor(const Vec4& color) override;
+        void Clear() override;
+        void DrawIndexed(const SharedPtr<VertexBuffer>& vertexBuffer, const SharedPtr<IndexBuffer>& indexBuffer) override;
+        void Present() override;
+
+        // void InitImGuiRenderer() override;
+        // void ShutdownImGuiRenderer() override;
+        // void BeginImGuiRendererFrame() override;
+        // void EndImGuiFrame() override;
 
         // virtual UniquePtr<GraphicsDevice> CreateGraphicsDevice() override;
         virtual SharedPtr<VertexBuffer> CreateVertexBuffer(float* vertices, uint32 size) override;

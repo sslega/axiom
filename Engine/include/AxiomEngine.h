@@ -28,4 +28,5 @@
 #include "Core/FileSystemModule.h"
 
 // ImGui
+#include "ImGui/ImGuiModule.h"
 #include <imgui.h>
