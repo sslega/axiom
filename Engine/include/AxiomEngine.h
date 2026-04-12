@@ -4,6 +4,7 @@
 #include "Core/Application.h"
 #include "Core/ApplicationModule.h"
 #include "Core/Types.h"
+#include "Core/Log.h"
 
 // Events
 #include "Event/Event.h"

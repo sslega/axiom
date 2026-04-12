@@ -15,8 +15,15 @@ namespace axiom
             Application::Get().m_log->InfoInternal(std::vformat(fmt, std::make_format_args(args...)));
         }
 
+        template<typename... Args>
+        static void Error(const char* fmt, Args&&... args)
+        {
+            Application::Get().m_log->ErrorInternal(std::vformat(fmt, std::make_format_args(args...)));
+        }
+
     protected:
         virtual void InfoInternal(StringView message) = 0;
+        virtual void ErrorInternal(StringView message) = 0;
     };
 
     class ConsoleLog : public Log
@@ -24,6 +31,11 @@ namespace axiom
         virtual void InfoInternal(StringView message) override
         {
             printf("[INFO] %.*s\n", (int)message.size(), message.data());
+        }
+
+        virtual void ErrorInternal(StringView message) override
+        {
+            printf("[ERROR] %.*s\n", (int)message.size(), message.data());
         }
     };
 }

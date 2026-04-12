@@ -109,8 +109,8 @@ namespace axiom
         RegisterModule<ImGuiModule>();     // must come after RenderModule
         // RegisterModule<SceneModule>();
 
-        ResourceModule* resourceModule = RegisterModule<ResourceModule>();
-        resourceModule->RegisterLoader(".glsl", MakeUnique<GLShaderLoader>());
+        // ResourceModule* resourceModule = RegisterModule<ResourceModule>();
+        // resourceModule->RegisterLoader(".glsl", MakeUnique<GLShaderLoader>());
     }
 
     void Application::InitializeModules()

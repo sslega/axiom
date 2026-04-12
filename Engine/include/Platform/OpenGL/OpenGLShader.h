@@ -11,8 +11,9 @@ namespace axiom
         virtual void Bind() const override;
         virtual void Unbind() const override;
 
-        virtual void UploadUniformMat4(const String& name,const Matrix4& matrix) override;
-        virtual void UploadUniformVec4(const String& name, const Vec4& vec4) override;
+        virtual void UploadUniformInt(const String& name,const int& value) override;
+        virtual void UploadUniformMat4(const String& name,const Matrix4& value) override;
+        virtual void UploadUniformVec4(const String& name, const Vec4& value) override;
     
     private:
         uint32 m_rendererID;

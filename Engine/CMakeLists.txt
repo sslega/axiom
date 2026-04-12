@@ -87,6 +87,25 @@ target_include_directories(glad PUBLIC
 )
 
 # =========================================================
+# STB (header-only)
+# =========================================================
+
+# add_library(stb INTERFACE)
+
+# target_include_directories(stb INTERFACE
+#     ${CMAKE_CURRENT_SOURCE_DIR}/external/stb
+# )
+
+add_library(stb
+    STATIC
+        external/stb/src/stb_image.cpp
+)
+
+target_include_directories(stb PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/stb/include
+)
+
+# =========================================================
 # Engine
 # =========================================================
 
@@ -122,6 +141,7 @@ target_link_libraries(Engine PUBLIC
     glad
     glfw
     imgui
+    stb
     OpenGL::GL
 )
 

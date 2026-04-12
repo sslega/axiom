@@ -9,6 +9,7 @@ namespace axiom
     class Shader;
     class WindowResizeEvent;
     class KeyboardEvent;
+    class Texture2D;
 }
 
 class Sandbox : public Application
@@ -31,6 +32,7 @@ private:
     SharedPtr<IndexBuffer>  m_rectangleIB;
     SharedPtr<Shader>       m_shader;
     OrtographicCamera       m_camera;
+    SharedPtr<Texture2D>    m_texture;
 
     Vec3 m_trianglePosition;
     Vec4 m_triangleColor;

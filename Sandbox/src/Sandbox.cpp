@@ -3,6 +3,9 @@
 #include "AxiomEngine.h"
 #include "Renderer/Buffer.h"
 #include "Renderer/Shader.h"
+#include "Renderer/Texture.h"
+
+#include "AxiomEngine.h"
 
 using namespace axiom;
 
@@ -40,6 +43,7 @@ void Sandbox::OnRegisterModules()
 void Sandbox::OnApplicationRun()
 {
     RenderModule* renderModule = GetModule<RenderModule>();
+    FileSystemModule* fileSystemModule = GetModule<FileSystemModule>();
     GraphicsDevice& GFX = renderModule->GetGraphicsDevice();
 
     float ratio = GetApplicationWindow().AspectRatio();
@@ -109,16 +113,25 @@ void Sandbox::OnApplicationRun()
         in vec2 v_TexCoord;
 
         uniform vec4 u_Color;
+        uniform sampler2D u_Texture;
 
         void main()
         {
             // color = v_Color * u_Color;
-            vec3 uvColor = vec3(v_TexCoord.x, v_TexCoord.y, 0.0f);
-            color = vec4(mix(u_Color.rgb, uvColor, u_Color.a), 1.0f);
+            // vec3 uvColor = vec3(v_TexCoord.x, v_TexCoord.y, 0.0f);
+            // color = vec4(mix(u_Color.rgb, uvColor, u_Color.a), 1.0f);
+            vec4 textureSample = texture(u_Texture, v_TexCoord);
+            color = textureSample;
         }
     )";
 
     m_shader = GFX.CreateShader(vertexSrc, fragmentSrc);
+
+    Path texturePath = fileSystemModule->Resolve("engine://Textures/heresy.png");
+    Log::Info("Texture path: {}", texturePath.string());
+    m_texture = Texture2D::Create(texturePath.string());
+
+    m_shader->UploadUniformInt("u_Texture", 0);
 
     GetApplicationWindow().AddEventListener(&Sandbox::OnResize, this);
 }
@@ -132,7 +145,7 @@ void Sandbox::OnRender()
 {
     RenderModule* renderModule = GetModule<RenderModule>();
     renderModule->BeginScene(m_camera);
-   
+
     float scale = 0.1f;
     Matrix4 scaleMatrix = Matrix4::Scale(Vec3(scale, scale, scale));
     for(int y = -2; y <= 2; y++)
@@ -147,18 +160,19 @@ void Sandbox::OnRender()
         }
     }
 
-    // Matrix4 triangleTransform = Matrix4::Translate(m_trianglePosition);    
-    // renderModule->Submit(m_rectangleVB, m_rectangleIB, m_shader, triangleTransform);
-
     Matrix4 triangleTransform = Matrix4::Translate(m_trianglePosition);
-    m_shader->UploadUniformVec4("u_Color", m_triangleColor);
-    renderModule->Submit(m_triangleVB,  m_triangleIB,  m_shader, triangleTransform);
+    m_texture->Bind();
+    renderModule->Submit(m_rectangleVB, m_rectangleIB, m_shader, triangleTransform);
+
+    // Matrix4 triangleTransform = Matrix4::Translate(m_trianglePosition);
+    // m_shader->UploadUniformVec4("u_Color", m_triangleColor);
+    // renderModule->Submit(m_triangleVB,  m_triangleIB,  m_shader, triangleTransform);
     
     renderModule->EndScene();
 
     ImGui::Begin("Hello World");
     ImGui::Text("Welcome to Yet Another Game Engine!");
-    ImGui::ColorEdit4("Triangle Color", &m_triangleColor.x);
+    // ImGui::ColorEdit4("Triangle Color", &m_triangleColor.x);
     ImGui::End();
 }
 
