@@ -3,6 +3,7 @@
 #include "Rendering/RenderModule.h"
 #include "Resources/ResourceModule.h"
 #include "Resources/GLShaderLoader.h"
+#include "Resources/Texture2DLoader.h"
 #include "Core/FileSystemModule.h"
 #include "Scene/SceneModule.h"
 #include "ImGui/ImGuiModule.h"
@@ -105,12 +106,14 @@ namespace axiom
     void Application::RegisterModules()
     {
         RegisterModule<FileSystemModule>();
-        RegisterModule<RenderModule>();    // creates GL context
-        RegisterModule<ImGuiModule>();     // must come after RenderModule
-        // RegisterModule<SceneModule>();
+        
+        ResourceModule* resourceModule = RegisterModule<ResourceModule>();
+        resourceModule->RegisterLoader(".glsl", MakeUnique<GLShaderLoader>());
+        resourceModule->RegisterLoader(".png",  MakeUnique<Texture2DLoader>());
+        resourceModule->RegisterLoader(".jpg",  MakeUnique<Texture2DLoader>());
 
-        // ResourceModule* resourceModule = RegisterModule<ResourceModule>();
-        // resourceModule->RegisterLoader(".glsl", MakeUnique<GLShaderLoader>());
+        RegisterModule<RenderModule>();
+        RegisterModule<ImGuiModule>();
     }
 
     void Application::InitializeModules()

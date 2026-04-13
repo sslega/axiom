@@ -1,11 +1,14 @@
 #include "Platform/OpenGL/OpenGLGraphicsDevice.h"
 #include "Platform/OpenGL/OpenGLBuffer.h"
 #include "Platform/OpenGL/OpenGLShader.h"
+#include "Platform/OpenGL/OpenGLTexture2D.h"
+#include "Resources/Texture2DResource.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <imgui.h>
 #include <imgui_impl_opengl3.h>
 #include "Core/Log.h"
+#include "Resources/ShaderResource.h"
 
 
 namespace axiom
@@ -76,19 +79,34 @@ namespace axiom
     //     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     // }
 
-    SharedPtr<VertexBuffer> OpenGLGraphicsDevice::CreateVertexBuffer(float* vertices, uint32 size)
+    SharedPtr<VertexBuffer> OpenGLGraphicsDevice::CreateVertexBuffer(float* vertices, uint32 size) const
     {
         return MakeShared<OpenGLVertexBuffer>(vertices, size);
     }
 
-    SharedPtr<IndexBuffer> OpenGLGraphicsDevice::CreateIndexBuffer(uint32* indices, uint32 count)
+    SharedPtr<IndexBuffer> OpenGLGraphicsDevice::CreateIndexBuffer(uint32* indices, uint32 count) const
     {
         return MakeShared<OpenGLIndexBuffer>(indices, count);
     }
 
-    SharedPtr<Shader> OpenGLGraphicsDevice::CreateShader(const String& vertexSource, const String& fragmentSource)
+    SharedPtr<Shader> OpenGLGraphicsDevice::CreateShader(const String& vertexSource, const String& fragmentSource) const
     {
         return MakeShared<OpenGLShader>(vertexSource, fragmentSource);
+    }
+
+    SharedPtr<Shader> OpenGLGraphicsDevice::CreateShader(const ShaderResource &shaderResource) const
+    {
+        return CreateShader(shaderResource.GetVertexSource(), shaderResource.GetFragmentSource());
+    }
+
+    SharedPtr<Texture2D> OpenGLGraphicsDevice::CreateTexture2D(const String& path) const
+    {
+        return MakeShared<OpenGLTexture2D>(path);
+    }
+
+    SharedPtr<Texture2D> OpenGLGraphicsDevice::CreateTexture2D(const Texture2DResource& resource) const
+    {
+        return MakeShared<OpenGLTexture2D>(resource);
     }
 
     uint32 OpenGLGraphicsDevice::GetOrCreateVAO(const SharedPtr<VertexBuffer> &vertexBuffer)

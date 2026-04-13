@@ -16,7 +16,5 @@ namespace axiom
 
     class Texture2D : public Texture
     {
-    public:
-        static SharedPtr<Texture2D> Create(const String& path);
     };
 }

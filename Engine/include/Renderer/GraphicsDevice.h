@@ -8,6 +8,9 @@ namespace axiom
     class IndexBuffer;
     class VertexBuffer;
     class Shader;
+    class ShaderResource;
+    class Texture2D;
+    class Texture2DResource;
     class ApplicationWindow;
 
     class GraphicsDevice 
@@ -24,9 +27,14 @@ namespace axiom
 
         // Resource creation
         // virtual UniquePtr<GraphicsDevice> CreateGraphicsDevice() = 0;
-        virtual SharedPtr<VertexBuffer> CreateVertexBuffer(float* vertices, uint32 size) = 0;
-        virtual SharedPtr<IndexBuffer>  CreateIndexBuffer(uint32* indices, uint32 count) = 0;        
-        virtual SharedPtr<Shader> CreateShader(const String& vertexSource, const String& fragmentSource) = 0;
+        virtual SharedPtr<VertexBuffer> CreateVertexBuffer(float* vertices, uint32 size) const = 0;
+        virtual SharedPtr<IndexBuffer>  CreateIndexBuffer(uint32* indices, uint32 count) const = 0;        
+        
+        virtual SharedPtr<Shader> CreateShader(const String& vertexSource, const String& fragmentSource) const = 0;
+        virtual SharedPtr<Shader> CreateShader(const ShaderResource& shaderResource) const = 0;
+        
+        virtual SharedPtr<Texture2D> CreateTexture2D(const String& path) const = 0;
+        virtual SharedPtr<Texture2D> CreateTexture2D(const Texture2DResource& resource) const = 0;
 
         // Draw commands
         virtual void SetClearColor(const Vec4& color) = 0;

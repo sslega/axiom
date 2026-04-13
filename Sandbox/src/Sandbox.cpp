@@ -1,11 +1,12 @@
 #include "Sandbox.h"
 #include "EntryPoint.h"
 #include "AxiomEngine.h"
+
 #include "Renderer/Buffer.h"
 #include "Renderer/Shader.h"
 #include "Renderer/Texture.h"
-
-#include "AxiomEngine.h"
+#include "Resources/ShaderResource.h"
+#include "Resources/Texture2DResource.h"
 
 using namespace axiom;
 
@@ -42,9 +43,10 @@ void Sandbox::OnRegisterModules()
 
 void Sandbox::OnApplicationRun()
 {
-    RenderModule* renderModule = GetModule<RenderModule>();
-    FileSystemModule* fileSystemModule = GetModule<FileSystemModule>();
-    GraphicsDevice& GFX = renderModule->GetGraphicsDevice();
+    RenderModule* Render = GetModule<RenderModule>();
+    GraphicsDevice& Device = Render->GetGraphicsDevice();
+    ResourceModule* Resource = GetModule<ResourceModule>();
+    FileSystemModule* FileSystem = GetModule<FileSystemModule>();
 
     float ratio = GetApplicationWindow().AspectRatio();
     m_camera = OrtographicCamera(-2.0f, 2.0f, -2.0f / ratio, 2.0f / ratio);
@@ -72,64 +74,19 @@ void Sandbox::OnApplicationRun()
         {ShaderDataType::Float2, "a_TexCoord"}
     };
 
-    m_triangleVB = GFX.CreateVertexBuffer(triangleVertices, sizeof(triangleVertices));
+    m_triangleVB = Device.CreateVertexBuffer(triangleVertices, sizeof(triangleVertices));
     m_triangleVB->SetLayout(layout);
-    m_triangleIB = GFX.CreateIndexBuffer(triangleIndices, 3);
+    m_triangleIB = Device.CreateIndexBuffer(triangleIndices, 3);
 
-    m_rectangleVB = GFX.CreateVertexBuffer(squareVertices, sizeof(squareVertices));
+    m_rectangleVB = Device.CreateVertexBuffer(squareVertices, sizeof(squareVertices));
     m_rectangleVB->SetLayout(layout);
-    m_rectangleIB = GFX.CreateIndexBuffer(squareIndices, 6);
+    m_rectangleIB = Device.CreateIndexBuffer(squareIndices, 6);
 
-    String vertexSrc = R"(
-        #version 330 core
+    auto shaderResource = Resource->Load<ShaderResource>("engine://Shaders/Texture.glsl");
+    m_shader = Device.CreateShader(*shaderResource);
 
-        layout(location = 0) in vec3 a_Position;
-        layout(location = 1) in vec4 a_Color;
-        layout(location = 2) in vec2 a_TexCoord;
-
-        uniform mat4 u_ViewProjection;
-        uniform mat4 u_Transform;
-
-        out vec3 v_Position;
-        out vec4 v_Color;
-        out vec2 v_TexCoord;
-
-        void main()
-        {
-            v_Position = a_Position;
-            v_Color = a_Color;
-            v_TexCoord = a_TexCoord;
-            gl_Position = u_ViewProjection * u_Transform * vec4(a_Position, 1.0);
-        }
-    )";
-
-    String fragmentSrc = R"(
-        #version 330 core
-
-        layout(location = 0) out vec4 color;
-
-        in vec3 v_Position;
-        in vec4 v_Color;
-        in vec2 v_TexCoord;
-
-        uniform vec4 u_Color;
-        uniform sampler2D u_Texture;
-
-        void main()
-        {
-            // color = v_Color * u_Color;
-            // vec3 uvColor = vec3(v_TexCoord.x, v_TexCoord.y, 0.0f);
-            // color = vec4(mix(u_Color.rgb, uvColor, u_Color.a), 1.0f);
-            vec4 textureSample = texture(u_Texture, v_TexCoord);
-            color = textureSample;
-        }
-    )";
-
-    m_shader = GFX.CreateShader(vertexSrc, fragmentSrc);
-
-    Path texturePath = fileSystemModule->Resolve("engine://Textures/heresy.png");
-    Log::Info("Texture path: {}", texturePath.string());
-    m_texture = Texture2D::Create(texturePath.string());
+    auto textureResource = Resource->Load<Texture2DResource>("engine://Textures/heresy.png");
+    m_texture = Device.CreateTexture2D(*textureResource);
 
     m_shader->UploadUniformInt("u_Texture", 0);
 

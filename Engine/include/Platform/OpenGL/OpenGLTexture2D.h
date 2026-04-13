@@ -4,10 +4,13 @@
 
 namespace axiom
 {
+    class Texture2DResource;
+
     class OpenGLTexture2D : public Texture2D
     {
     public:
         OpenGLTexture2D(const String& path);
+        OpenGLTexture2D(const Texture2DResource& resource);
         virtual ~OpenGLTexture2D();
         
         virtual uint32 GetWidth() const override { return m_width; }

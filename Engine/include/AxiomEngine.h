@@ -28,6 +28,9 @@
 // File system
 #include "Core/FileSystemModule.h"
 
+// Resources
+#include "Resources/ResourceModule.h"
+
 // ImGui
 #include "ImGui/ImGuiModule.h"
 #include <imgui.h>

@@ -9,6 +9,9 @@ class GLFWwindow;
 
 namespace axiom
 {
+    class ShaderResource;
+    class Texture2DResource;
+
     class OpenGLGraphicsDevice : public GraphicsDevice
     {
     public:
@@ -20,15 +23,14 @@ namespace axiom
         void DrawIndexed(const SharedPtr<VertexBuffer>& vertexBuffer, const SharedPtr<IndexBuffer>& indexBuffer) override;
         void Present() override;
 
-        // void InitImGuiRenderer() override;
-        // void ShutdownImGuiRenderer() override;
-        // void BeginImGuiRendererFrame() override;
-        // void EndImGuiFrame() override;
-
-        // virtual UniquePtr<GraphicsDevice> CreateGraphicsDevice() override;
-        virtual SharedPtr<VertexBuffer> CreateVertexBuffer(float* vertices, uint32 size) override;
-        virtual SharedPtr<IndexBuffer>  CreateIndexBuffer(uint32* indices, uint32 count) override;        
-        SharedPtr<Shader> CreateShader(const String& vertexSource, const String& fragmentSource)  override;
+        virtual SharedPtr<VertexBuffer> CreateVertexBuffer(float* vertices, uint32 size) const override;
+        virtual SharedPtr<IndexBuffer>  CreateIndexBuffer(uint32* indices, uint32 count) const override;        
+        
+        SharedPtr<Shader> CreateShader(const String& vertexSource, const String& fragmentSource) const override;
+        SharedPtr<Shader> CreateShader(const ShaderResource& shaderResource) const override;
+        
+        SharedPtr<Texture2D> CreateTexture2D(const String& path) const override;
+        SharedPtr<Texture2D> CreateTexture2D(const Texture2DResource& resource) const override;
 
     private:
         UnorderedMap<VertexBuffer*, uint32> m_vaoCache;
