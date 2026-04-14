@@ -18,7 +18,7 @@
 // Rendering
 #include "Renderer/GraphicsDevice.h"
 #include "Renderer/Camera.h"
-#include "Rendering/RenderModule.h"
+#include "Renderer/RenderModule.h"
 
 // Math
 #include "Math/Math.h"

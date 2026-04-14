@@ -1,4 +1,4 @@
-#include "Rendering/MeshComponent.h"
+#include "Renderer/MeshComponent.h"
 
 namespace axiom
 {
@@ -37,4 +37,3 @@ namespace axiom
     }
 
 }
-

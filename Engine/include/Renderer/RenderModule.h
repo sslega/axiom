@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Core/ApplicationModule.h"
-#include "Rendering/RenderTypes.h"
-#include "Rendering/RenderMesh.h"
+#include "Renderer/RenderTypes.h"
+#include "Renderer/RenderMesh.h"
 #include "Resources/MeshResource.h"
 #include "Resources/ShaderResource.h"
 #include "Renderer/GraphicsDevice.h"
@@ -45,7 +45,7 @@ namespace axiom
         // SceneModule* m_sceneModule;
 
         // Vector<MeshComponent*> m_meshComponents;
-        
+
         // RenderAPI m_renderApi;
         // UniquePtr<IRenderDevice> m_renderer;
 

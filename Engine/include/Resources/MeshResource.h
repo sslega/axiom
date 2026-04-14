@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Types.h"
-#include "Rendering/Vertex.h"
+#include "Renderer/Vertex.h"
 
 namespace axiom
 {

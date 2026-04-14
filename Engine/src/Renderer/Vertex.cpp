@@ -1,11 +1,11 @@
-#include "Rendering/Vertex.h"
+#include "Renderer/Vertex.h"
 
 namespace axiom
 {
     Vertex::Vertex()
     {
     }
-    
+
     Vertex::Vertex(Vec3 position)
     {
         m_position = position;
@@ -32,4 +32,3 @@ namespace axiom
         m_color = color;
     }
 }
-

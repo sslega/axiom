@@ -6,7 +6,7 @@ namespace axiom
 {
     class MeshResource;
     class Material;
-    
+
     class MeshComponent: public Component
     {
     public:

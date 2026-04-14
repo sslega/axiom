@@ -1,16 +1,16 @@
 #pragma once
 
-#include "Rendering/RenderMesh.h"
+#include "Renderer/RenderMesh.h"
 
 namespace axiom
 {
     class MeshResource;
 
-    class GLRenderMesh : public RenderMesh
+    class OpenGLRenderMesh : public RenderMesh
     {
     public:
-        GLRenderMesh(const MeshResource& meshResource);
-        ~GLRenderMesh();
+        OpenGLRenderMesh(const MeshResource& meshResource);
+        ~OpenGLRenderMesh();
 
         virtual void Bind() const override;
         virtual void Unbind() const override;

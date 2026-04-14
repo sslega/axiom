@@ -5,7 +5,7 @@
 #include "Application.h"
 #include "ApplicationModule.h"
 #include "Platform/ApplicationWindow.h"
-#include "Rendering/RenderTypes.h"
+#include "Renderer/RenderTypes.h"
 #include "Renderer/GraphicsDevice.h"
 #include "Event/Event.h"
 

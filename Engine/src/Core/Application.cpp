@@ -1,6 +1,6 @@
 #include "Core/Application.h"
 #include "Platform/ApplicationWindow.h"
-#include "Rendering/RenderModule.h"
+#include "Renderer/RenderModule.h"
 #include "Resources/ResourceModule.h"
 #include "Resources/GLShaderLoader.h"
 #include "Resources/Texture2DLoader.h"
