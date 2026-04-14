@@ -13,8 +13,8 @@ namespace axiom
         MeshResource(Vector<Vertex> vertices, Vector<uint32> indices);
         ~MeshResource() = default;
 
-        const Vector<Vertex> GetVertices() const;
-        const Vector<uint32> GetIndices() const;
+        const Vector<Vertex>& GetVertices() const;
+        const Vector<uint32>& GetIndices() const;
 
     protected:
         Vector<Vertex> m_vertices;

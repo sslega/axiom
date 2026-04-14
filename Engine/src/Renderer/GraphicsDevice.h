@@ -12,6 +12,7 @@ namespace axiom
     class Texture2D;
     class Texture2DResource;
     class ApplicationWindow;
+    class MeshResource;
 
     class GraphicsDevice 
     {
@@ -28,7 +29,9 @@ namespace axiom
         // Resource creation
         // virtual UniquePtr<GraphicsDevice> CreateGraphicsDevice() = 0;
         virtual SharedPtr<VertexBuffer> CreateVertexBuffer(float* vertices, uint32 size) const = 0;
-        virtual SharedPtr<IndexBuffer>  CreateIndexBuffer(uint32* indices, uint32 count) const = 0;        
+        virtual SharedPtr<IndexBuffer>  CreateIndexBuffer(uint32* indices, uint32 count) const = 0;
+        virtual SharedPtr<VertexBuffer> CreateVertexBuffer(const MeshResource& mesh) const = 0;
+        virtual SharedPtr<IndexBuffer>  CreateIndexBuffer(const MeshResource& mesh) const = 0;
         
         virtual SharedPtr<Shader> CreateShader(const String& vertexSource, const String& fragmentSource) const = 0;
         virtual SharedPtr<Shader> CreateShader(const ShaderResource& shaderResource) const = 0;

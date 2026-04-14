@@ -12,14 +12,14 @@ namespace axiom
         m_indices = std::move(indices);
     }
 
-    const Vector<Vertex> MeshResource::GetVertices() const
+    const Vector<Vertex>& MeshResource::GetVertices() const
     {
-        return Vector<Vertex>();
+        return m_vertices;
     }
 
-    const Vector<uint32> MeshResource::GetIndices() const
+    const Vector<uint32>& MeshResource::GetIndices() const
     {
-        return Vector<uint32>();
+        return m_indices;
     }
 
 }

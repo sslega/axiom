@@ -7,6 +7,8 @@
 #include "Renderer/Texture.h"
 #include "Resources/ShaderResource.h"
 #include "Resources/Texture2DResource.h"
+#include "Geometry/Quad.h"
+#include "Geometry/Triangle.h"
 
 using namespace axiom;
 
@@ -51,36 +53,13 @@ void Sandbox::OnApplicationRun()
     float ratio = GetApplicationWindow().AspectRatio();
     m_camera = OrtographicCamera(-2.0f, 2.0f, -2.0f / ratio, 2.0f / ratio);
 
-    uint32 triangleIndices[3] = {0, 1, 2};
-    float triangleVertices[9 * 3] =
-    {
-        -0.5f, -0.5f, 0.0f, 1.0f, 0.5f, 0.5f, 1.0f,     0.0f, 0.0f,
-         0.5f, -0.5f, 0.0f, 0.5f, 1.0f, 0.5f, 1.0f,     1.0f, 0.0f,
-         0.0f,  0.5f, 0.0f, 0.5f, 0.5f, 1.0f, 1.0f,     0.5f, 1.0f
-    };
+    Triangle triangle = Triangle();
+    m_triangleVB = Device.CreateVertexBuffer(triangle);
+    m_triangleIB = Device.CreateIndexBuffer(triangle);
 
-    uint32 squareIndices[6] = {0, 1, 2, 2, 3, 0};
-    float squareVertices[9 * 4] =
-    {
-        -1.0f, -1.0f, 0.0f,     1.0f, 1.0f, 1.0f, 1.0f,     0.0f, 0.0f,
-         1.0f, -1.0f, 0.0f,     1.0f, 1.0f, 1.0f, 1.0f,     1.0f, 0.0f,
-         1.0f,  1.0f, 0.0f,     1.0f, 1.0f, 1.0f, 1.0f,     1.0f, 1.0f,
-        -1.0f,  1.0f, 0.0f,     1.0f, 1.0f, 1.0f, 1.0f,     0.0f, 1.0f
-    };
-
-    BufferLayout layout = {
-        {ShaderDataType::Float3, "a_Position"},
-        {ShaderDataType::Float4, "a_Color"},
-        {ShaderDataType::Float2, "a_TexCoord"}
-    };
-
-    m_triangleVB = Device.CreateVertexBuffer(triangleVertices, sizeof(triangleVertices));
-    m_triangleVB->SetLayout(layout);
-    m_triangleIB = Device.CreateIndexBuffer(triangleIndices, 3);
-
-    m_rectangleVB = Device.CreateVertexBuffer(squareVertices, sizeof(squareVertices));
-    m_rectangleVB->SetLayout(layout);
-    m_rectangleIB = Device.CreateIndexBuffer(squareIndices, 6);
+    Quad quad = Quad();
+    m_rectangleVB = Device.CreateVertexBuffer(quad);
+    m_rectangleIB = Device.CreateIndexBuffer(quad);
 
     auto shaderResource = Resource->Load<ShaderResource>("engine://Shaders/Texture.glsl");
     m_shader = Device.CreateShader(*shaderResource);

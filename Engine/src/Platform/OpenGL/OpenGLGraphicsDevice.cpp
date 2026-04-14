@@ -3,6 +3,8 @@
 #include "Platform/OpenGL/OpenGLShader.h"
 #include "Platform/OpenGL/OpenGLTexture2D.h"
 #include "Resources/Texture2DResource.h"
+#include "Resources/MeshResource.h"
+#include "Renderer/Vertex.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <imgui.h>
@@ -88,6 +90,27 @@ namespace axiom
     {
         return MakeShared<OpenGLIndexBuffer>(indices, count);
     }
+
+    SharedPtr<VertexBuffer> OpenGLGraphicsDevice::CreateVertexBuffer(const MeshResource& mesh) const
+    {
+        const auto& vertices = mesh.GetVertices();
+        auto vb = CreateVertexBuffer(
+            reinterpret_cast<float*>(const_cast<Vertex*>(vertices.data())),
+            static_cast<uint32>(vertices.size() * sizeof(Vertex))
+        );
+        vb->SetLayout(Vertex::GetLayout());
+        return vb;
+    }
+
+    SharedPtr<IndexBuffer> OpenGLGraphicsDevice::CreateIndexBuffer(const MeshResource& mesh) const
+    {
+        const auto& indices = mesh.GetIndices();
+        return CreateIndexBuffer(
+            const_cast<uint32*>(indices.data()),
+            static_cast<uint32>(indices.size())
+        );
+    }
+
 
     SharedPtr<Shader> OpenGLGraphicsDevice::CreateShader(const String& vertexSource, const String& fragmentSource) const
     {
