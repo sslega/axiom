@@ -61,8 +61,10 @@ void Sandbox::OnApplicationRun()
     m_rectangleVB = Device.CreateVertexBuffer(quad);
     m_rectangleIB = Device.CreateIndexBuffer(quad);
 
-    auto shaderResource = Resource->Load<ShaderResource>("engine://Shaders/Texture.glsl");
-    m_shader = Device.CreateShader(*shaderResource);
+    // auto shaderResource = Resource->Load<ShaderResource>("engine://Shaders/Texture.glsl");
+    // m_shader = Device.CreateShader(*shaderResource);
+
+    m_shader = Render->GetShader("engine://Shaders/Texture.glsl");
 
     auto textureResource = Resource->Load<Texture2DResource>("engine://Textures/heresy.png");
     m_texture = Device.CreateTexture2D(*textureResource);

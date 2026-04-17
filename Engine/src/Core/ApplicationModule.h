@@ -17,7 +17,7 @@ namespace axiom
         virtual void OnRegister();
         virtual void OnUnregister();
 
-        Application& GetApp() const;
+        inline Application& GetApp() const { return m_application; };
 
     protected:
         virtual void OnInitialize()  {}
@@ -28,6 +28,12 @@ namespace axiom
         virtual void OnEndFrame()    {}
 
         Application& m_application;
+
+        template <typename T>
+        T* GetModule()
+        {
+            return GetApp().template GetModule<T>();
+        }
 
     private:
         friend class Application;

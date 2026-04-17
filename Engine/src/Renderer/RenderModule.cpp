@@ -2,6 +2,8 @@
 #include "Core/Application.h"
 #include "Renderer/Buffer.h"
 #include "Renderer/Shader.h"
+#include "RenderModule.h"
+#include "Resources/ResourceModule.h"
 
 namespace axiom
 {
@@ -51,6 +53,23 @@ namespace axiom
         shader->UploadUniformMat4("u_ViewProjection", m_sceneData.viewProjectionMatrix);
         shader->UploadUniformMat4("u_Transform", transform);
         m_graphicsDevice->DrawIndexed(vb, ib);
+    }
+
+    SharedPtr<Shader> RenderModule::GetShader(const String path)
+    {
+        auto it = m_shaderMap.find(path);
+        if(it == m_shaderMap.end())
+        {
+            m_shaderMap[path] = CreateShader(path);
+        }
+        it = m_shaderMap.find(path);
+        return it->second;
+    }
+
+    SharedPtr<Shader> RenderModule::CreateShader(const String path)
+    {
+        auto shaderResource = GetModule<ResourceModule>()->Load<ShaderResource>(path);
+        return GetGraphicsDevice().CreateShader(*shaderResource);
     }
 
     GraphicsDevice::API RenderModule::GetRenderAPI() const

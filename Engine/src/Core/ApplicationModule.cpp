@@ -25,9 +25,4 @@ namespace axiom
     void ApplicationModule::OnUnregister()
     {
     }
-
-    Application& ApplicationModule::GetApp() const
-    {
-        return m_application;
-    }
 }

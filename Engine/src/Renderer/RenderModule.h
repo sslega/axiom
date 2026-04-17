@@ -24,6 +24,8 @@ namespace axiom
         void EndScene();
         void Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Shader>& shader, const Matrix4& transform);
 
+        SharedPtr<Shader> GetShader(const String path);
+
         GraphicsDevice& GetGraphicsDevice() const;
         GraphicsDevice::API GetRenderAPI() const;
 
@@ -33,6 +35,8 @@ namespace axiom
         void OnUpdate() override;
         void OnRender() override;
 
+        SharedPtr<Shader> CreateShader(const String path);
+
     private:
         struct SceneData
         {
@@ -41,6 +45,8 @@ namespace axiom
 
         UniquePtr<GraphicsDevice> m_graphicsDevice;
         SceneData m_sceneData;
+
+        StringMap<SharedPtr<Shader>> m_shaderMap;
 
         // SceneModule* m_sceneModule;
 
