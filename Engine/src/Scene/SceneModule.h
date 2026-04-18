@@ -2,6 +2,7 @@
 #include "Core/ApplicationModule.h"
 #include "Core/Types.h"
 #include "Scene/Scene.h"
+#include "Scene/Entity.h"
 
 namespace axiom
 {
@@ -10,7 +11,7 @@ namespace axiom
     public:
         SceneModule(Application& application);
 
-        Scene* CreateScene(const String& name);
+        // Scene* CreateScene(const String& name);
         Scene* GetActiveScene() const;
         bool HasActiveScene() const;
 

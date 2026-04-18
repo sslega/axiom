@@ -11,7 +11,7 @@ namespace axiom
         m_mesh = mesh;
     }
 
-    const SharedPtr<MeshResource>& MeshComponent::GetMesh() const
+    const SharedPtr<MeshResource> MeshComponent::GetMesh() const
     {
         return m_mesh;
     }
@@ -21,14 +21,14 @@ namespace axiom
         m_material = material;
     }
 
-    const SharedPtr<Material>& MeshComponent::GetMaterial() const
+    const SharedPtr<Material> MeshComponent::GetMaterial() const
     {
         return m_material;
     }
 
     bool MeshComponent::IsVisible() const
     {
-        return false;
+        return m_isVisible;
     }
 
     void MeshComponent::SetVisible(bool visible)

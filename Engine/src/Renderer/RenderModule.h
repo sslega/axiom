@@ -13,6 +13,7 @@ namespace axiom
     class IndexBuffer;
     class VertexBuffer;
     class Shader;
+    class Material;
     class RenderResourceFactory;
 
     class RenderModule : public ApplicationModule
@@ -20,8 +21,9 @@ namespace axiom
     public:
         RenderModule(Application& engine);
 
-        void BeginScene(const OrtographicCamera& camera);
+        void BeginScene();
         void EndScene();
+        void Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Material>& material, const Matrix4& transform);
         void Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Shader>& shader, const Matrix4& transform);
 
         SharedPtr<Shader> GetShader(const String path);
@@ -46,7 +48,12 @@ namespace axiom
         UniquePtr<GraphicsDevice> m_graphicsDevice;
         SceneData m_sceneData;
 
-        StringMap<SharedPtr<Shader>> m_shaderMap;
+        StringMap<SharedPtr<Shader>> m_shaderCache;
+
+        struct MeshBuffers { SharedPtr<VertexBuffer> vb; SharedPtr<IndexBuffer> ib; };
+        UnorderedMap<MeshResource*, MeshBuffers> m_meshCache;
+
+        MeshBuffers GetOrCreateBuffers(const SharedPtr<MeshResource>& mesh);
 
         // SceneModule* m_sceneModule;
 

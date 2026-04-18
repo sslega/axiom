@@ -11,6 +11,7 @@ namespace axiom
         ~Scene() = default;
 
         Entity* CreateEntity();
+        Entity* CreateEntity(String name);
         void DestroyEntity(Entity* entity);
 
         const String& GetName() const;

@@ -10,6 +10,7 @@ namespace axiom
     class WindowResizeEvent;
     class KeyboardEvent;
     class Texture2D;
+    class CameraComponent;
 }
 
 class Sandbox : public Application
@@ -31,7 +32,7 @@ private:
     SharedPtr<VertexBuffer> m_rectangleVB;
     SharedPtr<IndexBuffer>  m_rectangleIB;
     SharedPtr<Shader>       m_shader;
-    OrtographicCamera       m_camera;
+    CameraComponent*        m_cameraComponent;
     SharedPtr<Texture2D>    m_texture;
 
     Vec3 m_trianglePosition;

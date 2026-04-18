@@ -1,7 +1,7 @@
-#include "Platform/OpenGL/OpenGLShader.h"
 #include "Core/Assert.h"
 #include "Core/Log.h"
 #include <glad/glad.h>
+#include "OpenGLShader.h"
 
 namespace axiom
 {
@@ -88,21 +88,21 @@ namespace axiom
         glUseProgram(0);
     }
 
-    void OpenGLShader::UploadUniformInt(const String &name, const int& value)
+    void OpenGLShader::UploadUniform(const String& name, const int& value)
     {
         GLint location = glGetUniformLocation(m_rendererID, name.c_str());
         glUniform1i(location, value);
     }
 
-    void OpenGLShader::UploadUniformMat4(const String &name, const Matrix4& value)
-    {
-        GLint location = glGetUniformLocation(m_rendererID, name.c_str());
-        glUniformMatrix4fv(location, 1, GL_FALSE, value.data);
-    }
-
-    void OpenGLShader::UploadUniformVec4(const String &name, const Vec4 &value)
+    void OpenGLShader::UploadUniform(const String& name, const Vec4& value)
     {
         GLint location = glGetUniformLocation(m_rendererID, name.c_str());
         glUniform4f(location, value.x, value.y, value.z, value.w);
+    }
+
+    void OpenGLShader::UploadUniform(const String& name, const Matrix4& value)
+    {
+        GLint location = glGetUniformLocation(m_rendererID, name.c_str());
+        glUniformMatrix4fv(location, 1, GL_FALSE, value.data);
     }
 }

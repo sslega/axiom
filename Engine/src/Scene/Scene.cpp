@@ -1,4 +1,5 @@
 #include "Scene/Scene.h"
+#include "Scene.h"
 
 namespace axiom
 {
@@ -16,7 +17,15 @@ namespace axiom
         return entityPtr;
     }
 
-    void Scene::DestroyEntity(Entity* entity)
+    Entity* Scene::CreateEntity(String name)
+    {
+        UniquePtr<Entity> entity = std::make_unique<Entity>(name);
+        Entity* entityPtr = entity.get();        
+        m_entities[entity->id] = std::move(entity);
+        return entityPtr;
+    }
+
+    void Scene::DestroyEntity(Entity *entity)
     {
         m_entities.erase(entity->id);
     }

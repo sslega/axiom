@@ -12,15 +12,15 @@ namespace axiom
     public:
         MeshComponent();
         void SetMesh(const SharedPtr<MeshResource>& mesh);
-        const SharedPtr<MeshResource>& GetMesh() const;
+        const SharedPtr<MeshResource> GetMesh() const;
         void SetMaterial(const SharedPtr<Material>& material);
-        const SharedPtr<Material>& GetMaterial() const;
+        const SharedPtr<Material> GetMaterial() const;
         bool IsVisible() const;
         void SetVisible(bool visible);
 
     protected:
         SharedPtr<MeshResource> m_mesh;
         SharedPtr<Material> m_material;
-        bool m_isVisible;
+        bool m_isVisible = true;
     };
 }

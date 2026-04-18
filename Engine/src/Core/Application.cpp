@@ -112,6 +112,7 @@ namespace axiom
         resourceModule->RegisterLoader(".png",  MakeUnique<Texture2DLoader>());
         resourceModule->RegisterLoader(".jpg",  MakeUnique<Texture2DLoader>());
 
+        RegisterModule<SceneModule>();
         RegisterModule<RenderModule>();
         RegisterModule<ImGuiModule>();
     }

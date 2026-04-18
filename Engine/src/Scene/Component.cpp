@@ -8,7 +8,7 @@ namespace axiom
 
     Entity* Component::GetEntity() const
     {
-        return nullptr;
+        return m_entity;
     }
 
 }
