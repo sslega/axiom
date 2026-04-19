@@ -54,6 +54,11 @@ namespace axiom
         UnorderedMap<MeshResource*, MeshBuffers> m_meshCache;
 
         MeshBuffers GetOrCreateBuffers(const SharedPtr<MeshResource>& mesh);
+        
+        std::chrono::steady_clock::time_point m_lastTime;        
+        float m_fps;
+
+        float GetFPS();
 
         // SceneModule* m_sceneModule;
 

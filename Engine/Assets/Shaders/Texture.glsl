@@ -36,7 +36,7 @@ void main()
 {
     // color = v_Color * u_Color;
     // vec3 uvColor = vec3(v_TexCoord.x, v_TexCoord.y, 0.0f);
-    // color = vec4(mix(u_Color.rgb, uvColor, u_Color.a), 1.0f);
+    // color = vec4(uvColor, 1.0f);
     vec4 textureSample = texture(u_Texture, v_TexCoord);
     color = textureSample;
 }

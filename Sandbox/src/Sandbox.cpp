@@ -53,8 +53,8 @@ void Sandbox::OnApplicationRun()
     
     Scene* scene = GetModule<SceneModule>()->GetActiveScene();
     auto quadMesh = MakeShared<Quad>();
-    // auto shader = Render->GetShader("engine://Shaders/Texture.glsl");
-    auto shader = Render->GetShader("engine://Shaders/VertexColor.glsl");
+    auto shader = Render->GetShader("engine://Shaders/Texture.glsl");
+    // auto shader = Render->GetShader("engine://Shaders/VertexColor.glsl");
 
     auto* cameraEntity = scene->CreateEntity("MainCamera");
     float ratio = GetApplicationWindow().AspectRatio();
@@ -73,23 +73,15 @@ void Sandbox::OnApplicationRun()
             t->position = {x * 0.5f, y * 0.5f, 0.0f};
             t->scale    = {0.1f, 0.1f, 0.1f};
 
-            auto mat = MakeShared<Material>();
-            mat->m_shader = shader;
+            auto mat = MakeShared<Material>(shader);
             mat->SetUniform("u_Color", Vec4{(x+2.f)/5.f, (y+2.f)/5.f, 0.f, 1.f});
-            mat->SetUniform("u_Texture", 0);
+            mat->SetTexture("u_Texture", m_texture, 0);
 
             auto* m = e->CreateComponent<MeshComponent>();
             m->SetMesh(quadMesh);
             m->SetMaterial(mat);
         }
     }
-
-    // Entity* entity = scene->CreateEntity("MyEntity");
-    // TransformComponent* transform = entity->CreateComponent<TransformComponent>();
-    // transform->position = {0, 0, 0};
-    // transform->scale = {0.1f, 0.1f, 0.1f};
-
-
     /*
     float ratio = GetApplicationWindow().AspectRatio();
     m_camera = OrtographicCamera(-2.0f, 2.0f, -2.0f / ratio, 2.0f / ratio);
@@ -149,9 +141,8 @@ void Sandbox::OnRender()
     
     // renderModule->EndScene();
 
-    ImGui::Begin("Hello World");
-    ImGui::Text("Welcome to Yet Another Game Engine!");
-    // ImGui::ColorEdit4("Triangle Color", &m_triangleColor.x);
+    ImGui::Begin("Params");
+    ImGui::ColorEdit4("Triangle Color", &m_triangleColor.x);
     ImGui::End();
 }
 

@@ -11,6 +11,7 @@
 #include "Scene/TransformComponent.h"
 #include "Core/Log.h"
 #include "Renderer/Material.h"
+#include <imgui.h>
 
 namespace axiom
 {
@@ -36,6 +37,7 @@ namespace axiom
 
     void RenderModule::OnRender()
     {
+
         BeginScene();
 
         SceneModule* sceneModule = GetModule<SceneModule>();
@@ -65,6 +67,13 @@ namespace axiom
         }
 
         EndScene();
+
+        int fps = std::ceil(GetFPS());
+        int drawCalls = GetGraphicsDevice().GetDrawCallCount();
+        // TODO: Move it to some sort of Debug/Log 
+        ImDrawList* dl = ImGui::GetForegroundDrawList();
+        dl->AddText(ImVec2(10, 10), IM_COL32(255, 255, 255, 255), std::string("FPS: " + std::to_string(fps)).c_str());
+        dl->AddText(ImVec2(10, 22), IM_COL32(255, 255, 255, 255), std::string("DrawCalls: " + std::to_string(drawCalls)).c_str());
     }
 
     GraphicsDevice& RenderModule::GetGraphicsDevice() const
@@ -96,8 +105,8 @@ namespace axiom
     void RenderModule::Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Material>& material, const Matrix4& transform)
     {
         material->Bind();
-        material->m_shader->UploadUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
-        material->m_shader->UploadUniform("u_Transform", transform);
+        material->SetUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
+        material->SetUniform("u_Transform", transform);
         m_graphicsDevice->DrawIndexed(vb, ib);
     }
 
@@ -136,6 +145,18 @@ namespace axiom
         buffers.ib = m_graphicsDevice->CreateIndexBuffer(*mesh);
         m_meshCache[mesh.get()] = buffers;
         return buffers;
+    }
+
+    float RenderModule::GetFPS()
+    {
+        std::chrono::steady_clock::time_point  now = std::chrono::steady_clock::now();
+        float dt  = std::chrono::duration<float>(now - m_lastTime).count();
+        m_lastTime = now;
+        if (dt > 0.0f)
+        {
+            m_fps = 1.0f / dt;
+        }
+        return m_fps;
     }
 
     GraphicsDevice::API RenderModule::GetRenderAPI() const

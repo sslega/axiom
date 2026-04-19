@@ -54,32 +54,14 @@ namespace axiom
         glBindVertexArray(vao);
         indexBuffer->Bind();
         glDrawElements(GL_TRIANGLES, indexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
+        m_drawCallCount++;
     }
 
     void OpenGLGraphicsDevice::Present()
     {
         glfwSwapBuffers(m_windowHandle);
+        ResetDrawCallCount();
     }
-
-    // void OpenGLGraphicsDevice::InitImGuiRenderer()
-    // {
-    //     ImGui_ImplOpenGL3_Init("#version 330");
-    // }
-
-    // void OpenGLGraphicsDevice::ShutdownImGuiRenderer()
-    // {
-    //     ImGui_ImplOpenGL3_Shutdown();
-    // }
-
-    // void OpenGLGraphicsDevice::BeginImGuiRendererFrame()
-    // {
-    //     ImGui_ImplOpenGL3_NewFrame();
-    // }
-
-    // void OpenGLGraphicsDevice::EndImGuiFrame()
-    // {
-    //     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    // }
 
     SharedPtr<VertexBuffer> OpenGLGraphicsDevice::CreateVertexBuffer(float* vertices, uint32 size) const
     {

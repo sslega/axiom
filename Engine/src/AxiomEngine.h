@@ -39,5 +39,4 @@
 #include "Resources/ResourceModule.h"
 
 // ImGui
-#include "ImGui/ImGuiModule.h"
 #include <imgui.h>

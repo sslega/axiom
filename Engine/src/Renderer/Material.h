@@ -13,12 +13,11 @@ namespace axiom
     class Material
     {
     public:
-        SharedPtr<Shader>         m_shader;
-        SharedPtr<ShaderResource> m_shaderResource;
-        SharedPtr<Texture2D>      m_texture;
+        Material(const SharedPtr<Shader> shader);
 
         void Bind();
         void Unbind();
+        void SetTexture(const String& name, const SharedPtr<Texture2D> texture, uint32 slot);
 
         template<typename T>
         void SetUniform(const String& name, const T& value)
@@ -27,7 +26,9 @@ namespace axiom
         }
 
     private:
+        SharedPtr<Shader> m_shader;
         using UniformValue = std::variant<int, Vec4, Matrix4>;
         StringMap<UniformValue> m_uniforms;
+        StringMap<std::pair<SharedPtr<Texture2D>, uint32>> m_textures;
     };
 } // namespace axiom

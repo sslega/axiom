@@ -45,13 +45,13 @@ namespace axiom
         virtual void DrawIndexed(const SharedPtr<VertexBuffer>& vertexBuffer, const SharedPtr<IndexBuffer>& indexBuffer) = 0;
         virtual void Present() = 0;
 
-        // ImGui renderer backend — implemented per graphics API
-        // virtual void InitImGuiRenderer()       {}
-        // virtual void ShutdownImGuiRenderer()   {}
-        // virtual void BeginImGuiRendererFrame() {}
-        // virtual void EndImGuiFrame()           {}
+        inline uint32 GetDrawCallCount() const { return m_drawCallCount; }
 
         inline API GetAPI() { return m_API; };
+        
+    protected:
+        uint32 m_drawCallCount;
+        void   ResetDrawCallCount() { m_drawCallCount = 0; }
     
     private:
         API m_API;
