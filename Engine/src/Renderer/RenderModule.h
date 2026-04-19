@@ -38,6 +38,7 @@ namespace axiom
         void OnRender() override;
 
         SharedPtr<Shader> CreateShader(const String path);
+        SharedPtr<Shader> CreateInstancedShader(const String path);
 
     private:
         struct SceneData
@@ -45,20 +46,32 @@ namespace axiom
             Matrix4 viewProjectionMatrix;
         };
 
+        struct RenderCommand
+        {
+            SharedPtr<MeshResource> mesh;
+            SharedPtr<Material> material;
+            Matrix4 transform;
+        };
+
         UniquePtr<GraphicsDevice> m_graphicsDevice;
         SceneData m_sceneData;
 
         StringMap<SharedPtr<Shader>> m_shaderCache;
+        UnorderedMap<Shader*, SharedPtr<Shader>> m_instancedShaderCache;
+
+        using InstanceGroupKey  = std::pair<MeshResource*, Material*>;   // for OnRender grouping
+        using InstanceBufferKey = std::pair<VertexBuffer*, Material*>;   // for SubmitInstanced cache
+
+        PairMap<InstanceBufferKey, SharedPtr<VertexBuffer>> m_instanceBufferCache;
 
         struct MeshBuffers { SharedPtr<VertexBuffer> vb; SharedPtr<IndexBuffer> ib; };
         UnorderedMap<MeshResource*, MeshBuffers> m_meshCache;
 
         MeshBuffers GetOrCreateBuffers(const SharedPtr<MeshResource>& mesh);
-        
-        std::chrono::steady_clock::time_point m_lastTime;        
-        float m_fps;
+        SharedPtr<Shader> GetOrCreateInstancedShader(const SharedPtr<Shader>& shader);
+        void SubmitInstanced(const MeshBuffers& buffers, const SharedPtr<Material>& material, const Vector<Matrix4>& transforms);
+        void SubmitBatched(const SharedPtr<Material>& material, const Vector<RenderCommand>& commands);
 
-        float GetFPS();
 
         // SceneModule* m_sceneModule;
 

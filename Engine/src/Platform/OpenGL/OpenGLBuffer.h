@@ -29,12 +29,14 @@ namespace axiom
     {
     public:
         OpenGLVertexBuffer(float* vertices, uint32 size);
+        OpenGLVertexBuffer(uint32 byteSize);
         ~OpenGLVertexBuffer();
 
         virtual void Bind() const;
         virtual void Unbind() const;
         virtual const BufferLayout& GetLayout() const override;
         virtual void SetLayout(const BufferLayout& layout) override;
+        virtual void SetData(const void* data, uint32 size) override;
     private:
         uint32 m_rendererID;
         BufferLayout m_layout;

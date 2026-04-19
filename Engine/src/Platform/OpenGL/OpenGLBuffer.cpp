@@ -1,5 +1,6 @@
 #include "Platform/OpenGL/OpenGLBuffer.h"
 #include <glad/glad.h>
+#include "OpenGLBuffer.h"
 
 namespace axiom
 {
@@ -7,8 +8,16 @@ namespace axiom
     {
         glCreateBuffers(1, &m_rendererID);
         glBindBuffer(GL_ARRAY_BUFFER, m_rendererID);
-        glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_DYNAMIC_DRAW);
     }
+
+    OpenGLVertexBuffer::OpenGLVertexBuffer(uint32 byteSize)
+    {
+        glCreateBuffers(1, &m_rendererID);
+        glBindBuffer(GL_ARRAY_BUFFER, m_rendererID);
+        glBufferData(GL_ARRAY_BUFFER, byteSize, nullptr, GL_DYNAMIC_DRAW);
+    }
+
 
     OpenGLVertexBuffer::~OpenGLVertexBuffer()
     {
@@ -33,6 +42,11 @@ namespace axiom
     void OpenGLVertexBuffer::SetLayout(const BufferLayout &layout)
     {
         m_layout = layout;
+    }
+
+    void OpenGLVertexBuffer::SetData(const void *data, uint32 size)
+    {
+        glNamedBufferSubData(m_rendererID, 0, size, data);
     }
 
     OpenGLIndexBuffer::OpenGLIndexBuffer(uint32 *indices, uint32 count)

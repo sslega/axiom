@@ -102,11 +102,15 @@ namespace axiom
         void PoolEvents();
         void Update();
         void Render();
+        void DebugRender();
         void RegisterModules();
         void InitializeModules();
         void ShutdownModules();
 
         static Application* s_instance;
-        TimePoint m_lastFrameTime;
+        TimePoint m_lastUpdateTime;
+        TimePoint m_lastRenderTime;
+        Timestep m_dt; 
+        // float m_fps;
     };
 }

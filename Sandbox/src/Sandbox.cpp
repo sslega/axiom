@@ -63,6 +63,10 @@ void Sandbox::OnApplicationRun()
     auto textureResource = Resource->Load<Texture2DResource>("engine://Textures/heresy.png");
     m_texture = Device.CreateTexture2D(*textureResource);
 
+    // Common, instanced material
+    auto mat = MakeShared<Material>(shader);
+    mat->SetTexture("u_Texture", m_texture, 0);
+
     for (int y = -2; y <= 2; y++)
     {
         for (int x = -2; x <= 2; x++)
@@ -73,9 +77,10 @@ void Sandbox::OnApplicationRun()
             t->position = {x * 0.5f, y * 0.5f, 0.0f};
             t->scale    = {0.1f, 0.1f, 0.1f};
 
-            auto mat = MakeShared<Material>(shader);
-            mat->SetUniform("u_Color", Vec4{(x+2.f)/5.f, (y+2.f)/5.f, 0.f, 1.f});
-            mat->SetTexture("u_Texture", m_texture, 0);
+            // Unique material
+            // auto mat = MakeShared<Material>(shader);
+            // mat->SetUniform("u_Color", Vec4{(x+2.f)/5.f, (y+2.f)/5.f, 0.f, 1.f});
+            // mat->SetTexture("u_Texture", m_texture, 0);
 
             auto* m = e->CreateComponent<MeshComponent>();
             m->SetMesh(quadMesh);
@@ -184,7 +189,4 @@ void Sandbox::OnUpdate(axiom::Timestep delta)
             m_cameraComponent->m_camera.SetRotation(m_cameraComponent->m_camera.GetRotation() + rotationSpeed);
         }
     }
-    
-
-    
 }

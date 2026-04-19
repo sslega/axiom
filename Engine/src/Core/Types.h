@@ -48,7 +48,7 @@ namespace axiom
     {
         return std::make_unique<T>(std::forward<Args>(args)...);
     }
-    
+
     template<typename T>
     using SharedPtr     = std::shared_ptr<T>;
     template<typename T, typename... Args>
@@ -57,4 +57,17 @@ namespace axiom
         return std::make_shared<T>(std::forward<Args>(args)...);
     }
 
+    struct PairHash
+    {
+        template<typename A, typename B>
+        size_t operator()(const std::pair<A, B>& p) const
+        {
+            size_t h1 = std::hash<A>{}(p.first);
+            size_t h2 = std::hash<B>{}(p.second);
+            return h1 ^ (h2 << 1);
+        }
+    };
+
+    template<typename K, typename V>
+    using PairMap = std::unordered_map<K, V, PairHash>;
 }

@@ -9,6 +9,8 @@
 #include "ImGui/ImGuiModule.h"
 #include "Input/Input.h"
 #include "Core/Log.h"
+#include <imgui.h>
+#include "Application.h"
 
 namespace axiom
 {
@@ -35,7 +37,8 @@ namespace axiom
 
         m_input = Input::Create(*m_applicationWindow);
         m_log = MakeUnique<ConsoleLog>();
-        m_lastFrameTime = std::chrono::steady_clock::now();
+        m_lastRenderTime = std::chrono::steady_clock::now();
+        m_lastUpdateTime = m_lastRenderTime;
     }
 
     Application::~Application()
@@ -75,8 +78,8 @@ namespace axiom
     void Application::Update()
     {
         auto now = std::chrono::steady_clock::now();
-        Timestep ts = std::chrono::duration<float>(now - m_lastFrameTime).count();
-        m_lastFrameTime = now;
+        Timestep ts = std::chrono::duration<float>(now - m_lastUpdateTime).count();
+        m_lastUpdateTime = now;
 
         m_applicationWindow->Update();
 
@@ -89,18 +92,42 @@ namespace axiom
 
     void Application::Render()
     {
-        for (auto& id : m_moduleOrder)
-            m_engineModules[id]->BeginFrame();
+        auto now = std::chrono::steady_clock::now();
+        m_dt = std::chrono::duration<float>(now - m_lastRenderTime).count();
+        m_lastRenderTime = now;
 
         for (auto& id : m_moduleOrder)
+        {
+            m_engineModules[id]->BeginFrame();
+        }
+            
+
+        for (auto& id : m_moduleOrder)
+        {
             m_engineModules[id]->Render();
+        }
 
         OnRender();
+        DebugRender();
 
         for (auto& id : m_moduleOrder)
+        {
             m_engineModules[id]->EndFrame();
+        }
 
         GetModule<RenderModule>()->GetGraphicsDevice().Present();
+    }
+
+    void Application::DebugRender()
+    {
+        uint8 fps = 1.0f / m_dt;
+        auto& device = GetModule<RenderModule>()->GetGraphicsDevice();
+
+        ImDrawList* dl = ImGui::GetForegroundDrawList();
+        dl->AddText(ImVec2(10, 10), IM_COL32(255, 255, 255, 255), std::string("FPS: " + std::to_string(fps)).c_str());
+        dl->AddText(ImVec2(10, 22), IM_COL32(255, 255, 255, 255), std::string("Draw Calls: " + std::to_string(device.GetDrawCallCount())).c_str());
+        dl->AddText(ImVec2(10, 34), IM_COL32(255, 255, 255, 255), std::string("Instanced calls: " + std::to_string(device.GetInstanceCallCount())).c_str());
+        dl->AddText(ImVec2(10, 46), IM_COL32(255, 255, 255, 255), std::string("Instances drawn: " + std::to_string(device.GetInstanceCount())).c_str());
     }
 
     void Application::RegisterModules()

@@ -10,8 +10,8 @@
 #include "Renderer/MeshComponent.h"
 #include "Scene/TransformComponent.h"
 #include "Core/Log.h"
+#include "Core/Types.h"
 #include "Renderer/Material.h"
-#include <imgui.h>
 
 namespace axiom
 {
@@ -39,41 +39,71 @@ namespace axiom
     {
 
         BeginScene();
-
+        
         SceneModule* sceneModule = GetModule<SceneModule>();
         AX_ASSERT(sceneModule->HasActiveScene(), "No active Scene!");
 
         Scene* scene = sceneModule->GetActiveScene();
         auto meshComponents = scene->GetComponents<MeshComponent>();
 
-        for (MeshComponent* meshComponent : meshComponents)
+        Vector<RenderCommand> renderCommands;
+        // 1. Collect
+        for(MeshComponent* meshComponent : meshComponents)
         {
             if (!meshComponent->IsVisible()) continue;
-
-            const SharedPtr<Material> material = meshComponent->GetMaterial();
-            const SharedPtr<MeshResource> mesh= meshComponent->GetMesh();
-            if (!material || !mesh) continue;
-
-            TransformComponent* transformComponent = meshComponent->GetEntity()->GetComponent<TransformComponent>();
-            Matrix4 transform = transformComponent ? transformComponent->GetTransform() : Matrix4::Identity();
-            
-            // SharedPtr<VertexBuffer> VB = m_graphicsDevice->CreateVertexBuffer(*mesh.get());
-            // SharedPtr<IndexBuffer> IB = m_graphicsDevice->CreateIndexBuffer(*mesh.get());
-            
-            auto buffers = GetOrCreateBuffers(mesh);
-            // TODO: Improve shader/material binding
-            Submit(buffers.vb, buffers.ib, material, transform);
-
+            if (!meshComponent->GetMaterial() || !meshComponent->GetMesh()) continue;
+            TransformComponent* tc = meshComponent->GetEntity()->GetComponent<TransformComponent>();
+            renderCommands.push_back({ meshComponent->GetMesh(), meshComponent->GetMaterial(), tc ? tc->GetTransform() : Matrix4::Identity() });
         }
 
-        EndScene();
+        // 2. Group by (mesh, material)
+        PairMap<InstanceGroupKey, Vector<Matrix4>> instanceGroups;
+        for (auto& renderCommand : renderCommands)
+        {
+            InstanceGroupKey groupKey{ renderCommand.mesh.get(), renderCommand.material.get() };
+            instanceGroups[groupKey].push_back(renderCommand.transform);
+        }
+        
+        // 3. Dispatch
+        for(auto& [key, transforms] : instanceGroups)
+        {
+            // need SharedPtrs back — find first matching command
+            auto it = std::find_if(renderCommands.begin(), renderCommands.end(), [&](const RenderCommand& c){
+                return c.mesh.get() == key.first && c.material.get() == key.second;
+            });
+            auto buffers  = GetOrCreateBuffers(it->mesh);
+            auto material = it->material;
+            if (transforms.size() > 1)
+            {
+                SubmitInstanced(buffers, material, transforms);
+            }
+            else
+            {
+                Submit(buffers.vb, buffers.ib, material, transforms[0]);
+            }
+        }
+        
+        // for (MeshComponent* meshComponent : meshComponents)
+        // {
+        //     if (!meshComponent->IsVisible()) continue;
 
-        int fps = std::ceil(GetFPS());
-        int drawCalls = GetGraphicsDevice().GetDrawCallCount();
-        // TODO: Move it to some sort of Debug/Log 
-        ImDrawList* dl = ImGui::GetForegroundDrawList();
-        dl->AddText(ImVec2(10, 10), IM_COL32(255, 255, 255, 255), std::string("FPS: " + std::to_string(fps)).c_str());
-        dl->AddText(ImVec2(10, 22), IM_COL32(255, 255, 255, 255), std::string("DrawCalls: " + std::to_string(drawCalls)).c_str());
+        //     const SharedPtr<Material> material = meshComponent->GetMaterial();
+        //     const SharedPtr<MeshResource> mesh= meshComponent->GetMesh();
+        //     if (!material || !mesh) continue;
+
+        //     TransformComponent* transformComponent = meshComponent->GetEntity()->GetComponent<TransformComponent>();
+        //     Matrix4 transform = transformComponent ? transformComponent->GetTransform() : Matrix4::Identity();
+            
+        //     // SharedPtr<VertexBuffer> VB = m_graphicsDevice->CreateVertexBuffer(*mesh.get());
+        //     // SharedPtr<IndexBuffer> IB = m_graphicsDevice->CreateIndexBuffer(*mesh.get());
+            
+        //     auto buffers = GetOrCreateBuffers(mesh);
+        //     // TODO: Improve shader/material binding
+        //     Submit(buffers.vb, buffers.ib, material, transform);
+
+        // }
+
+        EndScene();        
     }
 
     GraphicsDevice& RenderModule::GetGraphicsDevice() const
@@ -92,7 +122,6 @@ namespace axiom
         AX_ASSERT(!cameras.empty(), "No active Camera!");
         OrtographicCamera* camera = &cameras[0]->m_camera;
         
-
         m_sceneData.viewProjectionMatrix = camera->GetViewProjectionMatrix();
         m_graphicsDevice->SetClearColor(Vec4(0.5f, 0.5f, 0.5f, 1.0f));
         m_graphicsDevice->Clear();
@@ -123,9 +152,13 @@ namespace axiom
         auto it = m_shaderCache.find(path);
         if(it == m_shaderCache.end())
         {
-            m_shaderCache[path] = CreateShader(path);
+            auto shader = CreateShader(path);
+            m_shaderCache[path] = shader;
+
+            auto instancedShader = CreateInstancedShader(path);
+            m_instancedShaderCache[shader.get()] = instancedShader;
+            it = m_shaderCache.find(path);
         }
-        it = m_shaderCache.find(path);
         return it->second;
     }
 
@@ -133,6 +166,22 @@ namespace axiom
     {
         auto shaderResource = GetModule<ResourceModule>()->Load<ShaderResource>(path);
         return GetGraphicsDevice().CreateShader(*shaderResource);
+    }
+
+    SharedPtr<Shader> RenderModule::CreateInstancedShader(const String path)
+    {
+        auto shaderResource = GetModule<ResourceModule>()->Load<ShaderResource>(path);
+        // Inject #define after the #version line
+        const String& vertSrc = shaderResource->GetVertexSource();
+        
+        size_t versionPos = vertSrc.find("#version");
+        size_t newline    = vertSrc.find('\n', versionPos);   // newline AFTER #version line
+
+        String instancedVert = vertSrc.substr(0, newline + 1)
+                    + "#define INSTANCED 1\n"
+                    + vertSrc.substr(newline + 1);
+
+        return GetGraphicsDevice().CreateShader(instancedVert, shaderResource->GetFragmentSource());
     }
 
     RenderModule::MeshBuffers RenderModule::GetOrCreateBuffers(const SharedPtr<MeshResource> &mesh)
@@ -147,85 +196,56 @@ namespace axiom
         return buffers;
     }
 
-    float RenderModule::GetFPS()
+    SharedPtr<Shader> RenderModule::GetOrCreateInstancedShader(const SharedPtr<Shader> &shader)
     {
-        std::chrono::steady_clock::time_point  now = std::chrono::steady_clock::now();
-        float dt  = std::chrono::duration<float>(now - m_lastTime).count();
-        m_lastTime = now;
-        if (dt > 0.0f)
+        auto it = m_instancedShaderCache.find(shader.get());
+        return it != m_instancedShaderCache.end() ? it->second : nullptr;
+    }
+
+    void RenderModule::SubmitInstanced(const MeshBuffers& buffers, const SharedPtr<Material>& material, const Vector<Matrix4>& transforms)
+    {
+        uint32 byteSize = static_cast<uint32>(transforms.size() * sizeof(Matrix4));
+        auto cacheKey = std::make_pair(buffers.vb.get(), material.get());
+        auto it = m_instanceBufferCache.find(cacheKey);
+        if (it == m_instanceBufferCache.end())
         {
-            m_fps = 1.0f / dt;
+            auto instanceBuffer = m_graphicsDevice->CreateDynamicVertexBuffer(byteSize);
+                instanceBuffer->SetLayout({
+                { ShaderDataType::Float4, "a_InstanceTransform0" },
+                { ShaderDataType::Float4, "a_InstanceTransform1" },
+                { ShaderDataType::Float4, "a_InstanceTransform2" },
+                { ShaderDataType::Float4, "a_InstanceTransform3" },
+            });
+            m_instanceBufferCache[cacheKey] = instanceBuffer;
+            it = m_instanceBufferCache.find(cacheKey);
         }
-        return m_fps;
+
+        SharedPtr<VertexBuffer>& instanceBuffer = it->second;
+        instanceBuffer->SetData(transforms.data(), byteSize);
+
+        material->Bind();  // binds regular shader, uploads uniforms + textures
+
+        // Override with instanced shader variant
+        SharedPtr<Shader> instancedShader = GetOrCreateInstancedShader(material->GetShader());
+        if (instancedShader)
+        {
+            instancedShader->Bind();
+            instancedShader->UploadUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
+        }
+        else
+        {
+            material->GetShader()->UploadUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
+        }
+        
+        m_graphicsDevice->DrawIndexedInstanced(buffers.vb, buffers.ib, instanceBuffer, static_cast<uint32>(transforms.size()));
+    }
+
+    void RenderModule::SubmitBatched(const SharedPtr<Material>& material, const Vector<RenderCommand>& commands)
+    {
     }
 
     GraphicsDevice::API RenderModule::GetRenderAPI() const
     {
         return GetApp().GetRenderAPI();
     }
-
-    // RenderMesh* RenderModule::GetMesh(const SharedPtr<MeshResource> meshResource)
-    // {
-    //     auto it = m_meshes.find(meshResource);
-    //     if(it != m_meshes.end())
-    //     {
-    //         return it->second.get();
-    //     }
-    //     UniquePtr<RenderMesh> mesh = CreateMesh(meshResource);
-    //     RenderMesh* meshPtr = mesh.get();
-    //     m_meshes[meshResource] = std::move(mesh);
-    //     return meshPtr;
-    // }
-
-    // UniquePtr<RenderMesh> RenderModule::CreateMesh(const SharedPtr<MeshResource> meshResource)
-    // {
-    //     UniquePtr<RenderMesh> mesh;
-    //     switch (m_renderApi)
-    //     {
-    //         case RenderAPI::OpenGL:
-    //             mesh = MakeUnique<GLRenderMesh>(*meshResource.get());
-    //             break;
-    //         default:
-    //             mesh = nullptr;
-    //             AX_FATAL("Unknown RenderAPI");
-    //     }
-    //     return mesh;
-    // }
-
-    // void RenderModule::DestroyMesh(SharedPtr<MeshResource> meshResource)
-    // {
-    // }
-
-    // RenderShader* RenderModule::GetShader(const SharedPtr<ShaderResource> shaderResource)
-    // {
-    //      auto it = m_shaders.find(shaderResource);
-    //     if(it != m_shaders.end())
-    //     {
-    //         return it->second.get();
-    //     }
-    //     UniquePtr<RenderShader> shader = CreateShader(shaderResource);
-    //     RenderShader* shaderPtr = shader.get();
-    //     m_shaders[shaderResource] = std::move(shader);
-    //     return shaderPtr;
-    // }
-
-    // UniquePtr<RenderShader> RenderModule::CreateShader(const SharedPtr<ShaderResource> shaderResource)
-    // {
-    //     UniquePtr<RenderShader> shader;
-    //     switch (m_renderApi)
-    //     {
-    //         case RenderAPI::OpenGL:
-    //             shader = MakeUnique<GLRenderShader>(*shaderResource.get());
-    //             break;
-    //         default:
-    //             shader = nullptr;
-    //             AX_FATAL("Unknown RenderAPI");
-
-    //     }
-    //     return shader;
-    // }
-
-    // void RenderModule::DestroyShader(SharedPtr<ShaderResource> shaderResource)
-    // {
-    // }
 }

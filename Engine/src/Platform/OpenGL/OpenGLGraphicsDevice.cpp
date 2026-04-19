@@ -11,6 +11,7 @@
 #include <imgui_impl_opengl3.h>
 #include "Core/Log.h"
 #include "Resources/ShaderResource.h"
+#include "OpenGLGraphicsDevice.h"
 
 
 namespace axiom
@@ -57,6 +58,17 @@ namespace axiom
         m_drawCallCount++;
     }
 
+    void OpenGLGraphicsDevice::DrawIndexedInstanced(const SharedPtr<VertexBuffer> &vertexBuffer, const SharedPtr<IndexBuffer> &indexBuffer, const SharedPtr<VertexBuffer> &instanceBuffer, uint32 instanceCount)
+    {
+        uint32 vao = GetOrCreateVAO(vertexBuffer, instanceBuffer);
+        glBindVertexArray(vao);
+        indexBuffer->Bind();
+        glDrawElementsInstanced(GL_TRIANGLES, indexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr, instanceCount);
+        m_drawCallCount++;
+        m_instanceCallCount++;
+        m_instanceCount += instanceCount;
+    }
+
     void OpenGLGraphicsDevice::Present()
     {
         glfwSwapBuffers(m_windowHandle);
@@ -68,9 +80,9 @@ namespace axiom
         return MakeShared<OpenGLVertexBuffer>(vertices, size);
     }
 
-    SharedPtr<IndexBuffer> OpenGLGraphicsDevice::CreateIndexBuffer(uint32* indices, uint32 count) const
+    SharedPtr<VertexBuffer> OpenGLGraphicsDevice::CreateDynamicVertexBuffer(uint32 byteSize) const
     {
-        return MakeShared<OpenGLIndexBuffer>(indices, count);
+        return MakeShared<OpenGLVertexBuffer>(byteSize);
     }
 
     SharedPtr<VertexBuffer> OpenGLGraphicsDevice::CreateVertexBuffer(const MeshResource& mesh) const
@@ -84,6 +96,11 @@ namespace axiom
         return vb;
     }
 
+    SharedPtr<IndexBuffer> OpenGLGraphicsDevice::CreateIndexBuffer(uint32* indices, uint32 count) const
+    {
+        return MakeShared<OpenGLIndexBuffer>(indices, count);
+    }
+
     SharedPtr<IndexBuffer> OpenGLGraphicsDevice::CreateIndexBuffer(const MeshResource& mesh) const
     {
         const auto& indices = mesh.GetIndices();
@@ -92,7 +109,6 @@ namespace axiom
             static_cast<uint32>(indices.size())
         );
     }
-
 
     SharedPtr<Shader> OpenGLGraphicsDevice::CreateShader(const String& vertexSource, const String& fragmentSource) const
     {
@@ -114,9 +130,14 @@ namespace axiom
         return MakeShared<OpenGLTexture2D>(resource);
     }
 
-    uint32 OpenGLGraphicsDevice::GetOrCreateVAO(const SharedPtr<VertexBuffer> &vertexBuffer)
+    uint32 OpenGLGraphicsDevice::GetOrCreateVAO(const SharedPtr<VertexBuffer>& vertexBuffer)
     {
-        VertexBuffer* key = vertexBuffer.get();
+        return GetOrCreateVAO(vertexBuffer, nullptr);
+    }
+
+    uint32 OpenGLGraphicsDevice::GetOrCreateVAO(const SharedPtr<VertexBuffer>& vertexBuffer, const SharedPtr<VertexBuffer>& instanceBuffer)
+    {
+        auto key = std::make_pair(vertexBuffer.get(), instanceBuffer ? instanceBuffer.get() : nullptr);
         auto it = m_vaoCache.find(key);
         if (it != m_vaoCache.end())
             return it->second;
@@ -139,6 +160,28 @@ namespace axiom
                 layout.GetStride(),
                 (const void*)element.offset
             );
+        }
+
+        if (instanceBuffer)
+        {
+            instanceBuffer->Bind();
+            const BufferLayout& instanceLayout = instanceBuffer->GetLayout();
+            uint8 instanceAttribBase = static_cast<uint8>(layout.GetSize());
+            for (uint8 i = 0; i < instanceLayout.GetSize(); ++i)
+            {
+                const auto& element = instanceLayout.GetElement(i);
+                uint8 index = instanceAttribBase + i;
+                glEnableVertexAttribArray(index);
+                glVertexAttribPointer(
+                    index,
+                    element.GetComponentCount(),
+                    ShaderDataTypeToOpenGLBaseType(element.type),
+                    element.normalized ? GL_TRUE : GL_FALSE,
+                    instanceLayout.GetStride(),
+                    (const void*)element.offset
+                );
+                glVertexAttribDivisor(index, 1);
+            }
         }
 
         m_vaoCache[key] = vao;

@@ -108,6 +108,7 @@ namespace axiom
         
         virtual const BufferLayout& GetLayout() const = 0;
         virtual void SetLayout(const BufferLayout& layout) = 0;
+        virtual void SetData(const void* data, uint32 size) = 0;
     };
 
     class IndexBuffer : public Buffer

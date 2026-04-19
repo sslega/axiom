@@ -18,6 +18,7 @@ namespace axiom
         void Bind();
         void Unbind();
         void SetTexture(const String& name, const SharedPtr<Texture2D> texture, uint32 slot);
+        inline const SharedPtr<Shader>& GetShader() const { return m_shader; }
 
         template<typename T>
         void SetUniform(const String& name, const T& value)
