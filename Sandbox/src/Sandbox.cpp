@@ -6,6 +6,7 @@
 #include "Renderer/Shader.h"
 #include "Renderer/Texture.h"
 #include "Renderer/CameraComponent.h"
+#include "Renderer/CameraController.h"
 #include "Resources/ShaderResource.h"
 #include "Resources/Texture2DResource.h"
 #include "Geometry/Quad.h"
@@ -62,6 +63,7 @@ void Sandbox::OnApplicationRun()
     transformComponent->position = Vec3(0.0f, 0.0f, 2.0f);
     float aspectRatio = GetApplicationWindow().AspectRatio();
     m_cameraComponent = cameraEntity->CreateComponent<CameraComponent>(ToRadians(60.0f), aspectRatio, 0.1f, 1000.0f);
+    cameraEntity->CreateComponent<CameraController>();
 
     auto textureResource = Resource->Load<Texture2DResource>("engine://Textures/heresy.png");
     m_texture = Device.CreateTexture2D(*textureResource);
@@ -121,7 +123,7 @@ void Sandbox::OnRender()
     ImGui::End();
 }
 
-void Sandbox::OnUpdate(axiom::Timestep delta)
+void Sandbox::OnUpdate(float deltaTime)
 {
     if(Input::IsKeyPressed(KeyCode::Up))
     {

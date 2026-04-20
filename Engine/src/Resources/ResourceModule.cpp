@@ -28,26 +28,6 @@ namespace axiom
         m_fileSystemModule = GetModule<FileSystemModule>();
     }
 
-    void ResourceModule::OnRegister()
-    {
-    }
-
-    void ResourceModule::OnUnregister()
-    {
-    }
-
-    void ResourceModule::OnShutdown()
-    {
-    }
-
-    void ResourceModule::OnUpdate()
-    {
-    }
-
-    void ResourceModule::OnRender()
-    {
-    }
-
     SharedPtr<void> ResourceModule::LoadInternal(const String& virtualPath)
     {
         auto it = m_resources.find(virtualPath);

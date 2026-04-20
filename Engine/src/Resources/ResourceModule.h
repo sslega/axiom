@@ -33,14 +33,9 @@ namespace axiom
             m_loaders[fileExtension] = MakeUnique<T>(*this);
         }
 
-        void OnRegister() override;
-        void OnUnregister() override;
-
     protected:
         void OnInitialize() override;
-        void OnShutdown() override;
-        void OnUpdate() override;
-        void OnRender() override;
+        
     private:
         FileSystemModule* m_fileSystemModule;
         StringMap<UniquePtr<ResourceLoader>> m_loaders;

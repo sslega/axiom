@@ -31,7 +31,7 @@ namespace axiom
     {
     }
 
-    void RenderModule::OnUpdate()
+    void RenderModule::OnUpdate(float deltaTime)
     {
     }
 
@@ -146,17 +146,17 @@ namespace axiom
 
     void RenderModule::Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Material>& material, const Matrix4& transform)
     {
-        material->Bind();
         material->SetUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
         material->SetUniform("u_Transform", transform);
+        material->Bind();
         m_graphicsDevice->DrawIndexed(vb, ib);
     }
 
     void RenderModule::Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Shader>& shader, const Matrix4& transform)
     {
-        shader->Bind();
         shader->UploadUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
         shader->UploadUniform("u_Transform", transform);
+        shader->Bind();
         m_graphicsDevice->DrawIndexed(vb, ib);
     }
 
@@ -238,7 +238,6 @@ namespace axiom
 
         material->Bind();  // binds regular shader, uploads uniforms + textures
 
-        // Override with instanced shader variant
         SharedPtr<Shader> instancedShader = GetOrCreateInstancedShader(material->GetShader());
         if (instancedShader)
         {
@@ -300,8 +299,9 @@ namespace axiom
         m_batchIBCache[key]->SetData(indices.data(), ibCount);
 
         material->Bind();
-        material->SetUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
-        material->SetUniform("u_Transform", Matrix4::Identity());
+        material->GetShader()->UploadUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
+        material->GetShader()->UploadUniform("u_Transform", Matrix4::Identity());
+        
         m_graphicsDevice->DrawIndexed(m_batchVBCache[key], m_batchIBCache[key]);
         m_batchCallCount++;
         m_batchObjectCount += commands.size();

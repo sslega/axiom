@@ -36,6 +36,12 @@ namespace axiom
                 }
             }
         }
+    protected:
+        virtual void OnUpdate(float deltaTime);
+        virtual void OnBeginFrame();
+        virtual void OnRender();
+        virtual void OnEndFrame();
+        friend class SceneModule;
 
     private:
         String m_name;

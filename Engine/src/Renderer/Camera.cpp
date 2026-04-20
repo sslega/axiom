@@ -51,13 +51,13 @@ namespace axiom
         m_fovY = fovYRadians;
         RecalculateProjection();
     }
-
+    
     Matrix4 Camera::GetViewMatrix(Vec3 position, Vec3 rotation)
     {
         return Matrix4::Rotate({0,0,1}, -rotation.z)
-         * Matrix4::Rotate({0,1,0}, -rotation.y)
-         * Matrix4::Rotate({1,0,0}, -rotation.x)
-         * Matrix4::Translate({-position.x, -position.y, -position.z});
+            * Matrix4::Rotate({1,0,0}, -rotation.x)
+            * Matrix4::Rotate({0,1,0}, -rotation.y)
+            * Matrix4::Translate({-position.x, -position.y, -position.z});
     }
 
     void Camera::RecalculateProjection()

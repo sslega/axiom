@@ -34,4 +34,36 @@ namespace axiom
     {
         return m_name;
     }
+
+    void Scene::OnUpdate(float deltaTime)
+    {
+        for(auto& entity : m_entities)
+        {
+            entity.second->OnUpdate(deltaTime);
+        }
+    }
+    
+    void Scene::OnBeginFrame()
+    {
+        for(auto& entity : m_entities)
+        {
+            entity.second->OnBeginFrame();
+        }
+    }
+
+    void Scene::OnRender()
+    {
+        for(auto& entity : m_entities)
+        {
+            entity.second->OnRender();
+        }
+    }
+
+    void Scene::OnEndFrame()
+    {
+        for(auto& entity : m_entities)
+        {
+            entity.second->OnEndFrame();
+        }
+    }
 }

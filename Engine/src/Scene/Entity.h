@@ -61,6 +61,15 @@ namespace axiom
         
     protected:
         TypeMap<UniquePtr<Component>> m_components;
+
+        // virtual void OnRegister();
+        // virtual void OnInitialize();
+        // virtual void OnShutdown();
+        virtual void OnUpdate(float deltaTime);
+        virtual void OnBeginFrame();
+        virtual void OnRender();
+        virtual void OnEndFrame();
+        friend class Scene;
     
     private:
         inline static ID s_nextId = 0;

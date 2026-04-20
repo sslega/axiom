@@ -24,7 +24,7 @@ protected:
     void OnRegisterModules() override;
     void OnApplicationRun() override;
     void OnRender() override;
-    void OnUpdate(Timestep delta) override;
+    void OnUpdate(float deltaTime) override;
 
 private:
     SharedPtr<VertexBuffer> m_triangleVB;

@@ -12,7 +12,11 @@ namespace axiom
         GLFWInput(const ApplicationWindow& window);
 
     protected:
-        virtual bool IsKeyPressedInternal(KeyCode key) const override;
-        
+        bool  IsKeyPressedInternal(KeyCode key) const override;
+        bool  IsMouseButtonPressedInternal(MouseCode button) const override;
+        Vec2  GetMousePositionInternal() const override;
+        float GetScrollDeltaInternal() const override;
+    private:
+        mutable float m_scrollDelta = 0.0f;
     };
 }

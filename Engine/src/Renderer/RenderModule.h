@@ -40,7 +40,7 @@ namespace axiom
     protected:
         void OnInitialize() override;
         void OnShutdown() override;
-        void OnUpdate() override;
+        void OnUpdate(float deltaTime) override;
         void OnRender() override;
 
         SharedPtr<Shader> CreateShader(const String path);

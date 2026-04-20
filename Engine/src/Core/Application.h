@@ -69,7 +69,7 @@ namespace axiom
 
         // User override hooks — override these in your Application subclass
         virtual void OnApplicationRun()    {}
-        virtual void OnUpdate(Timestep delta) {}
+        virtual void OnUpdate(float deltaTime) {}
         virtual void OnRender()            {}
         virtual void OnRegisterModules()   {}
         virtual void OnInitializeModules() {}

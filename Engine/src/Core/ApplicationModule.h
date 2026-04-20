@@ -22,7 +22,7 @@ namespace axiom
     protected:
         virtual void OnInitialize()  {}
         virtual void OnShutdown()    {}
-        virtual void OnUpdate()      {}
+        virtual void OnUpdate(float deltaTime){}
         virtual void OnBeginFrame()  {}
         virtual void OnRender()      {}
         virtual void OnEndFrame()    {}
@@ -37,7 +37,7 @@ namespace axiom
 
     private:
         friend class Application;
-        void Update()     { OnUpdate(); }
+        void Update(float deltaTime) { OnUpdate(deltaTime); }
         void BeginFrame() { OnBeginFrame(); }
         void Render()     { OnRender(); }
         void EndFrame()   { OnEndFrame(); }

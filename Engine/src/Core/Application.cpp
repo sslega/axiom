@@ -79,15 +79,16 @@ namespace axiom
     {
         auto now = std::chrono::steady_clock::now();
         Timestep ts = std::chrono::duration<float>(now - m_lastUpdateTime).count();
+        float deltaTime = ts.Milliseconds();
         m_lastUpdateTime = now;
 
         m_applicationWindow->Update();
 
         for (auto& id : m_moduleOrder)
         {
-            m_engineModules[id]->Update();
+            m_engineModules[id]->Update(deltaTime);
         }
-        OnUpdate(ts);
+        OnUpdate(deltaTime);
     }
 
     void Application::Render()

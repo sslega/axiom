@@ -17,5 +17,24 @@ namespace axiom
     {
         return m_activeScene != nullptr;
     }
-}
 
+    void SceneModule::OnUpdate(float deltaTime)
+    {
+        m_activeScene->OnUpdate(deltaTime);
+    }
+
+    void SceneModule::OnBeginFrame()
+    {
+        m_activeScene->OnBeginFrame();
+    }
+
+    void SceneModule::OnRender()
+    {
+        m_activeScene->OnRender();
+    }
+
+    void SceneModule::OnEndFrame()
+    {
+        m_activeScene->OnEndFrame();
+    }
+}

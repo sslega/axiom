@@ -14,6 +14,12 @@ namespace axiom
         // Scene* CreateScene(const String& name);
         Scene* GetActiveScene() const;
         bool HasActiveScene() const;
+    
+    protected:
+        virtual void OnUpdate(float deltaTime) override;
+        virtual void OnBeginFrame() override;
+        virtual void OnRender() override;
+        virtual void OnEndFrame() override;
 
     private:
         UniquePtr<Scene>  m_activeScene;
