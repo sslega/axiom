@@ -121,13 +121,15 @@ namespace axiom
     void Application::DebugRender()
     {
         uint8 fps = 1.0f / m_dt;
-        auto& device = GetModule<RenderModule>()->GetGraphicsDevice();
+        auto Render = GetModule<RenderModule>();
 
         ImDrawList* dl = ImGui::GetForegroundDrawList();
         dl->AddText(ImVec2(10, 10), IM_COL32(255, 255, 255, 255), std::string("FPS: " + std::to_string(fps)).c_str());
-        dl->AddText(ImVec2(10, 22), IM_COL32(255, 255, 255, 255), std::string("Draw Calls: " + std::to_string(device.GetDrawCallCount())).c_str());
-        dl->AddText(ImVec2(10, 34), IM_COL32(255, 255, 255, 255), std::string("Instanced calls: " + std::to_string(device.GetInstanceCallCount())).c_str());
-        dl->AddText(ImVec2(10, 46), IM_COL32(255, 255, 255, 255), std::string("Instances drawn: " + std::to_string(device.GetInstanceCount())).c_str());
+        dl->AddText(ImVec2(10, 22), IM_COL32(255, 255, 255, 255), std::string("Draw Calls: " + std::to_string(Render->GetDrawCallCount())).c_str());
+        dl->AddText(ImVec2(10, 34), IM_COL32(255, 255, 255, 255), std::string("Instanced calls: " + std::to_string(Render->GetInstanceCallCount())).c_str());
+        dl->AddText(ImVec2(10, 46), IM_COL32(255, 255, 255, 255), std::string("Instanced objects drawn: " + std::to_string(Render->GetInstanceObjectCount())).c_str());
+        dl->AddText(ImVec2(10, 58), IM_COL32(255, 255, 255, 255), std::string("Batched calls: " + std::to_string(Render->GetBatchCallCount())).c_str());
+        dl->AddText(ImVec2(10, 70), IM_COL32(255, 255, 255, 255), std::string("Batched objects drawn: " + std::to_string(Render->GetBatchObjectCount())).c_str());
     }
 
     void Application::RegisterModules()

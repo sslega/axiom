@@ -55,7 +55,6 @@ namespace axiom
         glBindVertexArray(vao);
         indexBuffer->Bind();
         glDrawElements(GL_TRIANGLES, indexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
-        m_drawCallCount++;
     }
 
     void OpenGLGraphicsDevice::DrawIndexedInstanced(const SharedPtr<VertexBuffer> &vertexBuffer, const SharedPtr<IndexBuffer> &indexBuffer, const SharedPtr<VertexBuffer> &instanceBuffer, uint32 instanceCount)
@@ -64,15 +63,11 @@ namespace axiom
         glBindVertexArray(vao);
         indexBuffer->Bind();
         glDrawElementsInstanced(GL_TRIANGLES, indexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr, instanceCount);
-        m_drawCallCount++;
-        m_instanceCallCount++;
-        m_instanceCount += instanceCount;
     }
 
     void OpenGLGraphicsDevice::Present()
     {
         glfwSwapBuffers(m_windowHandle);
-        ResetDrawCallCount();
     }
 
     SharedPtr<VertexBuffer> OpenGLGraphicsDevice::CreateVertexBuffer(float* vertices, uint32 size) const
@@ -99,6 +94,11 @@ namespace axiom
     SharedPtr<IndexBuffer> OpenGLGraphicsDevice::CreateIndexBuffer(uint32* indices, uint32 count) const
     {
         return MakeShared<OpenGLIndexBuffer>(indices, count);
+    }
+
+    SharedPtr<IndexBuffer> OpenGLGraphicsDevice::CreateDynamicIndexBuffer(uint32 maxCount) const
+    {
+        return MakeShared<OpenGLIndexBuffer>(maxCount);
     }
 
     SharedPtr<IndexBuffer> OpenGLGraphicsDevice::CreateIndexBuffer(const MeshResource& mesh) const

@@ -37,7 +37,7 @@ namespace axiom
 
     void RenderModule::OnRender()
     {
-
+        ResetDebugDrawCounters();
         BeginScene();
         
         SceneModule* sceneModule = GetModule<SceneModule>();
@@ -64,43 +64,53 @@ namespace axiom
             instanceGroups[groupKey].push_back(renderCommand.transform);
         }
         
-        // 3. Dispatch
-        for(auto& [key, transforms] : instanceGroups)
+        // 3. Dispatch Intanced meshesh, collect batch candidates
+        UnorderedMap<Material*, Vector<RenderCommand>> batchCandidates;
+        for (auto& [key, transforms] : instanceGroups)
         {
-            // need SharedPtrs back — find first matching command
             auto it = std::find_if(renderCommands.begin(), renderCommands.end(), [&](const RenderCommand& c){
                 return c.mesh.get() == key.first && c.material.get() == key.second;
             });
-            auto buffers  = GetOrCreateBuffers(it->mesh);
-            auto material = it->material;
+            auto buffers = GetOrCreateBuffers(it->mesh);
             if (transforms.size() > 1)
             {
-                SubmitInstanced(buffers, material, transforms);
+                SubmitInstanced(buffers, it->material, transforms);
             }
             else
             {
-                Submit(buffers.vb, buffers.ib, material, transforms[0]);
+                batchCandidates[key.second].push_back({ it->mesh, it->material, transforms[0] });
+            }
+                
+        }
+
+        // 4. Draw batch and everything else
+        for (auto& [matPtr, cmds] : batchCandidates)
+        {
+            if (cmds.size() > 1)
+                SubmitBatched(cmds[0].material, cmds);
+            else
+            {
+                auto buffers = GetOrCreateBuffers(cmds[0].mesh);
+                Submit(buffers.vb, buffers.ib, cmds[0].material, cmds[0].transform);
             }
         }
-        
-        // for (MeshComponent* meshComponent : meshComponents)
+
+        // for(auto& [key, transforms] : instanceGroups)
         // {
-        //     if (!meshComponent->IsVisible()) continue;
-
-        //     const SharedPtr<Material> material = meshComponent->GetMaterial();
-        //     const SharedPtr<MeshResource> mesh= meshComponent->GetMesh();
-        //     if (!material || !mesh) continue;
-
-        //     TransformComponent* transformComponent = meshComponent->GetEntity()->GetComponent<TransformComponent>();
-        //     Matrix4 transform = transformComponent ? transformComponent->GetTransform() : Matrix4::Identity();
-            
-        //     // SharedPtr<VertexBuffer> VB = m_graphicsDevice->CreateVertexBuffer(*mesh.get());
-        //     // SharedPtr<IndexBuffer> IB = m_graphicsDevice->CreateIndexBuffer(*mesh.get());
-            
-        //     auto buffers = GetOrCreateBuffers(mesh);
-        //     // TODO: Improve shader/material binding
-        //     Submit(buffers.vb, buffers.ib, material, transform);
-
+        //     // need SharedPtrs back — find first matching command
+        //     auto it = std::find_if(renderCommands.begin(), renderCommands.end(), [&](const RenderCommand& c){
+        //         return c.mesh.get() == key.first && c.material.get() == key.second;
+        //     });
+        //     auto buffers  = GetOrCreateBuffers(it->mesh);
+        //     auto material = it->material;
+        //     if (transforms.size() > 1)
+        //     {
+        //         SubmitInstanced(buffers, material, transforms);
+        //     }
+        //     else
+        //     {
+        //         Submit(buffers.vb, buffers.ib, material, transforms[0]);
+        //     }
         // }
 
         EndScene();        
@@ -238,10 +248,68 @@ namespace axiom
         }
         
         m_graphicsDevice->DrawIndexedInstanced(buffers.vb, buffers.ib, instanceBuffer, static_cast<uint32>(transforms.size()));
+        m_instanceCallCount++;
+        m_instanceObjectCount += transforms.size();
     }
 
     void RenderModule::SubmitBatched(const SharedPtr<Material>& material, const Vector<RenderCommand>& commands)
     {
+        Vector<Vertex> vertices;
+        Vector<uint32> indices;
+
+        for (const auto& cmd : commands)
+        {
+            uint32 base = static_cast<uint32>(vertices.size());
+            for (const Vertex& v : cmd.mesh->GetVertices())
+            {
+                Vertex tv = v;
+                const Matrix4& t = cmd.transform;
+                tv.m_position = Vec3(
+                    t(0,0) * v.m_position.x + t(0,1) * v.m_position.y + t(0,2) * v.m_position.z + t(0,3),
+                    t(1,0) * v.m_position.x + t(1,1) * v.m_position.y + t(1,2) * v.m_position.z + t(1,3),
+                    t(2,0) * v.m_position.x + t(2,1) * v.m_position.y + t(2,2) * v.m_position.z + t(2,3)
+                );
+                vertices.push_back(tv);
+            }
+            for (uint32 idx : cmd.mesh->GetIndices())
+            {
+                indices.push_back(base + idx);
+            }
+        }
+
+        uint32 vbSize  = static_cast<uint32>(vertices.size() * sizeof(Vertex));
+        uint32 ibCount = static_cast<uint32>(indices.size());
+        Material* key  = material.get();
+
+        if (!m_batchVBCache.count(key))
+        {
+            auto vb = m_graphicsDevice->CreateDynamicVertexBuffer(vbSize);
+            vb->SetLayout(Vertex::GetLayout());
+            m_batchVBCache[key] = vb;
+        }
+
+        if (!m_batchIBCache.count(key))
+        {
+            m_batchIBCache[key] = m_graphicsDevice->CreateDynamicIndexBuffer(ibCount);
+        }
+
+        m_batchVBCache[key]->SetData(vertices.data(), vbSize);
+        m_batchIBCache[key]->SetData(indices.data(), ibCount);
+
+        material->Bind();
+        material->SetUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
+        material->SetUniform("u_Transform", Matrix4::Identity());
+        m_graphicsDevice->DrawIndexed(m_batchVBCache[key], m_batchIBCache[key]);
+        m_batchCallCount++;
+        m_batchObjectCount += commands.size();
+    }
+
+    void RenderModule::ResetDebugDrawCounters()
+    {
+        m_instanceCallCount = 0;
+        m_instanceObjectCount = 0;
+        m_batchCallCount = 0;
+        m_batchObjectCount = 0;
     }
 
     GraphicsDevice::API RenderModule::GetRenderAPI() const

@@ -31,6 +31,12 @@ namespace axiom
         GraphicsDevice& GetGraphicsDevice() const;
         GraphicsDevice::API GetRenderAPI() const;
 
+        inline uint32 GetDrawCallCount() const { return m_batchCallCount + m_instanceCallCount; }
+        inline uint32 GetBatchCallCount() const { return m_batchCallCount; }
+        inline uint32 GetBatchObjectCount() const { return m_batchObjectCount; }
+        inline uint32 GetInstanceCallCount() const { return m_instanceCallCount; }
+        inline uint32 GetInstanceObjectCount() const { return m_instanceObjectCount; }
+
     protected:
         void OnInitialize() override;
         void OnShutdown() override;
@@ -63,6 +69,8 @@ namespace axiom
         using InstanceBufferKey = std::pair<VertexBuffer*, Material*>;   // for SubmitInstanced cache
 
         PairMap<InstanceBufferKey, SharedPtr<VertexBuffer>> m_instanceBufferCache;
+        UnorderedMap<Material*, SharedPtr<VertexBuffer>> m_batchVBCache;
+        UnorderedMap<Material*, SharedPtr<IndexBuffer>> m_batchIBCache;
 
         struct MeshBuffers { SharedPtr<VertexBuffer> vb; SharedPtr<IndexBuffer> ib; };
         UnorderedMap<MeshResource*, MeshBuffers> m_meshCache;
@@ -71,24 +79,11 @@ namespace axiom
         SharedPtr<Shader> GetOrCreateInstancedShader(const SharedPtr<Shader>& shader);
         void SubmitInstanced(const MeshBuffers& buffers, const SharedPtr<Material>& material, const Vector<Matrix4>& transforms);
         void SubmitBatched(const SharedPtr<Material>& material, const Vector<RenderCommand>& commands);
+        void ResetDebugDrawCounters();
 
-
-        // SceneModule* m_sceneModule;
-
-        // Vector<MeshComponent*> m_meshComponents;
-
-        // RenderAPI m_renderApi;
-        // UniquePtr<IRenderDevice> m_renderer;
-
-        // RenderMesh* GetMesh(const SharedPtr<MeshResource> meshResource);
-        // UniquePtr<RenderMesh> CreateMesh(const SharedPtr<MeshResource> meshResource);
-        // void DestroyMesh(SharedPtr<MeshResource> meshResource);
-
-        // RenderShader* GetShader(const SharedPtr<ShaderResource> shaderResource);
-        // UniquePtr<RenderShader> CreateShader(const SharedPtr<ShaderResource> shaderResource);
-        // void DestroyShader(SharedPtr<ShaderResource> shaderResource);
-
-        // UnorderedMap<SharedPtr<MeshResource>, UniquePtr<RenderMesh>> m_meshes;
-        // UnorderedMap<SharedPtr<ShaderResource>, UniquePtr<RenderShader>> m_shaders;
+        uint32 m_instanceCallCount = 0;
+        uint32 m_instanceObjectCount = 0;
+        uint32 m_batchCallCount = 0;
+        uint32 m_batchObjectCount = 0;
     };
 }

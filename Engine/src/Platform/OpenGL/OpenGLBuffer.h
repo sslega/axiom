@@ -28,8 +28,8 @@ namespace axiom
     class OpenGLVertexBuffer : public VertexBuffer
     {
     public:
-        OpenGLVertexBuffer(float* vertices, uint32 size);
-        OpenGLVertexBuffer(uint32 byteSize);
+        OpenGLVertexBuffer(float* vertices, uint32 maxByteSize);
+        OpenGLVertexBuffer(uint32 maxByteSize);
         ~OpenGLVertexBuffer();
 
         virtual void Bind() const;
@@ -46,11 +46,14 @@ namespace axiom
     {
     public:
         OpenGLIndexBuffer(uint32* indices, uint32 count);
+        OpenGLIndexBuffer(uint32 maxCount);
         ~OpenGLIndexBuffer();
 
         virtual void Bind() const;
         virtual void Unbind() const;
         virtual uint32 GetCount() const;
+        virtual void SetData(const void* data, uint32 count) override;
+        
     private:
         uint32 m_rendererID;
         uint32 m_count;

@@ -117,6 +117,7 @@ namespace axiom
         virtual ~IndexBuffer() {}
 
         virtual uint32 GetCount() const = 0;
+        virtual void SetData(const void* data, uint32 count) = 0;
     };
 
     // TODO: this is purely OpenGL concept - remove it later

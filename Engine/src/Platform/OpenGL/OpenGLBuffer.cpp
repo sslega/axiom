@@ -46,7 +46,7 @@ namespace axiom
 
     void OpenGLVertexBuffer::SetData(const void *data, uint32 size)
     {
-        glNamedBufferSubData(m_rendererID, 0, size, data);
+        glNamedBufferData(m_rendererID, size, data, GL_DYNAMIC_DRAW);
     }
 
     OpenGLIndexBuffer::OpenGLIndexBuffer(uint32 *indices, uint32 count)
@@ -55,6 +55,14 @@ namespace axiom
         glCreateBuffers(1, &m_rendererID);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_rendererID);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_count * sizeof(uint32), indices, GL_STATIC_DRAW);
+    }
+
+    OpenGLIndexBuffer::OpenGLIndexBuffer(uint32 maxCount)
+    : m_count(0)
+    {
+        glCreateBuffers(1, &m_rendererID);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_rendererID);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, maxCount * sizeof(uint32), nullptr, GL_DYNAMIC_DRAW);
     }
 
     OpenGLIndexBuffer::~OpenGLIndexBuffer()
@@ -75,6 +83,12 @@ namespace axiom
     uint32 OpenGLIndexBuffer::GetCount() const
     {
         return m_count;
+    }
+
+    void OpenGLIndexBuffer::SetData(const void *data, uint32 count)
+    {
+        m_count = count;
+        glNamedBufferData(m_rendererID, count * sizeof(uint32), data, GL_DYNAMIC_DRAW);
     }
 
     OpenGLVertexArray::OpenGLVertexArray()
