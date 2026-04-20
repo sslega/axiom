@@ -135,9 +135,9 @@ namespace axiom
         RegisterModule<FileSystemModule>();
         
         ResourceModule* resourceModule = RegisterModule<ResourceModule>();
-        resourceModule->RegisterLoader(".glsl", MakeUnique<GLShaderLoader>());
-        resourceModule->RegisterLoader(".png",  MakeUnique<Texture2DLoader>());
-        resourceModule->RegisterLoader(".jpg",  MakeUnique<Texture2DLoader>());
+        resourceModule->RegisterLoader<GLShaderLoader>(".glsl");
+        resourceModule->RegisterLoader<Texture2DLoader>(".png");
+        resourceModule->RegisterLoader<Texture2DLoader>(".jpg");
 
         RegisterModule<SceneModule>();
         RegisterModule<RenderModule>();

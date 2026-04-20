@@ -8,6 +8,8 @@
 
 namespace axiom
 {
+    class ResourceModule;
+    
     struct FileData
     {
         Vector<uint8> buffer;
@@ -19,16 +21,15 @@ namespace axiom
     class ResourceLoader
     {
     public:
-        ResourceLoader();
+        ResourceLoader(const ResourceModule& resourceModule);
         virtual ~ResourceLoader() = default;
         
         SharedPtr<void> Load(const Path& path);
     
     protected:
         virtual SharedPtr<void> CreateResource(const FileData& fileData) = 0;
-        
-    private:
         FileData ReadFile(const Path& path);
+        const ResourceModule& m_resourceModule;
     };
     
 }

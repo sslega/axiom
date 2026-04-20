@@ -5,6 +5,11 @@
 
 namespace axiom
 {
+    Texture2DLoader::Texture2DLoader(const ResourceModule &resourceModule)
+    : ResourceLoader(resourceModule)
+    {
+    }
+
     SharedPtr<void> Texture2DLoader::CreateResource(const FileData& fileData)
     {
         int w, h, channels;

@@ -5,7 +5,8 @@
 namespace axiom
 {
 
-    ResourceLoader::ResourceLoader()
+    ResourceLoader::ResourceLoader(const ResourceModule& resourceModule)
+    : m_resourceModule(resourceModule)
     {
     }
 

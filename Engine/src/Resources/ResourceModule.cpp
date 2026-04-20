@@ -3,6 +3,7 @@
 #include "Core/Assert.h"
 #include "Core/Application.h"
 #include "Core/FileSystemModule.h"
+#include "ResourceModule.h"
 
 namespace axiom
 {
@@ -17,8 +18,14 @@ namespace axiom
         
     }
 
+    Path ResourceModule::Resolve(const String& virtualPath) const
+    {
+        return m_fileSystemModule->Resolve(virtualPath);
+    }
+    
     void ResourceModule::OnInitialize()
     {
+        m_fileSystemModule = GetModule<FileSystemModule>();
     }
 
     void ResourceModule::OnRegister()
@@ -41,11 +48,6 @@ namespace axiom
     {
     }
 
-    void ResourceModule::RegisterLoader(const String & fileExtension, UniquePtr<ResourceLoader> loader)
-    {
-        m_loaders[fileExtension] = std::move(loader);
-    }
-
     SharedPtr<void> ResourceModule::LoadInternal(const String& virtualPath)
     {
         auto it = m_resources.find(virtualPath);
@@ -54,8 +56,7 @@ namespace axiom
             return it->second;
         }
 
-        FileSystemModule* fileSystemModule = GetApp().GetModule<FileSystemModule>();
-        Path physicalPath = fileSystemModule->Resolve(virtualPath);
+        Path physicalPath = Resolve(virtualPath);
         // Path physicalPath = 
             
         ResourceLoader* loader = GetLoader(physicalPath);

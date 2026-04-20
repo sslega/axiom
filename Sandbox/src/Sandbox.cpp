@@ -73,18 +73,18 @@ void Sandbox::OnApplicationRun()
         {
             Entity* e = scene->CreateEntity();
 
-            auto* t = e->CreateComponent<TransformComponent>();
-            t->position = {x * 0.5f, y * 0.5f, 0.0f};
-            t->scale    = {0.1f, 0.1f, 0.1f};
+            auto* transform = e->CreateComponent<TransformComponent>();
+            transform->position = {x * 0.5f, y * 0.5f, 0.0f};
+            transform->scale    = {0.1f, 0.1f, 0.1f};
 
             // Unique material
             // auto mat = MakeShared<Material>(shader);
             // mat->SetUniform("u_Color", Vec4{(x+2.f)/5.f, (y+2.f)/5.f, 0.f, 1.f});
             // mat->SetTexture("u_Texture", m_texture, 0);
 
-            auto* m = e->CreateComponent<MeshComponent>();
-            m->SetMesh(quadMesh);
-            m->SetMaterial(mat);
+            auto* mesh = e->CreateComponent<MeshComponent>();
+            mesh->SetMesh(quadMesh);
+            mesh->SetMaterial(mat);
         }
     }
     /*

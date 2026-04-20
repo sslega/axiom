@@ -9,11 +9,15 @@ namespace axiom
     enum class ResourceType  { MeshResource, Texture, RenderShader };
     enum class ResourceState { Unloaded, Loading, Ready, Failed };
 
+    class FileSystemModule;
+
     class ResourceModule : public ApplicationModule
     {
     public:
         ResourceModule(Application& engine);
         ~ResourceModule();
+
+        Path Resolve(const String& virtualPath) const;
         
         template<typename T>
         SharedPtr<T> Load(const String& virtualPath)
@@ -22,7 +26,12 @@ namespace axiom
         }
         
 
-        void RegisterLoader(const String& fileExtension, UniquePtr<ResourceLoader> loader);
+        template<typename T>
+        void RegisterLoader(const String& fileExtension)
+        {
+            static_assert(std::is_base_of_v<ResourceLoader, T>, "T must derive from ResourceLoader");
+            m_loaders[fileExtension] = MakeUnique<T>(*this);
+        }
 
         void OnRegister() override;
         void OnUnregister() override;
@@ -33,7 +42,7 @@ namespace axiom
         void OnUpdate() override;
         void OnRender() override;
     private:
-
+        FileSystemModule* m_fileSystemModule;
         StringMap<UniquePtr<ResourceLoader>> m_loaders;
         StringMap<SharedPtr<void>> m_resources;
 
