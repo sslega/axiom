@@ -8,8 +8,8 @@ namespace axiom
     class CameraComponent : public Component
     {
     public:
-        CameraComponent() = default;
-        CameraComponent(float left, float right, float bottom, float top);
-        OrtographicCamera m_camera;
+        CameraComponent(float fovYRadians, float aspectRatio, float near, float far);
+        CameraComponent(float left, float right, float bottom, float top, float near, float far);
+        Camera m_camera;
     };
 }

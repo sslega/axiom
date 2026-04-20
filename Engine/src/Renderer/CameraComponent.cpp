@@ -2,8 +2,13 @@
 
 namespace axiom
 {
-    CameraComponent::CameraComponent(float left, float right, float bottom, float top)
+    CameraComponent::CameraComponent(float fovYRadians, float aspectRatio, float near, float far)
+    : m_camera(fovYRadians, aspectRatio, near, far)
     {
-        m_camera = OrtographicCamera(left, right, bottom, top);
+    }
+
+    CameraComponent::CameraComponent(float left, float right, float bottom, float top, float near, float far)
+    : m_camera(left, right, bottom, top, near, far)
+    {
     }
 }

@@ -7,7 +7,6 @@ namespace axiom
     class Component
     {
     public:
-        Component();
         virtual ~Component() = default;
 
         Entity* GetEntity() const;

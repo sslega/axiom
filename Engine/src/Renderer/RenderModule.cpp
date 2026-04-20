@@ -130,9 +130,12 @@ namespace axiom
         Vector<CameraComponent*> cameras = scene->GetComponents<CameraComponent>();
 
         AX_ASSERT(!cameras.empty(), "No active Camera!");
-        OrtographicCamera* camera = &cameras[0]->m_camera;
-        
-        m_sceneData.viewProjectionMatrix = camera->GetViewProjectionMatrix();
+        CameraComponent* cameraComponent = cameras[0];
+        TransformComponent* transform = cameraComponent->GetEntity()->GetComponent<TransformComponent>();
+        Camera* camera = &cameraComponent->m_camera;
+        camera->SetAspectRatio(GetApp().GetApplicationWindow().AspectRatio());
+        Matrix4 viewMatrix = transform ? Camera::GetViewMatrix(transform->position, transform->rotation) : Matrix4::Identity();
+        m_sceneData.viewProjectionMatrix = camera->GetProjectionMatrix() * viewMatrix;
         m_graphicsDevice->SetClearColor(Vec4(0.5f, 0.5f, 0.5f, 1.0f));
         m_graphicsDevice->Clear();
     }

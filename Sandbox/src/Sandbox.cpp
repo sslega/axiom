@@ -58,8 +58,10 @@ void Sandbox::OnApplicationRun()
     // auto shader = Render->GetShader("engine://Shaders/VertexColor.glsl");
 
     auto* cameraEntity = scene->CreateEntity("MainCamera");
-    float ratio = GetApplicationWindow().AspectRatio();
-    m_cameraComponent = cameraEntity->CreateComponent<CameraComponent>(-2.0f, 2.0f, -2.0f / ratio, 2.0f / ratio);
+    auto* transformComponent = cameraEntity->CreateComponent<TransformComponent>();
+    transformComponent->position = Vec3(0.0f, 0.0f, 2.0f);
+    float aspectRatio = GetApplicationWindow().AspectRatio();
+    m_cameraComponent = cameraEntity->CreateComponent<CameraComponent>(ToRadians(60.0f), aspectRatio, 0.1f, 1000.0f);
 
     auto textureResource = Resource->Load<Texture2DResource>("engine://Textures/heresy.png");
     m_texture = Device.CreateTexture2D(*textureResource);
@@ -106,13 +108,14 @@ void Sandbox::OnApplicationRun()
 
 void Sandbox::OnResize(const WindowResizeEvent& event)
 {
-    printf("Window width: %d, window height: %d\n", event.m_newWidth, event.m_newHeight);
+    // float aspect = (float)event.m_newWidth / event.m_newHeight;
+    // m_cameraComponent->m_camera.SetAspectRatio(aspect);
 }
 
 void Sandbox::OnRender()
 {
     RenderModule* renderModule = GetModule<RenderModule>();
-    
+
     ImGui::Begin("Params");
     ImGui::ColorEdit4("Triangle Color", &m_triangleColor.x);
     ImGui::End();
@@ -120,40 +123,36 @@ void Sandbox::OnRender()
 
 void Sandbox::OnUpdate(axiom::Timestep delta)
 {
-    
-
-    if(Input::IsKeyPressed(KeyCode::LeftShift))
+    if(Input::IsKeyPressed(KeyCode::Up))
     {
-        float translationSpeed = 1.0f * delta; // degrees per second
-        if(Input::IsKeyPressed(KeyCode::Left))
-        {
-            m_trianglePosition.x -= translationSpeed;
-        }
-
-        if(Input::IsKeyPressed(KeyCode::Right))
-        {
-            m_trianglePosition.x += translationSpeed;
-        }
-        if(Input::IsKeyPressed(KeyCode::Up))
-        {
-            m_trianglePosition.y += translationSpeed;
-        }
-        if(Input::IsKeyPressed(KeyCode::Down))
-        {
-            m_trianglePosition.y -= translationSpeed;
-        }
+        float fov = ToDegrees(m_cameraComponent->m_camera.GetFoV());
+        m_cameraComponent->m_camera.SetFoV(ToRadians(fov + 1.0f));
     }
-    else
+    if(Input::IsKeyPressed(KeyCode::Down))
     {
-        float rotationSpeed = 1.0f * delta; // degrees per second
-        if(Input::IsKeyPressed(KeyCode::Left))
-        {
-            m_cameraComponent->m_camera.SetRotation(m_cameraComponent->m_camera.GetRotation() - rotationSpeed);
-        }
-
-        if(Input::IsKeyPressed(KeyCode::Right))
-        {
-            m_cameraComponent->m_camera.SetRotation(m_cameraComponent->m_camera.GetRotation() + rotationSpeed);
-        }
+        float fov = ToDegrees(m_cameraComponent->m_camera.GetFoV());
+        m_cameraComponent->m_camera.SetFoV(ToRadians(fov - 1.0f));
     }
+
+    // if(Input::IsKeyPressed(KeyCode::LeftShift))
+    // {
+    //     float translationSpeed = 1.0f * delta; // degrees per second
+    //     if(Input::IsKeyPressed(KeyCode::Left))
+    //     {
+    //         m_trianglePosition.x -= translationSpeed;
+    //     }
+
+    //     if(Input::IsKeyPressed(KeyCode::Right))
+    //     {
+    //         m_trianglePosition.x += translationSpeed;
+    //     }
+    //     if(Input::IsKeyPressed(KeyCode::Up))
+    //     {
+    //         m_trianglePosition.y += translationSpeed;
+    //     }
+    //     if(Input::IsKeyPressed(KeyCode::Down))
+    //     {
+    //         m_trianglePosition.y -= translationSpeed;
+    //     }
+    // }
 }

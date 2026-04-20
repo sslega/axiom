@@ -1,63 +1,88 @@
 #include "Renderer/Camera.h"
 #include "Core/Assert.h"
+#include "Camera.h"
 
 namespace axiom
 {
-    axiom::OrtographicCamera::OrtographicCamera()
-    : OrtographicCamera(-1.0f, 1.0f, -1.0f, 1.0f)
+    Camera::Camera(float fovYRadians, float aspectRatio, float near, float far)
     {
+        SetPerspective(fovYRadians, aspectRatio, near, far);
     }
 
-    OrtographicCamera::OrtographicCamera(float left, float right, float bottom, float top)
-    : m_projectionMatrix(Matrix4::Ortho(left, right, bottom, top, -1.0f, 1.0f))
-    , m_viewMatrix(Matrix4::Identity())
+    Camera::Camera(float left, float right, float bottom, float top, float near, float far)
     {
-        m_viewProjectionMatrix = m_projectionMatrix * m_viewMatrix;
+        SetOrthographic(left, right, bottom, top, near, far);
     }
 
-    const Vec3 &OrtographicCamera::GetPosition() const
+    void Camera::SetProjectionType(ProjectionType type)
     {
-        return m_position;
+        m_projectionType = type;
+        RecalculateProjection();
     }
 
-    void OrtographicCamera::SetPosition(const Vec3 &position)
+    void Camera::SetOrthographic(float left, float right, float bottom, float top, float near, float far)
     {
-        m_position = position;
-        UpdateViewProjectionMatrix();
+        m_projectionType = ProjectionType::Orthographic;
+        m_orthoLeft = left; m_orthoRight = right;
+        m_orthoBottom = bottom; m_orthoTop = top;
+        m_orthoNear = near; m_orthoFar = far;
+        m_orthoSize = (top - bottom) * 0.5f;
+        RecalculateProjection();
     }
 
-    float OrtographicCamera::GetRotation() const
+    void Camera::SetPerspective(float fovYRadians, float aspectRatio, float near, float far)
     {
-        return m_rotation;
+        m_projectionType = ProjectionType::Perspective;
+        m_fovY = fovYRadians;
+        m_aspectRatio = aspectRatio;
+        m_perspNear = near;
+        m_perspFar = far;
+        RecalculateProjection();
     }
 
-    void OrtographicCamera::SetRotation(float rotation)
+    void Camera::SetOrthoSize(float halfHeight)
     {
-        m_rotation = rotation;
-        UpdateViewProjectionMatrix();
+        m_orthoSize = halfHeight;
+        SetAspectRatio(m_aspectRatio); 
     }
 
-    const Matrix4& OrtographicCamera::GetProjectionMatrix() const
+    void Camera::SetFoV(float fovYRadians)
     {
-        return m_projectionMatrix;
+        m_fovY = fovYRadians;
+        RecalculateProjection();
     }
 
-    const Matrix4& OrtographicCamera::GetViewMatrix() const
+    Matrix4 Camera::GetViewMatrix(Vec3 position, Vec3 rotation)
     {
-        return m_viewMatrix;
+        return Matrix4::Rotate({0,0,1}, -rotation.z)
+         * Matrix4::Rotate({0,1,0}, -rotation.y)
+         * Matrix4::Rotate({1,0,0}, -rotation.x)
+         * Matrix4::Translate({-position.x, -position.y, -position.z});
     }
 
-    const Matrix4& OrtographicCamera::GetViewProjectionMatrix() const
+    void Camera::RecalculateProjection()
     {
-        return m_viewProjectionMatrix;
+        if (m_projectionType == ProjectionType::Orthographic)
+        {
+            m_projectionMatrix = Matrix4::Ortho(m_orthoLeft, m_orthoRight, m_orthoBottom, m_orthoTop, m_orthoNear, m_orthoFar);
+        }
+        else
+        {
+            m_projectionMatrix = Matrix4::Perspective(m_fovY, m_aspectRatio, m_perspNear, m_perspFar);
+        }
     }
 
-    void OrtographicCamera::UpdateViewProjectionMatrix()
-    {
-        Matrix4 translate = Matrix4::Translate(Vec3(-m_position.x, -m_position.y, -m_position.z));
-        Matrix4 rotate    = Matrix4::Rotate(Vec3(0.0f, 0.0f, 1.0f), -m_rotation);
-        m_viewMatrix             = rotate * translate;
-        m_viewProjectionMatrix   = m_projectionMatrix * m_viewMatrix;
-    }
 
+    void Camera::SetAspectRatio(float aspectRatio)
+    {
+        m_aspectRatio = aspectRatio;
+        if (m_projectionType == ProjectionType::Orthographic)
+        {
+            m_orthoLeft   = -m_orthoSize * aspectRatio;
+            m_orthoRight  =  m_orthoSize * aspectRatio;
+            m_orthoBottom = -m_orthoSize;
+            m_orthoTop    =  m_orthoSize;
+        }
+        RecalculateProjection();
+    }
 }
