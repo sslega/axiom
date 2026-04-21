@@ -13,7 +13,9 @@ namespace axiom
 
         // Mouse look
         Vec2 mouse = Input::GetMousePosition();
-        if(Input::IsMouseButtonPressed(MouseCode::Right))
+        bool rmbPressed = Input::IsMouseButtonPressed(MouseCode::Right);
+        Input::SetCursorLocked(rmbPressed);
+        if(rmbPressed)
         {
             float dx = mouse.x - m_lastMouse.x;
             float dy = mouse.y - m_lastMouse.y;

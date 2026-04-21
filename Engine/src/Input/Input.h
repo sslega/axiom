@@ -30,6 +30,11 @@ namespace axiom
             return Application::Get().m_input->GetMousePositionInternal();
         }
 
+        static void SetCursorLocked(bool locked)
+        {
+             Application::Get().m_input->SetCursorLockedInternal(locked);
+        }
+
         static float GetScrollDelta()
         {
             return Application::Get().m_input->GetScrollDeltaInternal();
@@ -41,5 +46,6 @@ namespace axiom
         virtual Vec2 GetMousePositionInternal() const = 0;
         virtual bool  IsMouseButtonPressedInternal(MouseCode button) const = 0;
         virtual float GetScrollDeltaInternal() const = 0;
+        virtual void SetCursorLockedInternal(bool locked) = 0;
     };
 }
