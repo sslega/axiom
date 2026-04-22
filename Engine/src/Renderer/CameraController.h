@@ -4,12 +4,17 @@
 
 namespace axiom
 {
+    class TransformComponent;
+
     class CameraController: public Component
     {
         float moveSpeed      = 0.5f;
         float lookSensitivity = 0.002f;
 
         virtual void OnUpdate(float deltaTime) override;
+    protected:
+        TransformComponent* m_transformComponent;
+        virtual void OnInitialize() override;
     
     private:
         Vec2 m_lastMouse = {0, 0};

@@ -132,10 +132,9 @@ namespace axiom
         AX_ASSERT(!cameras.empty(), "No active Camera!");
         CameraComponent* cameraComponent = cameras[0];
         TransformComponent* transform = cameraComponent->GetEntity()->GetComponent<TransformComponent>();
-        Camera* camera = &cameraComponent->m_camera;
-        camera->SetAspectRatio(GetApp().GetApplicationWindow().AspectRatio());
+        cameraComponent->SetAspectRatio(GetApp().GetApplicationWindow().AspectRatio());
         Matrix4 viewMatrix = transform ? Camera::GetViewMatrix(transform->position, transform->rotation) : Matrix4::Identity();
-        m_sceneData.viewProjectionMatrix = camera->GetProjectionMatrix() * viewMatrix;
+        m_sceneData.viewProjectionMatrix = cameraComponent->GetProjectionMatrix() * viewMatrix;
         m_graphicsDevice->SetClearColor(Vec4(0.5f, 0.5f, 0.5f, 1.0f));
         m_graphicsDevice->Clear();
     }

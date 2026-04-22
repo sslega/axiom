@@ -14,18 +14,17 @@ namespace axiom
         void Initialize();
         void Shutdown();
 
-        virtual void OnRegister();
-        virtual void OnUnregister();
-
         inline Application& GetApp() const { return m_application; };
 
     protected:
-        virtual void OnInitialize()  {}
-        virtual void OnShutdown()    {}
-        virtual void OnUpdate(float deltaTime){}
-        virtual void OnBeginFrame()  {}
-        virtual void OnRender()      {}
-        virtual void OnEndFrame()    {}
+        virtual void OnRegister()   {}
+        virtual void OnUnregister() {}
+        virtual void OnInitialize() {}
+        virtual void OnShutdown()   {}
+        virtual void OnUpdate(float deltaTime) {}
+        virtual void OnBeginFrame() {}
+        virtual void OnRender()     {}
+        virtual void OnEndFrame()   {}
 
         Application& m_application;
 
@@ -37,9 +36,11 @@ namespace axiom
 
     private:
         friend class Application;
+        void Register()              { OnRegister(); }
+        void Unregister()            { OnUnregister(); }
         void Update(float deltaTime) { OnUpdate(deltaTime); }
-        void BeginFrame() { OnBeginFrame(); }
-        void Render()     { OnRender(); }
-        void EndFrame()   { OnEndFrame(); }
+        void BeginFrame()            { OnBeginFrame(); }
+        void Render()                { OnRender(); }
+        void EndFrame()              { OnEndFrame(); }
     };
 }

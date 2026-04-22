@@ -125,36 +125,5 @@ void Sandbox::OnRender()
 
 void Sandbox::OnUpdate(float deltaTime)
 {
-    if(Input::IsKeyPressed(KeyCode::Up))
-    {
-        float fov = ToDegrees(m_cameraComponent->m_camera.GetFoV());
-        m_cameraComponent->m_camera.SetFoV(ToRadians(fov + 1.0f));
-    }
-    if(Input::IsKeyPressed(KeyCode::Down))
-    {
-        float fov = ToDegrees(m_cameraComponent->m_camera.GetFoV());
-        m_cameraComponent->m_camera.SetFoV(ToRadians(fov - 1.0f));
-    }
-
-    // if(Input::IsKeyPressed(KeyCode::LeftShift))
-    // {
-    //     float translationSpeed = 1.0f * delta; // degrees per second
-    //     if(Input::IsKeyPressed(KeyCode::Left))
-    //     {
-    //         m_trianglePosition.x -= translationSpeed;
-    //     }
-
-    //     if(Input::IsKeyPressed(KeyCode::Right))
-    //     {
-    //         m_trianglePosition.x += translationSpeed;
-    //     }
-    //     if(Input::IsKeyPressed(KeyCode::Up))
-    //     {
-    //         m_trianglePosition.y += translationSpeed;
-    //     }
-    //     if(Input::IsKeyPressed(KeyCode::Down))
-    //     {
-    //         m_trianglePosition.y -= translationSpeed;
-    //     }
-    // }
+    
 }

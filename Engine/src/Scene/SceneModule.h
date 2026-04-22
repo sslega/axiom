@@ -16,6 +16,9 @@ namespace axiom
         bool HasActiveScene() const;
     
     protected:
+        virtual void OnRegister()  override;
+        virtual void OnInitialize() override;
+        virtual void OnShutdown()  override;
         virtual void OnUpdate(float deltaTime) override;
         virtual void OnBeginFrame() override;
         virtual void OnRender() override;

@@ -12,22 +12,32 @@ namespace axiom
     Entity* Scene::CreateEntity()
     {
         UniquePtr<Entity> entity = std::make_unique<Entity>();
-        Entity* entityPtr = entity.get();        
+        Entity* entityPtr = entity.get();
         m_entities[entity->id] = std::move(entity);
+        entityPtr->Register();
+        entityPtr->Initialize();
         return entityPtr;
     }
 
     Entity* Scene::CreateEntity(String name)
     {
         UniquePtr<Entity> entity = std::make_unique<Entity>(name);
-        Entity* entityPtr = entity.get();        
+        Entity* entityPtr = entity.get();
         m_entities[entity->id] = std::move(entity);
+        entityPtr->Register();
+        entityPtr->Initialize();
         return entityPtr;
     }
 
-    void Scene::DestroyEntity(Entity *entity)
+    void Scene::DestroyEntity(Entity* entity)
     {
-        m_entities.erase(entity->id);
+        auto it = m_entities.find(entity->id);
+        if (it != m_entities.end())
+        {
+            it->second->Shutdown();
+            it->second->Unregister();
+            m_entities.erase(it);
+        }
     }
 
     const String &Scene::GetName() const
@@ -37,33 +47,25 @@ namespace axiom
 
     void Scene::OnUpdate(float deltaTime)
     {
-        for(auto& entity : m_entities)
-        {
-            entity.second->OnUpdate(deltaTime);
-        }
+        for (auto& [id, entity] : m_entities)
+            entity->Update(deltaTime);
     }
-    
+
     void Scene::OnBeginFrame()
     {
-        for(auto& entity : m_entities)
-        {
-            entity.second->OnBeginFrame();
-        }
+        for (auto& [id, entity] : m_entities)
+            entity->BeginFrame();
     }
 
     void Scene::OnRender()
     {
-        for(auto& entity : m_entities)
-        {
-            entity.second->OnRender();
-        }
+        for (auto& [id, entity] : m_entities)
+            entity->Render();
     }
 
     void Scene::OnEndFrame()
     {
-        for(auto& entity : m_entities)
-        {
-            entity.second->OnEndFrame();
-        }
+        for (auto& [id, entity] : m_entities)
+            entity->EndFrame();
     }
 }

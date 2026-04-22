@@ -83,6 +83,7 @@ namespace axiom
             std::type_index id = TypeID<T>();
             m_engineModules[id] = std::move(module);
             m_moduleOrder.push_back(id);
+            ptr->Register();
             return ptr;
         }
 
@@ -90,6 +91,9 @@ namespace axiom
         void UnregisterModule()
         {
             std::type_index id = TypeID<T>();
+            auto it = m_engineModules.find(id);
+            if (it != m_engineModules.end())
+                it->second->Unregister();
             m_engineModules.erase(id);
             m_moduleOrder.erase(
                 std::remove(m_moduleOrder.begin(), m_moduleOrder.end(), id),

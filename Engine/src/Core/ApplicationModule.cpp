@@ -17,12 +17,4 @@ namespace axiom
     {
         OnShutdown();
     }
-
-    void ApplicationModule::OnRegister()
-    {
-    }
-
-    void ApplicationModule::OnUnregister()
-    {
-    }
 }
