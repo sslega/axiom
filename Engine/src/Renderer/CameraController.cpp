@@ -54,7 +54,7 @@ namespace axiom
     
     void CameraController::OnInitialize()
     {
-        m_transformComponent = GetEntity()->GetComponent<TransformComponent>();
+        m_transformComponent = GetEntity().GetComponent<TransformComponent>();
         AX_ASSERT(m_transformComponent, "TransformComponent required!");
     }
 }

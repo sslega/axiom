@@ -20,12 +20,12 @@ namespace axiom
         const ID id;
 
         template <IsComponent T, typename... Args>
-        T* CreateComponent(Args&&... args)
+        T& CreateComponent(Args&&... args)
         {
             auto it = m_components.find(std::type_index(typeid(T)));
             if (it != m_components.end())
             {
-                return static_cast<T*>(it->second.get());
+                return static_cast<T&>(*it->second.get());
             }
 
             UniquePtr<T> component = MakeUnique<T>(std::forward<Args>(args)...);
@@ -34,7 +34,7 @@ namespace axiom
             m_components[TypeID<T>()] = std::move(component);
             componentPtr->Register();
             componentPtr->Initialize();
-            return componentPtr;
+            return *componentPtr;
         }
 
         template <IsComponent T>

@@ -14,15 +14,14 @@
 
 namespace axiom
 {
-
-    Application* Application::s_instance = nullptr;
+    Application* Application::s_current = nullptr;
 
     Application::Application(AppConfig appConfig)
     : m_appConfig(appConfig)
     {
-        if(!s_instance)
+        if(!s_current)
         {
-            s_instance = this;
+            s_current = this;
         }
         else
         {
@@ -35,15 +34,16 @@ namespace axiom
         m_appConfig = appConfig;
         m_applicationWindow = ApplicationWindow::Create(m_appConfig.windowConfig);
 
-        m_input = Input::Create(*m_applicationWindow);
-        m_log = MakeUnique<ConsoleLog>();
         m_lastRenderTime = std::chrono::steady_clock::now();
         m_lastUpdateTime = m_lastRenderTime;
+
+        m_input = Input::Create(*m_applicationWindow);
+        m_log = MakeUnique<ConsoleLog>();
     }
 
     Application::~Application()
     {
-        s_instance = nullptr;
+        s_current = nullptr;
     }
 
     int Application::Run()
@@ -116,35 +116,34 @@ namespace axiom
             m_engineModules[id]->EndFrame();
         }
 
-        GetModule<RenderModule>()->GetGraphicsDevice().Present();
+        GetModule<RenderModule>().GetGraphicsDevice().Present();
     }
 
     void Application::DebugRender()
     {
         uint8 fps = 1.0f / m_dt;
-        auto Render = GetModule<RenderModule>();
 
         ImDrawList* dl = ImGui::GetForegroundDrawList();
         dl->AddText(ImVec2(10, 10), IM_COL32(255, 255, 255, 255), std::string("FPS: " + std::to_string(fps)).c_str());
-        dl->AddText(ImVec2(10, 22), IM_COL32(255, 255, 255, 255), std::string("Draw Calls: " + std::to_string(Render->GetDrawCallCount())).c_str());
-        dl->AddText(ImVec2(10, 34), IM_COL32(255, 255, 255, 255), std::string("Instanced calls: " + std::to_string(Render->GetInstanceCallCount())).c_str());
-        dl->AddText(ImVec2(10, 46), IM_COL32(255, 255, 255, 255), std::string("Instanced objects drawn: " + std::to_string(Render->GetInstanceObjectCount())).c_str());
-        dl->AddText(ImVec2(10, 58), IM_COL32(255, 255, 255, 255), std::string("Batched calls: " + std::to_string(Render->GetBatchCallCount())).c_str());
-        dl->AddText(ImVec2(10, 70), IM_COL32(255, 255, 255, 255), std::string("Batched objects drawn: " + std::to_string(Render->GetBatchObjectCount())).c_str());
+        dl->AddText(ImVec2(10, 22), IM_COL32(255, 255, 255, 255), std::string("Draw Calls: " + std::to_string(renderModule->GetDrawCallCount())).c_str());
+        dl->AddText(ImVec2(10, 34), IM_COL32(255, 255, 255, 255), std::string("Instanced calls: " + std::to_string(renderModule->GetInstanceCallCount())).c_str());
+        dl->AddText(ImVec2(10, 46), IM_COL32(255, 255, 255, 255), std::string("Instanced objects drawn: " + std::to_string(renderModule->GetInstanceObjectCount())).c_str());
+        dl->AddText(ImVec2(10, 58), IM_COL32(255, 255, 255, 255), std::string("Batched calls: " + std::to_string(renderModule->GetBatchCallCount())).c_str());
+        dl->AddText(ImVec2(10, 70), IM_COL32(255, 255, 255, 255), std::string("Batched objects drawn: " + std::to_string(renderModule->GetBatchObjectCount())).c_str());
     }
 
     void Application::RegisterModules()
     {
-        RegisterModule<FileSystemModule>();
+        fileSystemModule = RegisterModule<FileSystemModule>();
         
-        ResourceModule* resourceModule = RegisterModule<ResourceModule>();
+        resourceModule = RegisterModule<ResourceModule>();
         resourceModule->RegisterLoader<GLShaderLoader>(".glsl");
         resourceModule->RegisterLoader<Texture2DLoader>(".png");
         resourceModule->RegisterLoader<Texture2DLoader>(".jpg");
 
-        RegisterModule<SceneModule>();
-        RegisterModule<RenderModule>();
-        RegisterModule<ImGuiModule>();
+        sceneModule = RegisterModule<SceneModule>();
+        renderModule = RegisterModule<RenderModule>();
+        imGuiModule = RegisterModule<ImGuiModule>();
     }
 
     void Application::InitializeModules()

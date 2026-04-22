@@ -17,27 +17,27 @@ namespace axiom
         static UniquePtr<Input> Create(const ApplicationWindow& window);
         static bool IsKeyPressed(KeyCode key)
         {
-            return Application::Get().m_input->IsKeyPressedInternal(key);
+            return Application::Get().GetInput().IsKeyPressedInternal(key);
         }
 
         static bool IsMouseButtonPressed(MouseCode button)
         {
-            return Application::Get().m_input->IsMouseButtonPressedInternal(button);
+            return Application::Get().GetInput().IsMouseButtonPressedInternal(button);
         }
 
         static Vec2 GetMousePosition()
         {
-            return Application::Get().m_input->GetMousePositionInternal();
+            return Application::Get().GetInput().GetMousePositionInternal();
         }
 
         static void SetCursorLocked(bool locked)
         {
-             Application::Get().m_input->SetCursorLockedInternal(locked);
+             Application::Get().GetInput().SetCursorLockedInternal(locked);
         }
 
         static float GetScrollDelta()
         {
-            return Application::Get().m_input->GetScrollDeltaInternal();
+            return Application::Get().GetInput().GetScrollDeltaInternal();
         }
 
     protected:

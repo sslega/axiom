@@ -2,9 +2,9 @@
 
 namespace axiom
 {
-    Entity* Component::GetEntity() const
+    Entity& Component::GetEntity() const
     {
-        return m_entity;
+        return *m_entity;
     }
 
 }

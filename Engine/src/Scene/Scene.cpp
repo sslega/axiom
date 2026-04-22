@@ -9,29 +9,29 @@ namespace axiom
         m_name = name;
     }
 
-    Entity* Scene::CreateEntity()
+    Entity& Scene::CreateEntity()
     {
         UniquePtr<Entity> entity = std::make_unique<Entity>();
         Entity* entityPtr = entity.get();
         m_entities[entity->id] = std::move(entity);
         entityPtr->Register();
         entityPtr->Initialize();
-        return entityPtr;
+        return *entityPtr;
     }
 
-    Entity* Scene::CreateEntity(String name)
+    Entity& Scene::CreateEntity(String name)
     {
         UniquePtr<Entity> entity = std::make_unique<Entity>(name);
         Entity* entityPtr = entity.get();
         m_entities[entity->id] = std::move(entity);
         entityPtr->Register();
         entityPtr->Initialize();
-        return entityPtr;
+        return *entityPtr;
     }
 
-    void Scene::DestroyEntity(Entity* entity)
+    void Scene::DestroyEntity(Entity& entity)
     {
-        auto it = m_entities.find(entity->id);
+        auto it = m_entities.find(entity.id);
         if (it != m_entities.end())
         {
             it->second->Shutdown();
@@ -40,7 +40,7 @@ namespace axiom
         }
     }
 
-    const String &Scene::GetName() const
+    const String& Scene::GetName() const
     {
         return m_name;
     }

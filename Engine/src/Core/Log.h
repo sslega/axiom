@@ -12,13 +12,13 @@ namespace axiom
         template<typename... Args>
         static void Info(const char* fmt, Args&&... args)
         {
-            Application::Get().m_log->InfoInternal(std::vformat(fmt, std::make_format_args(args...)));
+            Application::Get().GetLog().InfoInternal(std::vformat(fmt, std::make_format_args(args...)));
         }
 
         template<typename... Args>
         static void Error(const char* fmt, Args&&... args)
         {
-            Application::Get().m_log->ErrorInternal(std::vformat(fmt, std::make_format_args(args...)));
+            Application::Get().GetLog().ErrorInternal(std::vformat(fmt, std::make_format_args(args...)));
         }
 
     protected:

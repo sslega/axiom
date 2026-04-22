@@ -1,5 +1,7 @@
 #include "Scene/SceneModule.h"
 #include "SceneModule.h"
+#include "Core/Assert.h"
+
 namespace axiom
 {
     SceneModule::SceneModule(Application& application)
@@ -8,14 +10,10 @@ namespace axiom
         m_activeScene = MakeUnique<Scene>("Scene");
     }
 
-    Scene* SceneModule::GetActiveScene() const
+    Scene& SceneModule::GetActiveScene() const
     {
-        return m_activeScene.get();
-    }
-
-    bool SceneModule::HasActiveScene() const
-    {
-        return m_activeScene != nullptr;
+        AX_ASSERT(m_activeScene, "Scene cannot be null!");
+        return *m_activeScene.get();
     }
 
     void SceneModule::OnRegister()

@@ -9,7 +9,7 @@ namespace axiom
     public:
         virtual ~Component() = default;
 
-        Entity* GetEntity() const;
+        Entity& GetEntity() const;
 
     protected:
         virtual void OnRegister()   {}

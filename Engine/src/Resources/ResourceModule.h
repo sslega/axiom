@@ -37,7 +37,8 @@ namespace axiom
         void OnInitialize() override;
         
     private:
-        FileSystemModule* m_fileSystemModule;
+        FileSystemModule* fileSystemModule;
+
         StringMap<UniquePtr<ResourceLoader>> m_loaders;
         StringMap<SharedPtr<void>> m_resources;
 

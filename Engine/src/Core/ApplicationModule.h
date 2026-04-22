@@ -29,7 +29,7 @@ namespace axiom
         Application& m_application;
 
         template <typename T>
-        T* GetModule()
+        T& GetModule()
         {
             return GetApp().template GetModule<T>();
         }

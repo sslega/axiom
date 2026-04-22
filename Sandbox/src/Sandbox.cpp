@@ -40,33 +40,29 @@ Sandbox::Sandbox(AppConfig appConfig)
 
 void Sandbox::OnRegisterModules()
 {
-    FileSystemModule* fileSystemModule = GetModule<FileSystemModule>();
-    fileSystemModule->Mount("Engine", AX_ENGINE_DIR);
-    fileSystemModule->Mount("Project", AX_PROJECT_DIR);
+    FileSystemModule& fileSystemModule = GetModule<FileSystemModule>();
+    fileSystemModule.Mount("Engine", AX_ENGINE_DIR);
+    fileSystemModule.Mount("Project", AX_PROJECT_DIR);
 }
 
 void Sandbox::OnApplicationRun()
 {
-    RenderModule* Render = GetModule<RenderModule>();
-    GraphicsDevice& Device = Render->GetGraphicsDevice();
-    ResourceModule* Resource = GetModule<ResourceModule>();
-    FileSystemModule* FileSystem = GetModule<FileSystemModule>();
     
-    Scene* scene = GetModule<SceneModule>()->GetActiveScene();
+    Scene& scene = sceneModule->GetActiveScene();
     auto quadMesh = MakeShared<Quad>();
     auto triangleMesh = MakeShared<Triangle>();
-    auto shader = Render->GetShader("engine://Shaders/Texture.glsl");
+    auto shader = renderModule->GetShader("engine://Shaders/Texture.glsl");
     // auto shader = Render->GetShader("engine://Shaders/VertexColor.glsl");
 
-    auto* cameraEntity = scene->CreateEntity("MainCamera");
-    auto* transformComponent = cameraEntity->CreateComponent<TransformComponent>();
-    transformComponent->position = Vec3(0.0f, 0.0f, 2.0f);
+    auto& cameraEntity = scene.CreateEntity("MainCamera");
+    auto& transformComponent = cameraEntity.CreateComponent<TransformComponent>();
+    transformComponent.position = Vec3(0.0f, 0.0f, 2.0f);
     float aspectRatio = GetApplicationWindow().AspectRatio();
-    m_cameraComponent = cameraEntity->CreateComponent<CameraComponent>(ToRadians(60.0f), aspectRatio, 0.1f, 1000.0f);
-    cameraEntity->CreateComponent<CameraController>();
+    m_cameraComponent = &cameraEntity.CreateComponent<CameraComponent>(ToRadians(60.0f), aspectRatio, 0.1f, 1000.0f);
+    cameraEntity.CreateComponent<CameraController>();
 
-    auto textureResource = Resource->Load<Texture2DResource>("engine://Textures/heresy.png");
-    m_texture = Device.CreateTexture2D(*textureResource);
+    auto textureResource = resourceModule->Load<Texture2DResource>("engine://Textures/heresy.png");
+    m_texture = renderModule->GetGraphicsDevice().CreateTexture2D(*textureResource);
 
     // Common, instanced material
     auto mat = MakeShared<Material>(shader);
@@ -76,15 +72,15 @@ void Sandbox::OnApplicationRun()
     {
         for (int x = -2; x <= 2; x++)
         {
-            Entity* e = scene->CreateEntity();
+            Entity& e = scene.CreateEntity();
 
-            auto* transform = e->CreateComponent<TransformComponent>();
-            transform->position = {x * 0.5f, y * 0.5f, 0.0f};
-            transform->scale    = {0.1f, 0.1f, 0.1f};
+            auto& transform = e.CreateComponent<TransformComponent>();
+            transform.position = {x * 0.5f, y * 0.5f, 0.0f};
+            transform.scale    = {0.1f, 0.1f, 0.1f};
 
-            auto* mesh = e->CreateComponent<MeshComponent>();
-            mesh->SetMesh(quadMesh);
-            mesh->SetMaterial(mat);
+            auto& mesh = e.CreateComponent<MeshComponent>();
+            mesh.SetMesh(quadMesh);
+            mesh.SetMaterial(mat);
         }
     }
 
@@ -92,16 +88,16 @@ void Sandbox::OnApplicationRun()
     {
         for (int x = -2; x < 2; x++)
         {
-            Entity* e = scene->CreateEntity();
+            Entity& e = scene.CreateEntity();
 
-            auto* transform = e->CreateComponent<TransformComponent>();
-            transform->position = {x * 0.5f + 0.25f, y * 0.5f + 0.25f, 0.0f};
-            transform->scale    = {0.1f, 0.1f, 0.1f};
+            auto& transform = e.CreateComponent<TransformComponent>();
+            transform.position = {x * 0.5f + 0.25f, y * 0.5f + 0.25f, 0.0f};
+            transform.scale    = {0.1f, 0.1f, 0.1f};
 
-            auto* mesh = e->CreateComponent<MeshComponent>();
+            auto& mesh = e.CreateComponent<MeshComponent>();
             auto triangle = MakeShared<Triangle>();
-            mesh->SetMesh(triangle);
-            mesh->SetMaterial(mat);
+            mesh.SetMesh(triangle);
+            mesh.SetMaterial(mat);
         }
     }
 
@@ -110,14 +106,12 @@ void Sandbox::OnApplicationRun()
 
 void Sandbox::OnResize(const WindowResizeEvent& event)
 {
-    // float aspect = (float)event.m_newWidth / event.m_newHeight;
-    // m_cameraComponent->m_camera.SetAspectRatio(aspect);
+    float aspect = (float)event.m_newWidth / event.m_newHeight;
+    m_cameraComponent->SetAspectRatio(aspect);
 }
 
 void Sandbox::OnRender()
 {
-    RenderModule* renderModule = GetModule<RenderModule>();
-
     ImGui::Begin("Params");
     ImGui::ColorEdit4("Triangle Color", &m_triangleColor.x);
     ImGui::End();

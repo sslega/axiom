@@ -10,7 +10,6 @@ namespace axiom
     ResourceModule::ResourceModule(Application& application)
     :ApplicationModule(application)
     {
-        
     }
     
     ResourceModule::~ResourceModule()
@@ -20,12 +19,12 @@ namespace axiom
 
     Path ResourceModule::Resolve(const String& virtualPath) const
     {
-        return m_fileSystemModule->Resolve(virtualPath);
+        return fileSystemModule->Resolve(virtualPath);
     }
     
     void ResourceModule::OnInitialize()
     {
-        m_fileSystemModule = GetModule<FileSystemModule>();
+        fileSystemModule = &GetModule<FileSystemModule>();
     }
 
     SharedPtr<void> ResourceModule::LoadInternal(const String& virtualPath)

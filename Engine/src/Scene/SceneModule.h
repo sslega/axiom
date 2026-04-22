@@ -11,9 +11,7 @@ namespace axiom
     public:
         SceneModule(Application& application);
 
-        // Scene* CreateScene(const String& name);
-        Scene* GetActiveScene() const;
-        bool HasActiveScene() const;
+        Scene& GetActiveScene() const;
     
     protected:
         virtual void OnRegister()  override;

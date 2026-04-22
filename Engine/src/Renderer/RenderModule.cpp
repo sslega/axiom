@@ -40,11 +40,10 @@ namespace axiom
         ResetDebugDrawCounters();
         BeginScene();
         
-        SceneModule* sceneModule = GetModule<SceneModule>();
-        AX_ASSERT(sceneModule->HasActiveScene(), "No active Scene!");
+        SceneModule& sceneModule = GetModule<SceneModule>();
 
-        Scene* scene = sceneModule->GetActiveScene();
-        auto meshComponents = scene->GetComponents<MeshComponent>();
+        Scene& scene = sceneModule.GetActiveScene();
+        auto meshComponents = scene.GetComponents<MeshComponent>();
 
         Vector<RenderCommand> renderCommands;
         // 1. Collect
@@ -52,7 +51,7 @@ namespace axiom
         {
             if (!meshComponent->IsVisible()) continue;
             if (!meshComponent->GetMaterial() || !meshComponent->GetMesh()) continue;
-            TransformComponent* tc = meshComponent->GetEntity()->GetComponent<TransformComponent>();
+            TransformComponent* tc = meshComponent->GetEntity().GetComponent<TransformComponent>();
             renderCommands.push_back({ meshComponent->GetMesh(), meshComponent->GetMaterial(), tc ? tc->GetTransform() : Matrix4::Identity() });
         }
 
@@ -123,15 +122,14 @@ namespace axiom
 
     void RenderModule::BeginScene()
     {
-        SceneModule* sceneModule = GetModule<SceneModule>();
-        AX_ASSERT(sceneModule->HasActiveScene(), "No active Scene!");
+        SceneModule& sceneModule = GetModule<SceneModule>();
 
-        Scene* scene = sceneModule->GetActiveScene();
-        Vector<CameraComponent*> cameras = scene->GetComponents<CameraComponent>();
+        Scene& scene = sceneModule.GetActiveScene();
+        Vector<CameraComponent*> cameras = scene.GetComponents<CameraComponent>();
 
         AX_ASSERT(!cameras.empty(), "No active Camera!");
         CameraComponent* cameraComponent = cameras[0];
-        TransformComponent* transform = cameraComponent->GetEntity()->GetComponent<TransformComponent>();
+        TransformComponent* transform = cameraComponent->GetEntity().GetComponent<TransformComponent>();
         cameraComponent->SetAspectRatio(GetApp().GetApplicationWindow().AspectRatio());
         Matrix4 viewMatrix = transform ? Camera::GetViewMatrix(transform->position, transform->rotation) : Matrix4::Identity();
         m_sceneData.viewProjectionMatrix = cameraComponent->GetProjectionMatrix() * viewMatrix;
@@ -176,13 +174,13 @@ namespace axiom
 
     SharedPtr<Shader> RenderModule::CreateShader(const String path)
     {
-        auto shaderResource = GetModule<ResourceModule>()->Load<ShaderResource>(path);
+        auto shaderResource = GetModule<ResourceModule>().Load<ShaderResource>(path);
         return GetGraphicsDevice().CreateShader(*shaderResource);
     }
 
     SharedPtr<Shader> RenderModule::CreateInstancedShader(const String path)
     {
-        auto shaderResource = GetModule<ResourceModule>()->Load<ShaderResource>(path);
+        auto shaderResource = GetModule<ResourceModule>().Load<ShaderResource>(path);
         // Inject #define after the #version line
         const String& vertSrc = shaderResource->GetVertexSource();
         

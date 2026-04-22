@@ -8,6 +8,7 @@
 #include "Renderer/RenderTypes.h"
 #include "Renderer/GraphicsDevice.h"
 #include "Event/Event.h"
+#include "Log.h"
 
 #include "Core/Timestep.h"
 
@@ -18,6 +19,12 @@ namespace axiom
 {
     class Input;
     class Log;
+    class FileSystemModule;
+    class ResourceModule;
+    class SceneModule;
+    class RenderModule;
+    class ImGuiModule;
+
 
     struct AppConfig
     {
@@ -27,9 +34,6 @@ namespace axiom
 
     class Application : public EventDispatcher
     {
-        friend class Input;
-        friend class Log;
-
     public:
         Application(AppConfig appConfig);
         ~Application();
@@ -41,31 +45,48 @@ namespace axiom
 
         const GraphicsDevice::API GetRenderAPI() const;
         ApplicationWindow& GetApplicationWindow();
+        Input& GetInput() const { return *m_input; }
+        Log& GetLog() const { return *m_log; }
 
-        static inline Application& Get() { return *s_instance; }
+        static inline Application& Get() { return *s_current; }
 
         template <typename T>
-        T* GetModule()
+        T& GetModule()
         {
-            return const_cast<T*>(std::as_const(*this).GetModule<T>());
+            auto it = m_engineModules.find(TypeID<T>());
+            AX_ASSERT(it != m_engineModules.end(), "Module not registered");
+            return *reinterpret_cast<T*>(it->second.get());
         }
 
         template <typename T>
-        const T* GetModule() const
+        const T& GetModule() const
         {
             auto it = m_engineModules.find(TypeID<T>());
-            if (it == m_engineModules.end())
-                return nullptr;
-            return static_cast<const T*>(it->second.get());
+            AX_ASSERT(it != m_engineModules.end(), "Module not registered");
+            return *reinterpret_cast<const T*>(it->second.get());
+        }
+
+        template <typename T>
+        bool HasModule() const
+        {
+            return m_engineModules.find(TypeID<T>()) != m_engineModules.end();
         }
 
     protected:
+        
         AppConfig m_appConfig;
         UniquePtr<ApplicationWindow> m_applicationWindow;
         TypeMap<UniquePtr<ApplicationModule>> m_engineModules;
         Vector<std::type_index> m_moduleOrder; // tracks registration order
+
         UniquePtr<Input> m_input;
         UniquePtr<Log> m_log;
+
+        FileSystemModule* fileSystemModule = nullptr;
+        ResourceModule* resourceModule = nullptr;
+        SceneModule* sceneModule = nullptr;
+        RenderModule* renderModule = nullptr;
+        ImGuiModule* imGuiModule = nullptr;
 
         // User override hooks — override these in your Application subclass
         virtual void OnApplicationRun()    {}
@@ -111,7 +132,12 @@ namespace axiom
         void InitializeModules();
         void ShutdownModules();
 
-        static Application* s_instance;
+        inline static Application& GetCurrent() {
+            AX_ASSERT(s_current, "No Application in scope");
+            return *s_current;
+        }
+
+        static Application* s_current;
         TimePoint m_lastUpdateTime;
         TimePoint m_lastRenderTime;
         Timestep m_dt; 
