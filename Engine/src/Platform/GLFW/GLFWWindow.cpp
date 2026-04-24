@@ -85,22 +85,22 @@ namespace axiom
         glfwSetWindowShouldClose(m_window, GLFW_TRUE);
     }
 
-    uint32 GLFWWindow::Width() const
+    uint32 GLFWWindow::GetWidth() const
     {
         return GetConfig().width;
     }
 
-    uint32 GLFWWindow::Height() const
+    uint32 GLFWWindow::GetHeight() const
     {
         return GetConfig().height;
     }
 
-    float GLFWWindow::AspectRatio() const
+    float GLFWWindow::GetAspectRatio() const
     {
         return float(GetConfig().width) / float(GetConfig().height);
     }
 
-    StringView GLFWWindow::Title() const
+    StringView GLFWWindow::GetTitle() const
     {
         return GetConfig().title;
     }

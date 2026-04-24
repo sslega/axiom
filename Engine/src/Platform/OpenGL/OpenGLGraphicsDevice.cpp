@@ -2,6 +2,8 @@
 #include "Platform/OpenGL/OpenGLBuffer.h"
 #include "Platform/OpenGL/OpenGLShader.h"
 #include "Platform/OpenGL/OpenGLTexture2D.h"
+#include "Platform/OpenGL/OpenGLFrameBuffer.h"
+#include "Renderer/FrameBuffer.h"
 #include "Resources/Texture2DResource.h"
 #include "Resources/MeshResource.h"
 #include "Renderer/Vertex.h"
@@ -11,7 +13,7 @@
 #include <imgui_impl_opengl3.h>
 #include "Core/Log.h"
 #include "Resources/ShaderResource.h"
-#include "OpenGLGraphicsDevice.h"
+
 
 
 namespace axiom
@@ -65,8 +67,16 @@ namespace axiom
         glDrawElementsInstanced(GL_TRIANGLES, indexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr, instanceCount);
     }
 
-    void OpenGLGraphicsDevice::Present()
+    void OpenGLGraphicsDevice::SwapBuffers(FrameBuffer& frameBuffer)
     {
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, frameBuffer.GetNativeHandle());
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+        glBlitFramebuffer(
+            0, 0, frameBuffer.GetWidth(), frameBuffer.GetHeight(),
+            0, 0, frameBuffer.GetWidth(), frameBuffer.GetHeight(),
+            GL_COLOR_BUFFER_BIT, GL_NEAREST
+        );
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glfwSwapBuffers(m_windowHandle);
     }
 
@@ -128,6 +138,11 @@ namespace axiom
     SharedPtr<Texture2D> OpenGLGraphicsDevice::CreateTexture2D(const Texture2DResource& resource) const
     {
         return MakeShared<OpenGLTexture2D>(resource);
+    }
+
+    SharedPtr<FrameBuffer> OpenGLGraphicsDevice::CreateFrameBuffer(const FramebufferSpec &spec) const
+    {
+        return MakeShared<OpenGLFrameBuffer>(spec);
     }
 
     uint32 OpenGLGraphicsDevice::GetOrCreateVAO(const SharedPtr<VertexBuffer>& vertexBuffer)

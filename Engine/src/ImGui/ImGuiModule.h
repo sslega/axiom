@@ -10,9 +10,10 @@ namespace axiom
         ImGuiModule(Application& application);
 
     protected:
-        void OnInitialize()  override;
-        void OnShutdown()    override;
-        void OnBeginFrame()  override;
-        void OnEndFrame()    override;
+        void OnInitialize() override;
+        void OnShutdown() override;
+        void OnBeginFrame() override;
+        void OnRender() override;
+        void OnEndFrame() override;
     };
 }

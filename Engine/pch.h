@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Core/Types.h"
+
 // Standard library — stable, large, used broadly across the engine
 #include <string>
 #include <string_view>

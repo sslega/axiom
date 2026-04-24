@@ -77,22 +77,22 @@ namespace axiom
         m_shouldClose = true;
     }
 
-    uint32 Win32Window::Width() const
+    uint32 Win32Window::GetWidth() const
     {
         return GetConfig().width;
     }
 
-    uint32 Win32Window::Height() const
+    uint32 Win32Window::GetHeight() const
     {
         return GetConfig().height;
     }
 
-    float Win32Window::AspectRatio() const
+    float Win32Window::GetAspectRatio() const
     {
         return float(GetConfig().width) / float(GetConfig().height);
     }
 
-    StringView Win32Window::Title() const
+    StringView Win32Window::GetTitle() const
     {
         return GetConfig().title;
     }

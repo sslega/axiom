@@ -7,6 +7,7 @@
 #include "Resources/ShaderResource.h"
 #include "Renderer/GraphicsDevice.h"
 #include "Renderer/Camera.h"
+#include "Core/Timestep.h"
 
 namespace axiom
 {
@@ -15,14 +16,13 @@ namespace axiom
     class Shader;
     class Material;
     class RenderResourceFactory;
+    class FrameBuffer;
 
     class RenderModule : public ApplicationModule
     {
     public:
         RenderModule(Application& engine);
 
-        void BeginScene();
-        void EndScene();
         void Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Material>& material, const Matrix4& transform);
         void Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Shader>& shader, const Matrix4& transform);
 
@@ -41,7 +41,14 @@ namespace axiom
         void OnInitialize() override;
         void OnShutdown() override;
         void OnUpdate(float deltaTime) override;
+        void OnBeginFrame() override;
         void OnRender() override;
+        void OnEndFrame() override;
+
+        void BeginScene();
+        void EndScene();
+
+        virtual void OnGUI();
 
         SharedPtr<Shader> CreateShader(const String path);
         SharedPtr<Shader> CreateInstancedShader(const String path);
@@ -81,9 +88,14 @@ namespace axiom
         void SubmitBatched(const SharedPtr<Material>& material, const Vector<RenderCommand>& commands);
         void ResetDebugDrawCounters();
 
+        SharedPtr<FrameBuffer> m_frameBuffer;
+
         uint32 m_instanceCallCount = 0;
         uint32 m_instanceObjectCount = 0;
         uint32 m_batchCallCount = 0;
         uint32 m_batchObjectCount = 0;
+
+        TimePoint m_lastRenderTime;
+        float m_dt;
     };
 }

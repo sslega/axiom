@@ -13,10 +13,10 @@ namespace axiom
 
         bool ShouldClose() const override;
         void CloseWindow() override;
-        uint32 Width()  const override;
-        uint32 Height() const override;
-        float AspectRatio() const override;
-        StringView Title() const override;
+        uint32 GetWidth()  const override;
+        uint32 GetHeight() const override;
+        float GetAspectRatio() const override;
+        StringView GetTitle() const override;
 
         void* GetNativeWindow() const override;
 

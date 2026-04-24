@@ -13,6 +13,9 @@ namespace axiom
     class Texture2DResource;
     class ApplicationWindow;
     class MeshResource;
+    class FrameBuffer;
+
+    struct FramebufferSpec;
 
     class GraphicsDevice 
     {
@@ -42,13 +45,15 @@ namespace axiom
         virtual SharedPtr<Texture2D> CreateTexture2D(const String& path) const = 0;
         virtual SharedPtr<Texture2D> CreateTexture2D(const Texture2DResource& resource) const = 0;
 
+        virtual SharedPtr<FrameBuffer> CreateFrameBuffer(const FramebufferSpec& spec) const = 0;
+
         // Draw commands
         virtual void SetClearColor(const Vec4& color) = 0;
         virtual void Clear() = 0;
         virtual void DrawIndexed(const SharedPtr<VertexBuffer>& vertexBuffer, const SharedPtr<IndexBuffer>& indexBuffer) = 0;
         virtual void DrawIndexedInstanced(const SharedPtr<VertexBuffer>& vertexBuffer, const SharedPtr<IndexBuffer>& indexBuffer, const SharedPtr<VertexBuffer>& instanceBuffer, uint32 instanceCount) = 0;
 
-        virtual void Present() = 0;
+        virtual void SwapBuffers(FrameBuffer& frameBuffer) = 0;
 
         inline API GetAPI() { return m_API; };
     

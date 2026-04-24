@@ -57,7 +57,7 @@ void Sandbox::OnApplicationRun()
     auto& cameraEntity = scene.CreateEntity("MainCamera");
     auto& transformComponent = cameraEntity.CreateComponent<TransformComponent>();
     transformComponent.position = Vec3(0.0f, 0.0f, 2.0f);
-    float aspectRatio = GetApplicationWindow().AspectRatio();
+    float aspectRatio = GetApplicationWindow().GetAspectRatio();
     m_cameraComponent = &cameraEntity.CreateComponent<CameraComponent>(ToRadians(60.0f), aspectRatio, 0.1f, 1000.0f);
     cameraEntity.CreateComponent<CameraController>();
 

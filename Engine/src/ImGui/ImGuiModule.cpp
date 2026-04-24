@@ -44,9 +44,14 @@ namespace axiom
         ImGui::NewFrame();
     }
 
-    void ImGuiModule::OnEndFrame()
+    void ImGuiModule::OnRender()
     {
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    }
+
+    void ImGuiModule::OnEndFrame()
+    {
+    
     }
 }

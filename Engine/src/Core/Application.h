@@ -89,10 +89,12 @@ namespace axiom
         ImGuiModule* imGuiModule = nullptr;
 
         // User override hooks — override these in your Application subclass
-        virtual void OnApplicationRun()    {}
+        virtual void OnApplicationRun() {}
         virtual void OnUpdate(float deltaTime) {}
-        virtual void OnRender()            {}
-        virtual void OnRegisterModules()   {}
+        virtual void OnBeginFrame() {}
+        virtual void OnRender() {}
+        virtual void OnEndFrame();
+        virtual void OnRegisterModules() {}
         virtual void OnInitializeModules() {}
 
         template <typename T>
@@ -127,7 +129,6 @@ namespace axiom
         void PoolEvents();
         void Update();
         void Render();
-        void DebugRender();
         void RegisterModules();
         void InitializeModules();
         void ShutdownModules();
@@ -139,8 +140,6 @@ namespace axiom
 
         static Application* s_current;
         TimePoint m_lastUpdateTime;
-        TimePoint m_lastRenderTime;
         Timestep m_dt; 
-        // float m_fps;
     };
 }

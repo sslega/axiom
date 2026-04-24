@@ -12,6 +12,8 @@
 #include "Core/Log.h"
 #include "Core/Types.h"
 #include "Renderer/Material.h"
+#include "FrameBuffer.h"
+#include <imgui.h>
 
 namespace axiom
 {
@@ -25,6 +27,11 @@ namespace axiom
         auto API = GetRenderAPI();
         auto& window = GetApp().GetApplicationWindow();
         m_graphicsDevice = GraphicsDevice::Create(API, window);
+
+        FramebufferSpec fbSpec;
+        fbSpec.width = window.GetWidth();
+        fbSpec.height = window.GetHeight();
+        m_frameBuffer = m_graphicsDevice->CreateFrameBuffer(fbSpec);
     }
 
     void RenderModule::OnShutdown()
@@ -35,11 +42,18 @@ namespace axiom
     {
     }
 
-    void RenderModule::OnRender()
+    void RenderModule::OnBeginFrame()
     {
         ResetDebugDrawCounters();
         BeginScene();
-        
+    }
+
+    void RenderModule::OnRender()
+    {    
+        auto now = std::chrono::steady_clock::now();
+        m_dt = std::chrono::duration<float>(now - m_lastRenderTime).count();
+        m_lastRenderTime = now;
+
         SceneModule& sceneModule = GetModule<SceneModule>();
 
         Scene& scene = sceneModule.GetActiveScene();
@@ -93,26 +107,13 @@ namespace axiom
                 Submit(buffers.vb, buffers.ib, cmds[0].material, cmds[0].transform);
             }
         }
+        
+        OnGUI();
+    }
 
-        // for(auto& [key, transforms] : instanceGroups)
-        // {
-        //     // need SharedPtrs back — find first matching command
-        //     auto it = std::find_if(renderCommands.begin(), renderCommands.end(), [&](const RenderCommand& c){
-        //         return c.mesh.get() == key.first && c.material.get() == key.second;
-        //     });
-        //     auto buffers  = GetOrCreateBuffers(it->mesh);
-        //     auto material = it->material;
-        //     if (transforms.size() > 1)
-        //     {
-        //         SubmitInstanced(buffers, material, transforms);
-        //     }
-        //     else
-        //     {
-        //         Submit(buffers.vb, buffers.ib, material, transforms[0]);
-        //     }
-        // }
-
-        EndScene();        
+    void RenderModule::OnEndFrame()
+    {
+        EndScene(); 
     }
 
     GraphicsDevice& RenderModule::GetGraphicsDevice() const
@@ -122,6 +123,8 @@ namespace axiom
 
     void RenderModule::BeginScene()
     {
+        m_frameBuffer->Bind();
+
         SceneModule& sceneModule = GetModule<SceneModule>();
 
         Scene& scene = sceneModule.GetActiveScene();
@@ -130,7 +133,7 @@ namespace axiom
         AX_ASSERT(!cameras.empty(), "No active Camera!");
         CameraComponent* cameraComponent = cameras[0];
         TransformComponent* transform = cameraComponent->GetEntity().GetComponent<TransformComponent>();
-        cameraComponent->SetAspectRatio(GetApp().GetApplicationWindow().AspectRatio());
+        cameraComponent->SetAspectRatio(GetApp().GetApplicationWindow().GetAspectRatio());
         Matrix4 viewMatrix = transform ? Camera::GetViewMatrix(transform->position, transform->rotation) : Matrix4::Identity();
         m_sceneData.viewProjectionMatrix = cameraComponent->GetProjectionMatrix() * viewMatrix;
         m_graphicsDevice->SetClearColor(Vec4(0.5f, 0.5f, 0.5f, 1.0f));
@@ -139,6 +142,28 @@ namespace axiom
 
     void RenderModule::EndScene()
     {
+        m_graphicsDevice->SwapBuffers(*m_frameBuffer);
+    }
+
+    void RenderModule::OnGUI()
+    {
+        uint8 fps = static_cast<uint8>(1.0f / m_dt);
+
+        ImGui::SetNextWindowPos(ImVec2(0, 0));
+        ImGui::SetNextWindowBgAlpha(0.0f);
+        ImGui::Begin("##debug", nullptr,
+            ImGuiWindowFlags_NoDecoration  |
+            ImGuiWindowFlags_NoNav         |
+            ImGuiWindowFlags_NoMove        |
+            ImGuiWindowFlags_NoInputs      |
+            ImGuiWindowFlags_NoSavedSettings);
+        ImGui::Text("FPS: %d", fps);
+        ImGui::Text("Draw calls: %d", GetDrawCallCount());
+        ImGui::Text("Instanced calls: %d", GetInstanceCallCount());
+        ImGui::Text("Instanced objects: %d", GetInstanceObjectCount());
+        ImGui::Text("Batched calls: %d", GetBatchCallCount());
+        ImGui::Text("Batched objects: %d", GetBatchObjectCount());
+        ImGui::End();
     }
 
     void RenderModule::Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Material>& material, const Matrix4& transform)

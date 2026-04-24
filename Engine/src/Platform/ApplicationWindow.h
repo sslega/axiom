@@ -30,10 +30,10 @@ namespace axiom
         virtual bool ShouldClose() const = 0;
         virtual void CloseWindow() = 0;
 
-        virtual uint32 Width()  const = 0;
-        virtual uint32 Height() const = 0;
-        virtual float AspectRatio() const = 0;
-        virtual StringView Title() const = 0;
+        virtual uint32 GetWidth()  const = 0;
+        virtual uint32 GetHeight() const = 0;
+        virtual float GetAspectRatio() const = 0;
+        virtual StringView GetTitle() const = 0;
 
         virtual void* GetNativeWindow() const = 0;
 

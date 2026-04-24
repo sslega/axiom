@@ -10,11 +10,10 @@
 #include "Input/Input.h"
 #include "Core/Log.h"
 #include <imgui.h>
-#include "Application.h"
 
 namespace axiom
 {
-    Application* Application::s_current = nullptr;
+    Application* Application::s_current = nullptr; 
 
     Application::Application(AppConfig appConfig)
     : m_appConfig(appConfig)
@@ -28,14 +27,10 @@ namespace axiom
             AX_ASSERT(false, "Application instance already exists!");
         }
 
-        // forces each printf to flush immediately.
-        // TODO: Remove after adding proper logging
-        setvbuf(stdout, NULL, _IONBF, 0);
         m_appConfig = appConfig;
         m_applicationWindow = ApplicationWindow::Create(m_appConfig.windowConfig);
 
-        m_lastRenderTime = std::chrono::steady_clock::now();
-        m_lastUpdateTime = m_lastRenderTime;
+        m_lastUpdateTime = std::chrono::steady_clock::now();
 
         m_input = Input::Create(*m_applicationWindow);
         m_log = MakeUnique<ConsoleLog>();
@@ -93,43 +88,30 @@ namespace axiom
 
     void Application::Render()
     {
-        auto now = std::chrono::steady_clock::now();
-        m_dt = std::chrono::duration<float>(now - m_lastRenderTime).count();
-        m_lastRenderTime = now;
+        OnBeginFrame();
 
         for (auto& id : m_moduleOrder)
         {
             m_engineModules[id]->BeginFrame();
         }
-            
+        
+        OnRender();
 
         for (auto& id : m_moduleOrder)
         {
             m_engineModules[id]->Render();
         }
-
-        OnRender();
-        DebugRender();
+        
+        OnEndFrame();
 
         for (auto& id : m_moduleOrder)
         {
             m_engineModules[id]->EndFrame();
         }
-
-        GetModule<RenderModule>().GetGraphicsDevice().Present();
     }
 
-    void Application::DebugRender()
+    void Application::OnEndFrame()
     {
-        uint8 fps = 1.0f / m_dt;
-
-        ImDrawList* dl = ImGui::GetForegroundDrawList();
-        dl->AddText(ImVec2(10, 10), IM_COL32(255, 255, 255, 255), std::string("FPS: " + std::to_string(fps)).c_str());
-        dl->AddText(ImVec2(10, 22), IM_COL32(255, 255, 255, 255), std::string("Draw Calls: " + std::to_string(renderModule->GetDrawCallCount())).c_str());
-        dl->AddText(ImVec2(10, 34), IM_COL32(255, 255, 255, 255), std::string("Instanced calls: " + std::to_string(renderModule->GetInstanceCallCount())).c_str());
-        dl->AddText(ImVec2(10, 46), IM_COL32(255, 255, 255, 255), std::string("Instanced objects drawn: " + std::to_string(renderModule->GetInstanceObjectCount())).c_str());
-        dl->AddText(ImVec2(10, 58), IM_COL32(255, 255, 255, 255), std::string("Batched calls: " + std::to_string(renderModule->GetBatchCallCount())).c_str());
-        dl->AddText(ImVec2(10, 70), IM_COL32(255, 255, 255, 255), std::string("Batched objects drawn: " + std::to_string(renderModule->GetBatchObjectCount())).c_str());
     }
 
     void Application::RegisterModules()
