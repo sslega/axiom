@@ -77,6 +77,7 @@ namespace axiom
 
         // 2. Depth Pre-Pass
         m_graphicsDevice->SetColorWriteEnabled(false);
+        m_graphicsDevice->SetDepthWriteEnabled(true);
 
         UnorderedMap<MeshResource*, Vector<Matrix4>> depthGroups;
         for (const auto& cmd : renderCommands)
@@ -137,9 +138,10 @@ namespace axiom
                 Submit(buffers.vb, buffers.ib, cmds[0].material, cmds[0].transform);
             }
         }
-        
+
         OnGUI();
         RenderToScreen();
+
     }
 
     void RenderModule::OnEndFrame()
@@ -167,6 +169,8 @@ namespace axiom
         cameraComponent->SetAspectRatio(GetApp().GetApplicationWindow().GetAspectRatio());
         Matrix4 viewMatrix = transform ? Camera::GetViewMatrix(transform->position, transform->rotation) : Matrix4::Identity();
         m_sceneData.viewProjectionMatrix = cameraComponent->GetProjectionMatrix() * viewMatrix;
+        m_graphicsDevice->SetDepthWriteEnabled(true);
+        m_graphicsDevice->SetDepthFunction(DepthFunction::Less);
         m_graphicsDevice->SetClearColor(Vec4(0.5f, 0.5f, 0.5f, 1.0f));
         m_graphicsDevice->Clear();
     }
@@ -199,17 +203,17 @@ namespace axiom
 
     void RenderModule::Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Material>& material, const Matrix4& transform)
     {
+        material->Bind();
         material->SetUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
         material->SetUniform("u_Transform", transform);
-        material->Bind();
         m_graphicsDevice->DrawIndexed(vb, ib);
     }
 
     void RenderModule::Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Shader>& shader, const Matrix4& transform)
     {
+        shader->Bind();
         shader->UploadUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
         shader->UploadUniform("u_Transform", transform);
-        shader->Bind();
         m_graphicsDevice->DrawIndexed(vb, ib);
     }
 

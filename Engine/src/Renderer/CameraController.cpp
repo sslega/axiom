@@ -24,32 +24,29 @@ namespace axiom
         }
         m_lastMouse = mouse;
 
-        // WASD movement along camera's local axes
+        // WASD movement along camera's local axes (full 3D, respects pitch)
         float speed = moveSpeed * dt;
-        float yaw = m_transformComponent->rotation.y;
-        Vec3 forward = { -std::sin(yaw), 0.0f, -std::cos(yaw) };
+        float yaw   = m_transformComponent->rotation.y;
+        float pitch = m_transformComponent->rotation.x;
+        Vec3 forward = {
+            -std::sin(yaw) * std::cos(pitch),
+            std::sin(pitch),
+            -std::cos(yaw) * std::cos(pitch)
+        };
         Vec3 right = { std::cos(yaw), 0.0f, -std::sin(yaw) };
 
-        if (Input::IsKeyPressed(KeyCode::W)) 
-        { 
-            m_transformComponent->position.x += forward.x * speed; 
-            m_transformComponent->position.z += forward.z * speed; 
-        }
-        if (Input::IsKeyPressed(KeyCode::S)) 
-        { 
-            m_transformComponent->position.x -= forward.x * speed;
-            m_transformComponent->position.z -= forward.z * speed; 
-        }
+        if (Input::IsKeyPressed(KeyCode::W))
+            m_transformComponent->position = m_transformComponent->position + forward * speed;
+        if (Input::IsKeyPressed(KeyCode::S))
+            m_transformComponent->position = m_transformComponent->position - forward * speed;
         if (Input::IsKeyPressed(KeyCode::A))
-        { 
-            m_transformComponent->position.x -= right.x * speed;
-            m_transformComponent->position.z -= right.z * speed; 
-        }
+            m_transformComponent->position = m_transformComponent->position - right * speed;
         if (Input::IsKeyPressed(KeyCode::D))
-        { 
-            m_transformComponent->position.x += right.x * speed;
-            m_transformComponent->position.z += right.z * speed;
-        }
+            m_transformComponent->position = m_transformComponent->position + right * speed;
+        if (Input::IsKeyPressed(KeyCode::E))
+            m_transformComponent->position.y += speed;
+        if (Input::IsKeyPressed(KeyCode::Q))
+            m_transformComponent->position.y -= speed;
     }
     
     void CameraController::OnInitialize()

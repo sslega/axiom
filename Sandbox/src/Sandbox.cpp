@@ -11,6 +11,7 @@
 #include "Resources/Texture2DResource.h"
 #include "Geometry/Quad.h"
 #include "Geometry/Triangle.h"
+#include "Geometry/Cube.h"
 
 using namespace axiom;
 
@@ -51,6 +52,7 @@ void Sandbox::OnApplicationRun()
     Scene& scene = sceneModule->GetActiveScene();
     auto quadMesh = MakeShared<Quad>();
     auto triangleMesh = MakeShared<Triangle>();
+    auto cubeMesh = MakeShared<Cube>();
     auto shader = renderModule->GetShader("engine://Shaders/Texture.glsl");
     // auto shader = Render->GetShader("engine://Shaders/VertexColor.glsl");
 
@@ -79,7 +81,8 @@ void Sandbox::OnApplicationRun()
             transform.scale    = {0.1f, 0.1f, 0.1f};
 
             auto& mesh = e.CreateComponent<MeshComponent>();
-            mesh.SetMesh(quadMesh);
+            // mesh.SetMesh(quadMesh);
+            mesh.SetMesh(cubeMesh);
             mesh.SetMaterial(mat);
         }
     }
@@ -100,6 +103,7 @@ void Sandbox::OnApplicationRun()
             mesh.SetMaterial(mat);
         }
     }
+    
 
     GetApplicationWindow().AddEventListener(&Sandbox::OnResize, this);
 }
