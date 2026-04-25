@@ -88,12 +88,19 @@ namespace axiom
         void SubmitBatched(const SharedPtr<Material>& material, const Vector<RenderCommand>& commands);
         void ResetDebugDrawCounters();
 
+        SharedPtr<Shader> m_screenQuadShader;
+        SharedPtr<VertexBuffer> m_screenQuadVB;
+        SharedPtr<IndexBuffer> m_screenQuadIB;
+        void RenderScreen();
+
         SharedPtr<FrameBuffer> m_frameBuffer;
 
         uint32 m_instanceCallCount = 0;
         uint32 m_instanceObjectCount = 0;
         uint32 m_batchCallCount = 0;
         uint32 m_batchObjectCount = 0;
+
+        
 
         TimePoint m_lastRenderTime;
         float m_dt;

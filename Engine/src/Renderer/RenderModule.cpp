@@ -14,6 +14,7 @@
 #include "Renderer/Material.h"
 #include "FrameBuffer.h"
 #include <imgui.h>
+#include "Geometry/Quad.h"
 
 namespace axiom
 {
@@ -32,6 +33,11 @@ namespace axiom
         fbSpec.width = window.GetWidth();
         fbSpec.height = window.GetHeight();
         m_frameBuffer = m_graphicsDevice->CreateFrameBuffer(fbSpec);
+
+        Quad quad;
+        m_screenQuadVB = m_graphicsDevice->CreateVertexBuffer(quad);
+        m_screenQuadIB = m_graphicsDevice->CreateIndexBuffer(quad);
+        m_screenQuadShader = CreateShader("engine://Shaders/FullScreen.glsl");
     }
 
     void RenderModule::OnShutdown()
@@ -109,6 +115,7 @@ namespace axiom
         }
         
         OnGUI();
+        RenderScreenQuad();
     }
 
     void RenderModule::OnEndFrame()
@@ -142,7 +149,7 @@ namespace axiom
 
     void RenderModule::EndScene()
     {
-        m_graphicsDevice->SwapBuffers(*m_frameBuffer);
+        m_graphicsDevice->SwapBuffers();
     }
 
     void RenderModule::OnGUI()
@@ -335,6 +342,19 @@ namespace axiom
         m_instanceObjectCount = 0;
         m_batchCallCount = 0;
         m_batchObjectCount = 0;
+    }
+
+    void RenderModule::RenderScreen()
+    {
+        m_frameBuffer->Unbind();
+        m_graphicsDevice->SetDepthTestEnabled(false);
+        m_graphicsDevice->SetClearColor(Vec4(0.0f, 0.0f, 0.0f, 1.0f));
+        m_graphicsDevice->Clear();
+        m_screenQuadShader->Bind();
+        m_screenQuadShader->UploadUniform("u_screenTexture", 0);
+        m_graphicsDevice->BindFrameBufferTexture(*m_frameBuffer, 0);
+        m_graphicsDevice->DrawIndexed(m_screenQuadVB, m_screenQuadIB);
+        m_graphicsDevice->SetDepthTestEnabled(true);
     }
 
     GraphicsDevice::API RenderModule::GetRenderAPI() const

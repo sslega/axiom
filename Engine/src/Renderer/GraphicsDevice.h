@@ -52,8 +52,10 @@ namespace axiom
         virtual void Clear() = 0;
         virtual void DrawIndexed(const SharedPtr<VertexBuffer>& vertexBuffer, const SharedPtr<IndexBuffer>& indexBuffer) = 0;
         virtual void DrawIndexedInstanced(const SharedPtr<VertexBuffer>& vertexBuffer, const SharedPtr<IndexBuffer>& indexBuffer, const SharedPtr<VertexBuffer>& instanceBuffer, uint32 instanceCount) = 0;
+        virtual void SetDepthTestEnabled(bool enabled) = 0;
+        virtual void BindFrameBufferTexture(FrameBuffer& frameBuffer, uint32 slot) = 0;
 
-        virtual void SwapBuffers(FrameBuffer& frameBuffer) = 0;
+        virtual void SwapBuffers() = 0;
 
         inline API GetAPI() { return m_API; };
     

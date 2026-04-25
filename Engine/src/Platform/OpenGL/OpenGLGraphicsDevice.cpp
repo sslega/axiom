@@ -13,6 +13,7 @@
 #include <imgui_impl_opengl3.h>
 #include "Core/Log.h"
 #include "Resources/ShaderResource.h"
+#include "OpenGLGraphicsDevice.h"
 
 
 
@@ -67,16 +68,8 @@ namespace axiom
         glDrawElementsInstanced(GL_TRIANGLES, indexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr, instanceCount);
     }
 
-    void OpenGLGraphicsDevice::SwapBuffers(FrameBuffer& frameBuffer)
+    void OpenGLGraphicsDevice::SwapBuffers()
     {
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, frameBuffer.GetNativeHandle());
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-        glBlitFramebuffer(
-            0, 0, frameBuffer.GetWidth(), frameBuffer.GetHeight(),
-            0, 0, frameBuffer.GetWidth(), frameBuffer.GetHeight(),
-            GL_COLOR_BUFFER_BIT, GL_NEAREST
-        );
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glfwSwapBuffers(m_windowHandle);
     }
 
@@ -145,7 +138,26 @@ namespace axiom
         return MakeShared<OpenGLFrameBuffer>(spec);
     }
 
-    uint32 OpenGLGraphicsDevice::GetOrCreateVAO(const SharedPtr<VertexBuffer>& vertexBuffer)
+    void OpenGLGraphicsDevice::SetDepthTestEnabled(bool enabled)
+    {
+        if(enabled)
+        {
+            glEnable(GL_DEPTH_TEST);
+        }
+        else
+        {
+            glDisable(GL_DEPTH_TEST);
+        }
+        
+    }
+
+    void OpenGLGraphicsDevice::BindFrameBufferTexture(FrameBuffer& frameBuffer, uint32 slot)
+    {
+        glActiveTexture(GL_TEXTURE0 + slot);
+        glBindTexture(GL_TEXTURE_2D, frameBuffer.GetColorAttachmentID());
+    }
+
+    uint32 OpenGLGraphicsDevice::GetOrCreateVAO(const SharedPtr<VertexBuffer> &vertexBuffer)
     {
         return GetOrCreateVAO(vertexBuffer, nullptr);
     }

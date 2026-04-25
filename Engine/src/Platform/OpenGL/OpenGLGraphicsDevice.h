@@ -22,7 +22,7 @@ namespace axiom
         void Clear() override;
         void DrawIndexed(const SharedPtr<VertexBuffer>& vertexBuffer, const SharedPtr<IndexBuffer>& indexBuffer) override;
         void DrawIndexedInstanced(const SharedPtr<VertexBuffer>& vertexBuffer, const SharedPtr<IndexBuffer>& indexBuffer, const SharedPtr<VertexBuffer>& instanceBuffer, uint32 instanceCount) override;
-        void SwapBuffers(FrameBuffer& frameBuffer) override;
+        void SwapBuffers() override;
 
         virtual SharedPtr<VertexBuffer> CreateVertexBuffer(const MeshResource& mesh) const override;
         virtual SharedPtr<VertexBuffer> CreateVertexBuffer(float* vertices, uint32 size) const override;        
@@ -39,6 +39,8 @@ namespace axiom
         SharedPtr<Texture2D> CreateTexture2D(const Texture2DResource& resource) const override;
 
         virtual SharedPtr<FrameBuffer> CreateFrameBuffer(const FramebufferSpec& spec) const override;
+        virtual void SetDepthTestEnabled(bool enabled) override;
+        virtual void BindFrameBufferTexture(FrameBuffer& frameBuffer, uint32 slot) override;
 
     private:
         PairMap<std::pair<VertexBuffer*, VertexBuffer*>, uint32> m_vaoCache;
