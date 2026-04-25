@@ -39,8 +39,12 @@ namespace axiom
         SharedPtr<Texture2D> CreateTexture2D(const Texture2DResource& resource) const override;
 
         virtual SharedPtr<FrameBuffer> CreateFrameBuffer(const FramebufferSpec& spec) const override;
-        virtual void SetDepthTestEnabled(bool enabled) override;
         virtual void BindFrameBufferTexture(FrameBuffer& frameBuffer, uint32 slot) override;
+        
+        virtual void SetDepthTestEnabled(bool enabled) override;
+        virtual void SetColorWriteEnabled(bool enabled) override;
+        virtual void SetDepthWriteEnabled(bool enabled) override;
+        virtual void SetDepthFunction(DepthFunction func) override;
 
     private:
         PairMap<std::pair<VertexBuffer*, VertexBuffer*>, uint32> m_vaoCache;

@@ -37,7 +37,7 @@ namespace axiom
         Quad quad;
         m_screenQuadVB = m_graphicsDevice->CreateVertexBuffer(quad);
         m_screenQuadIB = m_graphicsDevice->CreateIndexBuffer(quad);
-        m_screenQuadShader = CreateShader("engine://Shaders/FullScreen.glsl");
+        m_screenQuadShader = GetShader("engine://Shaders/FullScreen.glsl");
     }
 
     void RenderModule::OnShutdown()
@@ -75,7 +75,31 @@ namespace axiom
             renderCommands.push_back({ meshComponent->GetMesh(), meshComponent->GetMaterial(), tc ? tc->GetTransform() : Matrix4::Identity() });
         }
 
-        // 2. Group by (mesh, material)
+        // 2. Depth Pre-Pass
+        m_graphicsDevice->SetColorWriteEnabled(false);
+
+        UnorderedMap<MeshResource*, Vector<Matrix4>> depthGroups;
+        for (const auto& cmd : renderCommands)
+            depthGroups[cmd.mesh.get()].push_back(cmd.transform);
+
+        for (const auto& [meshPtr, transforms] : depthGroups)
+        {
+            auto it = std::find_if(renderCommands.begin(), renderCommands.end(),
+                [meshPtr](const RenderCommand& c) { return c.mesh.get() == meshPtr; });
+            auto buffers = GetOrCreateBuffers(it->mesh);
+            auto& materialShader = it->material->GetShader();
+
+            if (transforms.size() > 1)
+                SubmitInstanced(buffers, GetOrCreateDepthPassInstancedShader(materialShader), transforms);
+            else
+                Submit(buffers.vb, buffers.ib, GetOrCreateDepthPassShader(materialShader), transforms[0]);
+        }
+
+        m_graphicsDevice->SetColorWriteEnabled(true);
+        m_graphicsDevice->SetDepthWriteEnabled(false);
+        m_graphicsDevice->SetDepthFunction(DepthFunction::LessEqual);
+
+        // 3. Group by (mesh, material)
         PairMap<InstanceGroupKey, Vector<Matrix4>> instanceGroups;
         for (auto& renderCommand : renderCommands)
         {
@@ -83,7 +107,7 @@ namespace axiom
             instanceGroups[groupKey].push_back(renderCommand.transform);
         }
         
-        // 3. Dispatch Intanced meshesh, collect batch candidates
+        // 4. Dispatch Intanced meshesh, collect batch candidates
         UnorderedMap<Material*, Vector<RenderCommand>> batchCandidates;
         for (auto& [key, transforms] : instanceGroups)
         {
@@ -102,7 +126,7 @@ namespace axiom
                 
         }
 
-        // 4. Draw batch and everything else
+        // 5. Draw batch and everything else
         for (auto& [matPtr, cmds] : batchCandidates)
         {
             if (cmds.size() > 1)
@@ -115,7 +139,7 @@ namespace axiom
         }
         
         OnGUI();
-        RenderScreenQuad();
+        RenderToScreen();
     }
 
     void RenderModule::OnEndFrame()
@@ -200,6 +224,12 @@ namespace axiom
             auto instancedShader = CreateInstancedShader(path);
             m_instancedShaderCache[shader.get()] = instancedShader;
             it = m_shaderCache.find(path);
+
+            auto depthShader = CreateDepthPassShader(path);
+            m_depthPassShaderCache[shader.get()] = depthShader;
+
+            auto depthInstancedShader = CreateDepthPassInstancedShader(path);
+            m_depthPassInstancedShaderCache[shader.get()] = depthInstancedShader;
         }
         return it->second;
     }
@@ -244,12 +274,43 @@ namespace axiom
         return it != m_instancedShaderCache.end() ? it->second : nullptr;
     }
 
+    SharedPtr<Shader> RenderModule::CreateDepthPassShader(const String path)
+    {
+        auto shaderResource = GetModule<ResourceModule>().Load<ShaderResource>(path);
+        const String depthFrag = "#version 330 core\nvoid main() {}\n";
+        return GetGraphicsDevice().CreateShader(shaderResource->GetVertexSource(), depthFrag);
+    }
+
+    SharedPtr<Shader> RenderModule::CreateDepthPassInstancedShader(const String path)
+    {
+        auto shaderResource = GetModule<ResourceModule>().Load<ShaderResource>(path);
+        const String& vertSrc = shaderResource->GetVertexSource();
+        size_t newline = vertSrc.find('\n', vertSrc.find("#version"));
+        String instancedVert = vertSrc.substr(0, newline + 1)
+            + "#define INSTANCED 1\n"
+            + vertSrc.substr(newline + 1);
+        const String depthFrag = "#version 330 core\nvoid main() {}\n";
+        return GetGraphicsDevice().CreateShader(instancedVert, depthFrag);
+    }
+
+    SharedPtr<Shader> RenderModule::GetOrCreateDepthPassShader(const SharedPtr<Shader> &shader)
+    {
+        auto it = m_depthPassShaderCache.find(shader.get());
+        return it != m_depthPassShaderCache.end() ? it->second : nullptr;
+    }
+
+    SharedPtr<Shader> RenderModule::GetOrCreateDepthPassInstancedShader(const SharedPtr<Shader> &shader)
+    {
+        auto it = m_depthPassInstancedShaderCache.find(shader.get());
+        return it != m_depthPassInstancedShaderCache.end() ? it->second : nullptr;
+    }
+
     void RenderModule::SubmitInstanced(const MeshBuffers& buffers, const SharedPtr<Material>& material, const Vector<Matrix4>& transforms)
     {
         uint32 byteSize = static_cast<uint32>(transforms.size() * sizeof(Matrix4));
         auto cacheKey = std::make_pair(buffers.vb.get(), material.get());
-        auto it = m_instanceBufferCache.find(cacheKey);
-        if (it == m_instanceBufferCache.end())
+        auto it = m_instanceMaterialBufferCache.find(cacheKey);
+        if (it == m_instanceMaterialBufferCache.end())
         {
             auto instanceBuffer = m_graphicsDevice->CreateDynamicVertexBuffer(byteSize);
                 instanceBuffer->SetLayout({
@@ -258,8 +319,8 @@ namespace axiom
                 { ShaderDataType::Float4, "a_InstanceTransform2" },
                 { ShaderDataType::Float4, "a_InstanceTransform3" },
             });
-            m_instanceBufferCache[cacheKey] = instanceBuffer;
-            it = m_instanceBufferCache.find(cacheKey);
+            m_instanceMaterialBufferCache[cacheKey] = instanceBuffer;
+            it = m_instanceMaterialBufferCache.find(cacheKey);
         }
 
         SharedPtr<VertexBuffer>& instanceBuffer = it->second;
@@ -278,6 +339,32 @@ namespace axiom
             material->GetShader()->UploadUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
         }
         
+        m_graphicsDevice->DrawIndexedInstanced(buffers.vb, buffers.ib, instanceBuffer, static_cast<uint32>(transforms.size()));
+        m_instanceCallCount++;
+        m_instanceObjectCount += transforms.size();
+    }
+
+    void RenderModule::SubmitInstanced(const MeshBuffers& buffers, const SharedPtr<Shader>& instancedShader, const Vector<Matrix4>& transforms)
+    {
+        uint32 byteSize = static_cast<uint32>(transforms.size() * sizeof(Matrix4));
+        auto cacheKey = std::make_pair(buffers.vb.get(), instancedShader.get());
+        auto it = m_instanceShaderBufferCache.find(cacheKey);
+        if (it == m_instanceShaderBufferCache.end())
+        {
+            auto instanceBuffer = m_graphicsDevice->CreateDynamicVertexBuffer(byteSize);
+            instanceBuffer->SetLayout({
+                { ShaderDataType::Float4, "a_InstanceTransform0" },
+                { ShaderDataType::Float4, "a_InstanceTransform1" },
+                { ShaderDataType::Float4, "a_InstanceTransform2" },
+                { ShaderDataType::Float4, "a_InstanceTransform3" },
+            });
+            m_instanceShaderBufferCache[cacheKey] = instanceBuffer;
+            it = m_instanceShaderBufferCache.find(cacheKey);
+        }
+        SharedPtr<VertexBuffer>& instanceBuffer = it->second;
+        instanceBuffer->SetData(transforms.data(), byteSize);
+        instancedShader->Bind();
+        instancedShader->UploadUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
         m_graphicsDevice->DrawIndexedInstanced(buffers.vb, buffers.ib, instanceBuffer, static_cast<uint32>(transforms.size()));
         m_instanceCallCount++;
         m_instanceObjectCount += transforms.size();
@@ -344,7 +431,7 @@ namespace axiom
         m_batchObjectCount = 0;
     }
 
-    void RenderModule::RenderScreen()
+    void RenderModule::RenderToScreen()
     {
         m_frameBuffer->Unbind();
         m_graphicsDevice->SetDepthTestEnabled(false);

@@ -68,14 +68,19 @@ namespace axiom
 
         UniquePtr<GraphicsDevice> m_graphicsDevice;
         SceneData m_sceneData;
-
+        
+        // TODO: this should be single cache
         StringMap<SharedPtr<Shader>> m_shaderCache;
         UnorderedMap<Shader*, SharedPtr<Shader>> m_instancedShaderCache;
+        UnorderedMap<Shader*, SharedPtr<Shader>> m_depthPassShaderCache;
+        UnorderedMap<Shader*, SharedPtr<Shader>> m_depthPassInstancedShaderCache;
 
         using InstanceGroupKey  = std::pair<MeshResource*, Material*>;   // for OnRender grouping
-        using InstanceBufferKey = std::pair<VertexBuffer*, Material*>;   // for SubmitInstanced cache
+        using InstanceMaterialBufferKey = std::pair<VertexBuffer*, Material*>;   // for SubmitInstanced cache
+        using InstanceShaderBufferKey = std::pair<VertexBuffer*, Shader*>;
 
-        PairMap<InstanceBufferKey, SharedPtr<VertexBuffer>> m_instanceBufferCache;
+        PairMap<InstanceMaterialBufferKey, SharedPtr<VertexBuffer>> m_instanceMaterialBufferCache;
+        PairMap<InstanceShaderBufferKey, SharedPtr<VertexBuffer>> m_instanceShaderBufferCache;
         UnorderedMap<Material*, SharedPtr<VertexBuffer>> m_batchVBCache;
         UnorderedMap<Material*, SharedPtr<IndexBuffer>> m_batchIBCache;
 
@@ -83,15 +88,23 @@ namespace axiom
         UnorderedMap<MeshResource*, MeshBuffers> m_meshCache;
 
         MeshBuffers GetOrCreateBuffers(const SharedPtr<MeshResource>& mesh);
+        // TODO: this should be single GetOrSetShader
         SharedPtr<Shader> GetOrCreateInstancedShader(const SharedPtr<Shader>& shader);
+        SharedPtr<Shader> CreateDepthPassShader(const String path);
+        SharedPtr<Shader> CreateDepthPassInstancedShader(const String path);
+        SharedPtr<Shader> GetOrCreateDepthPassShader(const SharedPtr<Shader>& shader);
+        SharedPtr<Shader> GetOrCreateDepthPassInstancedShader(const SharedPtr<Shader>& shader);
+
         void SubmitInstanced(const MeshBuffers& buffers, const SharedPtr<Material>& material, const Vector<Matrix4>& transforms);
+        void SubmitInstanced(const MeshBuffers& buffers, const SharedPtr<Shader>& instancedShader, const Vector<Matrix4>& transforms);
         void SubmitBatched(const SharedPtr<Material>& material, const Vector<RenderCommand>& commands);
         void ResetDebugDrawCounters();
 
-        SharedPtr<Shader> m_screenQuadShader;
+        SharedPtr<Shader> m_screenQuadShader;        
+
         SharedPtr<VertexBuffer> m_screenQuadVB;
         SharedPtr<IndexBuffer> m_screenQuadIB;
-        void RenderScreen();
+        void RenderToScreen();
 
         SharedPtr<FrameBuffer> m_frameBuffer;
 

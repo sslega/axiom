@@ -17,6 +17,8 @@ namespace axiom
 
     struct FramebufferSpec;
 
+    enum class DepthFunction { Less, LessEqual, Equal };
+
     class GraphicsDevice 
     {
     public:
@@ -52,8 +54,13 @@ namespace axiom
         virtual void Clear() = 0;
         virtual void DrawIndexed(const SharedPtr<VertexBuffer>& vertexBuffer, const SharedPtr<IndexBuffer>& indexBuffer) = 0;
         virtual void DrawIndexedInstanced(const SharedPtr<VertexBuffer>& vertexBuffer, const SharedPtr<IndexBuffer>& indexBuffer, const SharedPtr<VertexBuffer>& instanceBuffer, uint32 instanceCount) = 0;
-        virtual void SetDepthTestEnabled(bool enabled) = 0;
         virtual void BindFrameBufferTexture(FrameBuffer& frameBuffer, uint32 slot) = 0;
+
+        virtual void SetDepthTestEnabled(bool enabled) = 0;
+        virtual void SetColorWriteEnabled(bool enabled) = 0;
+        virtual void SetDepthWriteEnabled(bool enabled) = 0;
+
+        virtual void SetDepthFunction(DepthFunction func) = 0;
 
         virtual void SwapBuffers() = 0;
 

@@ -151,6 +151,27 @@ namespace axiom
         
     }
 
+    void OpenGLGraphicsDevice::SetColorWriteEnabled(bool enabled)
+    {
+        GLboolean v = enabled ? GL_TRUE : GL_FALSE;
+        glColorMask(v, v, v, v);
+    }
+
+    void OpenGLGraphicsDevice::SetDepthWriteEnabled(bool enabled)
+    {
+        glDepthMask(enabled ? GL_TRUE: GL_FALSE);
+    }
+
+    void OpenGLGraphicsDevice::SetDepthFunction(DepthFunction func)
+    {
+        switch (func)
+        {
+            case DepthFunction::Less: glDepthFunc(GL_LESS); break;
+            case DepthFunction::LessEqual: glDepthFunc(GL_LEQUAL); break;
+            case DepthFunction::Equal: glDepthFunc(GL_EQUAL); break;
+        }
+    }
+
     void OpenGLGraphicsDevice::BindFrameBufferTexture(FrameBuffer& frameBuffer, uint32 slot)
     {
         glActiveTexture(GL_TEXTURE0 + slot);
