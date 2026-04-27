@@ -19,7 +19,7 @@ namespace axiom
         virtual void UploadUniform(const String& name, const Vec2& value) = 0;
         virtual void UploadUniform(const String& name, const Vec3& value) = 0;
         virtual void UploadUniform(const String& name, const Vec4& value) = 0;
-        virtual void UploadUniform(const String& name, const Matrix4& value) = 0;       
+        virtual void UploadUniform(const String& name, const Matrix4& value) = 0;
 
     private:
         uint32 m_rendererID;

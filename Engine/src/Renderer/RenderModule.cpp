@@ -38,6 +38,7 @@ namespace axiom
         m_screenQuadVB = m_graphicsDevice->CreateVertexBuffer(quad);
         m_screenQuadIB = m_graphicsDevice->CreateIndexBuffer(quad);
         m_screenQuadShader = GetShader("engine://Shaders/FullScreen.glsl");
+        m_debugDrawMaterial = GetMaterial("engine://Shaders/DebugDraw.glsl");
     }
 
     void RenderModule::OnShutdown()
@@ -100,6 +101,7 @@ namespace axiom
         m_graphicsDevice->SetDepthWriteEnabled(false);
         m_graphicsDevice->SetDepthFunction(DepthFunction::LessEqual);
 
+        //TODO: Clean up instancing/batching toggle flags
         // 3. Group by (mesh, material)
         PairMap<InstanceGroupKey, Vector<Matrix4>> instanceGroups;
         for (auto& renderCommand : renderCommands)
@@ -110,32 +112,39 @@ namespace axiom
         
         // 4. Dispatch Intanced meshesh, collect batch candidates
         UnorderedMap<Material*, Vector<RenderCommand>> batchCandidates;
+
         for (auto& [key, transforms] : instanceGroups)
         {
             auto it = std::find_if(renderCommands.begin(), renderCommands.end(), [&](const RenderCommand& c){
                 return c.mesh.get() == key.first && c.material.get() == key.second;
             });
             auto buffers = GetOrCreateBuffers(it->mesh);
-            if (transforms.size() > 1)
+            if (transforms.size() > 1 && m_instancingEnabled)
             {
                 SubmitInstanced(buffers, it->material, transforms);
             }
             else
             {
-                batchCandidates[key.second].push_back({ it->mesh, it->material, transforms[0] });
+                for(auto& t : transforms)
+                {
+                    batchCandidates[key.second].push_back({ it->mesh, it->material, t });
+                }
             }
-                
         }
+
 
         // 5. Draw batch and everything else
         for (auto& [matPtr, cmds] : batchCandidates)
         {
-            if (cmds.size() > 1)
+            if (cmds.size() > 1 && m_batchingEnabled)
                 SubmitBatched(cmds[0].material, cmds);
             else
             {
-                auto buffers = GetOrCreateBuffers(cmds[0].mesh);
-                Submit(buffers.vb, buffers.ib, cmds[0].material, cmds[0].transform);
+                for(auto& c : cmds)
+                {
+                    auto buffers = GetOrCreateBuffers(c.mesh);
+                    Submit(buffers.vb, buffers.ib, c.material, c.transform);
+                }
             }
         }
 
@@ -171,7 +180,7 @@ namespace axiom
         m_sceneData.viewProjectionMatrix = cameraComponent->GetProjectionMatrix() * viewMatrix;
         m_graphicsDevice->SetDepthWriteEnabled(true);
         m_graphicsDevice->SetDepthFunction(DepthFunction::Less);
-        m_graphicsDevice->SetClearColor(Vec4(0.5f, 0.5f, 0.5f, 1.0f));
+        m_graphicsDevice->SetClearColor(Vec4(0.25f, 0.25f, 0.25f, 1.0f));
         m_graphicsDevice->Clear();
     }
 
@@ -203,10 +212,12 @@ namespace axiom
 
     void RenderModule::Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Material>& material, const Matrix4& transform)
     {
-        
-        material->SetUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
-        material->SetUniform("u_Transform", transform);
-        material->Bind();
+        auto& m = m_debugDrawMode > 0 ? m_debugDrawMaterial : material;
+        m->SetUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
+        m->SetUniform("u_LocalToWorld", transform);
+        m->SetUniform("u_WorldToLocal", transform.Inverse());
+        m->SetUniform("u_DebugMode", m_debugDrawMode);
+        m->Bind();
         m_graphicsDevice->DrawIndexed(vb, ib);
         m_callCount++;
     }
@@ -215,9 +226,14 @@ namespace axiom
     {
         shader->Bind();
         shader->UploadUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
-        shader->UploadUniform("u_Transform", transform);
+        shader->UploadUniform("u_LocalToWorld", transform);
         m_graphicsDevice->DrawIndexed(vb, ib);
         m_callCount++;
+    }
+
+    SharedPtr<Material> RenderModule::GetMaterial(const String path)
+    {
+        return MakeShared<Material>(GetShader(path));
     }
 
     SharedPtr<Shader> RenderModule::GetShader(const String path)
@@ -289,28 +305,42 @@ namespace axiom
 
     void RenderModule::SubmitInstanced(const MeshBuffers& buffers, const SharedPtr<Material>& material, const Vector<Matrix4>& transforms)
     {
-        uint32 byteSize = static_cast<uint32>(transforms.size() * sizeof(Matrix4));
-        auto cacheKey = std::make_pair(buffers.vb.get(), material.get());
+        auto& m = m_debugDrawMode > 0 ? m_debugDrawMaterial : material;
+
+        Vector<Matrix4> instanceData;
+        instanceData.reserve(transforms.size() * 2);
+        for (const auto& t : transforms)
+        {
+            instanceData.push_back(t);
+            instanceData.push_back(t.Inverse());
+        }
+        uint32 byteSize = static_cast<uint32>(instanceData.size() * sizeof(Matrix4));
+
+        auto cacheKey = std::make_pair(buffers.vb.get(), m.get());
         auto it = m_instanceMaterialBufferCache.find(cacheKey);
         if (it == m_instanceMaterialBufferCache.end())
         {
             auto instanceBuffer = m_graphicsDevice->CreateDynamicVertexBuffer(byteSize);
-                instanceBuffer->SetLayout({
+            instanceBuffer->SetLayout({
                 { ShaderDataType::Float4, "a_InstanceTransform0" },
                 { ShaderDataType::Float4, "a_InstanceTransform1" },
                 { ShaderDataType::Float4, "a_InstanceTransform2" },
                 { ShaderDataType::Float4, "a_InstanceTransform3" },
+                { ShaderDataType::Float4, "a_InstanceInverse0" },
+                { ShaderDataType::Float4, "a_InstanceInverse1" },
+                { ShaderDataType::Float4, "a_InstanceInverse2" },
+                { ShaderDataType::Float4, "a_InstanceInverse3" },
             });
             m_instanceMaterialBufferCache[cacheKey] = instanceBuffer;
             it = m_instanceMaterialBufferCache.find(cacheKey);
         }
 
         SharedPtr<VertexBuffer>& instanceBuffer = it->second;
-        instanceBuffer->SetData(transforms.data(), byteSize);
+        instanceBuffer->SetData(instanceData.data(), byteSize);
 
         // Bind the INSTANCED variant — uploads all material uniforms to the correct GL program
-        material->SetUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
-        material->Bind({"INSTANCED"});
+        m->SetUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
+        m->Bind({"INSTANCED"});
         // material->GetShader()->GetVariant({"INSTANCED"})->UploadUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
         
         m_graphicsDevice->DrawIndexedInstanced(buffers.vb, buffers.ib, instanceBuffer, static_cast<uint32>(transforms.size()));
@@ -350,19 +380,18 @@ namespace axiom
     {
         Vector<Vertex> vertices;
         Vector<uint32> indices;
+        auto& m = m_debugDrawMode > 0 ? m_debugDrawMaterial : material;
 
         for (const auto& cmd : commands)
         {
             uint32 base = static_cast<uint32>(vertices.size());
+            Matrix4 localToWorld = cmd.transform;
             for (const Vertex& v : cmd.mesh->GetVertices())
             {
                 Vertex tv = v;
                 const Matrix4& t = cmd.transform;
-                tv.m_position = Vec3(
-                    t(0,0) * v.m_position.x + t(0,1) * v.m_position.y + t(0,2) * v.m_position.z + t(0,3),
-                    t(1,0) * v.m_position.x + t(1,1) * v.m_position.y + t(1,2) * v.m_position.z + t(1,3),
-                    t(2,0) * v.m_position.x + t(2,1) * v.m_position.y + t(2,2) * v.m_position.z + t(2,3)
-                );
+                tv.m_position = localToWorld.TransformPoint(v.m_position);
+                tv.m_normal   = Normalize(localToWorld.TransformDirection(v.m_normal));
                 vertices.push_back(tv);
             }
             for (uint32 idx : cmd.mesh->GetIndices())
@@ -373,7 +402,7 @@ namespace axiom
 
         uint32 vbSize  = static_cast<uint32>(vertices.size() * sizeof(Vertex));
         uint32 ibCount = static_cast<uint32>(indices.size());
-        Material* key  = material.get();
+        Material* key  = m.get();
 
         if (!m_batchVBCache.count(key))
         {
@@ -390,12 +419,18 @@ namespace axiom
         m_batchVBCache[key]->SetData(vertices.data(), vbSize);
         m_batchIBCache[key]->SetData(indices.data(), ibCount);
 
-        material->Bind();
-        material->GetShader()->UploadUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
-        material->GetShader()->UploadUniform("u_Transform", Matrix4::Identity());
+        auto& vb = m_batchVBCache[key];
+        auto& ib = m_batchIBCache[key];
+
+        Submit(vb, ib, m, Matrix4::Identity());
+
+        // m->SetUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
+        // m->Bind();
+        // m->GetShader()->UploadUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
+        // m->GetShader()->UploadUniform("u_LocalToWorld", Matrix4::Identity());
         
-        m_graphicsDevice->DrawIndexed(m_batchVBCache[key], m_batchIBCache[key]);
-        m_callCount++;
+        // m_graphicsDevice->DrawIndexed(m_batchVBCache[key], m_batchIBCache[key]);
+        // m_callCount++;
         m_batchCallCount++;
         m_batchObjectCount += commands.size();
     }

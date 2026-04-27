@@ -7,6 +7,7 @@ namespace axiom
     {
         float x, y;
         Vec2() : x(0), y(0) {}
+        Vec2(float xy) : x(xy), y(xy) {}
         Vec2(float _x, float _y) : x(_x), y(_y) {}
     };
 
@@ -14,7 +15,8 @@ namespace axiom
     {
         float x, y, z;
         Vec3() : x(0), y(0), z(0) {}
-        Vec3(float _x, float _y, float _z) : x(_x), y(_y), z(_z) {}
+        Vec3(float xyz) : x(xyz), y(xyz), z(xyz){}
+        Vec3(float x, float y, float z) : x(x), y(y), z(z) {}
 
         Vec3 operator+(const Vec3& o) const { return Vec3(x + o.x, y + o.y, z + o.z); }
         Vec3 operator-(const Vec3& o) const { return Vec3(x - o.x, y - o.y, z - o.z); }

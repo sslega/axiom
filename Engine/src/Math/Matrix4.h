@@ -29,9 +29,74 @@ namespace axiom
             return c;
         }
 
+        // Returns the inverse using the cofactor/adjugate method.
+        // Computes 12 sub-determinants from pairs of rows, then builds all 16 adjugate entries.
+        Matrix4 Inverse() const
+        {
+            // 2x2 sub-determinants from rows 0-1 and rows 2-3
+            float s0 = (*this)(0,0)*(*this)(1,1) - (*this)(1,0)*(*this)(0,1);
+            float s1 = (*this)(0,0)*(*this)(1,2) - (*this)(1,0)*(*this)(0,2);
+            float s2 = (*this)(0,0)*(*this)(1,3) - (*this)(1,0)*(*this)(0,3);
+            float s3 = (*this)(0,1)*(*this)(1,2) - (*this)(1,1)*(*this)(0,2);
+            float s4 = (*this)(0,1)*(*this)(1,3) - (*this)(1,1)*(*this)(0,3);
+            float s5 = (*this)(0,2)*(*this)(1,3) - (*this)(1,2)*(*this)(0,3);
+
+            float c5 = (*this)(2,2)*(*this)(3,3) - (*this)(3,2)*(*this)(2,3);
+            float c4 = (*this)(2,1)*(*this)(3,3) - (*this)(3,1)*(*this)(2,3);
+            float c3 = (*this)(2,1)*(*this)(3,2) - (*this)(3,1)*(*this)(2,2);
+            float c2 = (*this)(2,0)*(*this)(3,3) - (*this)(3,0)*(*this)(2,3);
+            float c1 = (*this)(2,0)*(*this)(3,2) - (*this)(3,0)*(*this)(2,2);
+            float c0 = (*this)(2,0)*(*this)(3,1) - (*this)(3,0)*(*this)(2,1);
+
+            float inv_det = 1.0f / (s0*c5 - s1*c4 + s2*c3 + s3*c2 - s4*c1 + s5*c0);
+
+            Matrix4 inv;
+            inv(0,0) = ( (*this)(1,1)*c5 - (*this)(1,2)*c4 + (*this)(1,3)*c3) * inv_det;
+            inv(0,1) = (-(*this)(0,1)*c5 + (*this)(0,2)*c4 - (*this)(0,3)*c3) * inv_det;
+            inv(0,2) = ( (*this)(3,1)*s5 - (*this)(3,2)*s4 + (*this)(3,3)*s3) * inv_det;
+            inv(0,3) = (-(*this)(2,1)*s5 + (*this)(2,2)*s4 - (*this)(2,3)*s3) * inv_det;
+
+            inv(1,0) = (-(*this)(1,0)*c5 + (*this)(1,2)*c2 - (*this)(1,3)*c1) * inv_det;
+            inv(1,1) = ( (*this)(0,0)*c5 - (*this)(0,2)*c2 + (*this)(0,3)*c1) * inv_det;
+            inv(1,2) = (-(*this)(3,0)*s5 + (*this)(3,2)*s2 - (*this)(3,3)*s1) * inv_det;
+            inv(1,3) = ( (*this)(2,0)*s5 - (*this)(2,2)*s2 + (*this)(2,3)*s1) * inv_det;
+
+            inv(2,0) = ( (*this)(1,0)*c4 - (*this)(1,1)*c2 + (*this)(1,3)*c0) * inv_det;
+            inv(2,1) = (-(*this)(0,0)*c4 + (*this)(0,1)*c2 - (*this)(0,3)*c0) * inv_det;
+            inv(2,2) = ( (*this)(3,0)*s4 - (*this)(3,1)*s2 + (*this)(3,3)*s0) * inv_det;
+            inv(2,3) = (-(*this)(2,0)*s4 + (*this)(2,1)*s2 - (*this)(2,3)*s0) * inv_det;
+
+            inv(3,0) = (-(*this)(1,0)*c3 + (*this)(1,1)*c1 - (*this)(1,2)*c0) * inv_det;
+            inv(3,1) = ( (*this)(0,0)*c3 - (*this)(0,1)*c1 + (*this)(0,2)*c0) * inv_det;
+            inv(3,2) = (-(*this)(3,0)*s3 + (*this)(3,1)*s1 - (*this)(3,2)*s0) * inv_det;
+            inv(3,3) = ( (*this)(2,0)*s3 - (*this)(2,1)*s1 + (*this)(2,2)*s0) * inv_det;
+
+            return inv;
+        }
+
         // -----------------------------------------------------------------------
         // Factory methods
         // -----------------------------------------------------------------------
+
+        Vec3 TransformPoint(Vec3 p) const
+        {
+            return Vec3(
+                (*this)(0,0)*p.x + (*this)(0,1)*p.y + (*this)(0,2)*p.z + (*this)(0,3),
+                (*this)(1,0)*p.x + (*this)(1,1)*p.y + (*this)(1,2)*p.z + (*this)(1,3),
+                (*this)(2,0)*p.x + (*this)(2,1)*p.y + (*this)(2,2)*p.z + (*this)(2,3)
+            );
+        }
+
+        // Transforms a direction vector (w=0 — translation is ignored).
+        // For normals, pass the inverse matrix: inverseTransform.TransformDirection(normal).
+        Vec3 TransformDirection(Vec3 d) const
+        {
+            return Vec3(
+                (*this)(0,0)*d.x + (*this)(0,1)*d.y + (*this)(0,2)*d.z,
+                (*this)(1,0)*d.x + (*this)(1,1)*d.y + (*this)(1,2)*d.z,
+                (*this)(2,0)*d.x + (*this)(2,1)*d.y + (*this)(2,2)*d.z
+            );
+        }
 
         static Matrix4 Identity()
         {

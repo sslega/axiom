@@ -25,11 +25,16 @@ namespace axiom
 
         void Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Material>& material, const Matrix4& transform);
         void Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Shader>& shader, const Matrix4& transform);
-
+        
+        SharedPtr<Material> GetMaterial(const String path);
         SharedPtr<Shader> GetShader(const String path);
 
         GraphicsDevice& GetGraphicsDevice() const;
         GraphicsDevice::API GetRenderAPI() const;
+
+        inline void SetBatchingEnabled(bool value) { m_batchingEnabled = value; };
+        inline void SetInstancingEnabled(bool value) { m_instancingEnabled = value; };
+        inline void SetDebugDrawMode(int value) { m_debugDrawMode = value; }
 
         inline uint32 GetDrawCallCount() const { return m_callCount; }
         inline uint32 GetBatchCallCount() const { return m_batchCallCount; }
@@ -96,6 +101,8 @@ namespace axiom
         void ResetDebugDrawCounters();
 
         SharedPtr<Shader> m_screenQuadShader;        
+        
+        SharedPtr<Material> m_debugDrawMaterial;
 
         SharedPtr<VertexBuffer> m_screenQuadVB;
         SharedPtr<IndexBuffer> m_screenQuadIB;
@@ -109,6 +116,9 @@ namespace axiom
         uint32 m_batchCallCount = 0;
         uint32 m_batchObjectCount = 0;
 
+        bool m_batchingEnabled = true;
+        bool m_instancingEnabled = true;
+        int m_debugDrawMode = 0;
         
 
         TimePoint m_lastRenderTime;

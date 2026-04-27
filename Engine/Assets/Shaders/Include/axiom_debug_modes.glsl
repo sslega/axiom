@@ -1,0 +1,6 @@
+#ifndef AXIOM_DEBUG_DRAW_GLSL
+#define AXIOM_DEBUG_DRAW_GLSL
+
+#define DEBUG_DRAW_WORLD_NORMAL 1
+
+#endif

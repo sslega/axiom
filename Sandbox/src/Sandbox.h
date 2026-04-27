@@ -42,7 +42,13 @@ private:
     Vec3 m_lightDirection;
     float m_roughness;
 
+    bool m_batchingEnabled = true;
+    bool m_instancingEnabled = true;
+    int m_debugDrawMode = 0;
+
     Vec3 m_trianglePosition;
     Vec4 m_triangleColor;
+    float m_cubeRotation = 0;
+    TransformComponent* m_cubeTransform;
 };
 
