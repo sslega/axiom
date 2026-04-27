@@ -13,10 +13,18 @@ namespace axiom
         virtual void Unbind() const override;
 
         virtual void UploadUniform(const String& name, const int& value) override;
+        virtual void UploadUniform(const String& name, const float& value) override;
+        virtual void UploadUniform(const String& name, const Vec2& value) override;
+        virtual void UploadUniform(const String& name, const Vec3& value) override;
         virtual void UploadUniform(const String& name, const Vec4& value) override;
         virtual void UploadUniform(const String& name, const Matrix4& value) override;
-    
+        virtual SharedPtr<Shader> GetVariant(const Vector<String>& defines) override;
+
     private:
         uint32 m_rendererID;
+
+        String m_vertexSource;
+        String m_fragmentSource;
+        StringMap<SharedPtr<Shader>> m_variantCache;
     };
 }

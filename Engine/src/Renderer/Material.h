@@ -15,7 +15,7 @@ namespace axiom
     public:
         Material(const SharedPtr<Shader> shader);
 
-        void Bind();
+        void Bind(const Vector<String>& defines = {});
         void Unbind();
         void SetTexture(const String& name, const SharedPtr<Texture2D> texture, uint32 slot);
         inline const SharedPtr<Shader>& GetShader() const { return m_shader; }
@@ -28,7 +28,7 @@ namespace axiom
 
     private:
         SharedPtr<Shader> m_shader;
-        using UniformValue = std::variant<int, Vec4, Matrix4>;
+        using UniformValue = std::variant<int, float, Vec2, Vec3, Vec4, Matrix4>;
         StringMap<UniformValue> m_uniforms;
         StringMap<std::pair<SharedPtr<Texture2D>, uint32>> m_textures;
     };

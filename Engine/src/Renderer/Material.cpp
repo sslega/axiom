@@ -9,18 +9,21 @@ namespace axiom
     {
     }
 
-    void Material::Bind()
+    void Material::Bind(const Vector<String>& defines)
     {
-        m_shader->Bind();
+        Shader* target = defines.empty()? m_shader.get(): m_shader->GetVariant(defines).get();
+
+        target->Bind();
         for (auto& [name, value] : m_uniforms)
         {
-            std::visit([&](auto& v){ m_shader->UploadUniform(name, v); }, value);
+            std::visit([&](auto& v){ target->UploadUniform(name, v); }, value);
         }
+            
         for (auto& [name, pair] : m_textures)
         {
             auto& [texture, slot] = pair;
             texture->Bind();
-            m_shader->UploadUniform(name, slot);
+            target->UploadUniform(name, (int)slot);
         }
     }
     

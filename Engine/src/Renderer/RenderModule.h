@@ -31,7 +31,7 @@ namespace axiom
         GraphicsDevice& GetGraphicsDevice() const;
         GraphicsDevice::API GetRenderAPI() const;
 
-        inline uint32 GetDrawCallCount() const { return m_batchCallCount + m_instanceCallCount; }
+        inline uint32 GetDrawCallCount() const { return m_callCount; }
         inline uint32 GetBatchCallCount() const { return m_batchCallCount; }
         inline uint32 GetBatchObjectCount() const { return m_batchObjectCount; }
         inline uint32 GetInstanceCallCount() const { return m_instanceCallCount; }
@@ -51,7 +51,6 @@ namespace axiom
         virtual void OnGUI();
 
         SharedPtr<Shader> CreateShader(const String path);
-        SharedPtr<Shader> CreateInstancedShader(const String path);
 
     private:
         struct SceneData
@@ -69,9 +68,7 @@ namespace axiom
         UniquePtr<GraphicsDevice> m_graphicsDevice;
         SceneData m_sceneData;
         
-        // TODO: this should be single cache
         StringMap<SharedPtr<Shader>> m_shaderCache;
-        UnorderedMap<Shader*, SharedPtr<Shader>> m_instancedShaderCache;
         UnorderedMap<Shader*, SharedPtr<Shader>> m_depthPassShaderCache;
         UnorderedMap<Shader*, SharedPtr<Shader>> m_depthPassInstancedShaderCache;
 
@@ -88,8 +85,6 @@ namespace axiom
         UnorderedMap<MeshResource*, MeshBuffers> m_meshCache;
 
         MeshBuffers GetOrCreateBuffers(const SharedPtr<MeshResource>& mesh);
-        // TODO: this should be single GetOrSetShader
-        SharedPtr<Shader> GetOrCreateInstancedShader(const SharedPtr<Shader>& shader);
         SharedPtr<Shader> CreateDepthPassShader(const String path);
         SharedPtr<Shader> CreateDepthPassInstancedShader(const String path);
         SharedPtr<Shader> GetOrCreateDepthPassShader(const SharedPtr<Shader>& shader);
@@ -108,6 +103,7 @@ namespace axiom
 
         SharedPtr<FrameBuffer> m_frameBuffer;
 
+        uint32 m_callCount = 0;
         uint32 m_instanceCallCount = 0;
         uint32 m_instanceObjectCount = 0;
         uint32 m_batchCallCount = 0;

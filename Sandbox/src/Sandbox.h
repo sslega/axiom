@@ -35,6 +35,13 @@ private:
     CameraComponent*        m_cameraComponent;
     SharedPtr<Texture2D>    m_texture;
 
+    SharedPtr<Material> m_litMaterial;
+    TransformComponent* m_cameraTransform = nullptr;
+
+    Vec3 m_lightColor;
+    Vec3 m_lightDirection;
+    float m_roughness;
+
     Vec3 m_trianglePosition;
     Vec4 m_triangleColor;
 };

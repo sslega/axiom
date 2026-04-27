@@ -203,10 +203,12 @@ namespace axiom
 
     void RenderModule::Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Material>& material, const Matrix4& transform)
     {
-        material->Bind();
+        
         material->SetUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
         material->SetUniform("u_Transform", transform);
+        material->Bind();
         m_graphicsDevice->DrawIndexed(vb, ib);
+        m_callCount++;
     }
 
     void RenderModule::Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Shader>& shader, const Matrix4& transform)
@@ -215,6 +217,7 @@ namespace axiom
         shader->UploadUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
         shader->UploadUniform("u_Transform", transform);
         m_graphicsDevice->DrawIndexed(vb, ib);
+        m_callCount++;
     }
 
     SharedPtr<Shader> RenderModule::GetShader(const String path)
@@ -224,9 +227,6 @@ namespace axiom
         {
             auto shader = CreateShader(path);
             m_shaderCache[path] = shader;
-
-            auto instancedShader = CreateInstancedShader(path);
-            m_instancedShaderCache[shader.get()] = instancedShader;
             it = m_shaderCache.find(path);
 
             auto depthShader = CreateDepthPassShader(path);
@@ -244,22 +244,6 @@ namespace axiom
         return GetGraphicsDevice().CreateShader(*shaderResource);
     }
 
-    SharedPtr<Shader> RenderModule::CreateInstancedShader(const String path)
-    {
-        auto shaderResource = GetModule<ResourceModule>().Load<ShaderResource>(path);
-        // Inject #define after the #version line
-        const String& vertSrc = shaderResource->GetVertexSource();
-        
-        size_t versionPos = vertSrc.find("#version");
-        size_t newline    = vertSrc.find('\n', versionPos);   // newline AFTER #version line
-
-        String instancedVert = vertSrc.substr(0, newline + 1)
-                    + "#define INSTANCED 1\n"
-                    + vertSrc.substr(newline + 1);
-
-        return GetGraphicsDevice().CreateShader(instancedVert, shaderResource->GetFragmentSource());
-    }
-
     RenderModule::MeshBuffers RenderModule::GetOrCreateBuffers(const SharedPtr<MeshResource> &mesh)
     {
         auto it = m_meshCache.find(mesh.get());
@@ -270,12 +254,6 @@ namespace axiom
         buffers.ib = m_graphicsDevice->CreateIndexBuffer(*mesh);
         m_meshCache[mesh.get()] = buffers;
         return buffers;
-    }
-
-    SharedPtr<Shader> RenderModule::GetOrCreateInstancedShader(const SharedPtr<Shader> &shader)
-    {
-        auto it = m_instancedShaderCache.find(shader.get());
-        return it != m_instancedShaderCache.end() ? it->second : nullptr;
     }
 
     SharedPtr<Shader> RenderModule::CreateDepthPassShader(const String path)
@@ -330,20 +308,13 @@ namespace axiom
         SharedPtr<VertexBuffer>& instanceBuffer = it->second;
         instanceBuffer->SetData(transforms.data(), byteSize);
 
-        material->Bind();  // binds regular shader, uploads uniforms + textures
-
-        SharedPtr<Shader> instancedShader = GetOrCreateInstancedShader(material->GetShader());
-        if (instancedShader)
-        {
-            instancedShader->Bind();
-            instancedShader->UploadUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
-        }
-        else
-        {
-            material->GetShader()->UploadUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
-        }
+        // Bind the INSTANCED variant — uploads all material uniforms to the correct GL program
+        material->SetUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
+        material->Bind({"INSTANCED"});
+        // material->GetShader()->GetVariant({"INSTANCED"})->UploadUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
         
         m_graphicsDevice->DrawIndexedInstanced(buffers.vb, buffers.ib, instanceBuffer, static_cast<uint32>(transforms.size()));
+        m_callCount++;
         m_instanceCallCount++;
         m_instanceObjectCount += transforms.size();
     }
@@ -370,6 +341,7 @@ namespace axiom
         instancedShader->Bind();
         instancedShader->UploadUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
         m_graphicsDevice->DrawIndexedInstanced(buffers.vb, buffers.ib, instanceBuffer, static_cast<uint32>(transforms.size()));
+        m_callCount++;
         m_instanceCallCount++;
         m_instanceObjectCount += transforms.size();
     }
@@ -423,12 +395,14 @@ namespace axiom
         material->GetShader()->UploadUniform("u_Transform", Matrix4::Identity());
         
         m_graphicsDevice->DrawIndexed(m_batchVBCache[key], m_batchIBCache[key]);
+        m_callCount++;
         m_batchCallCount++;
         m_batchObjectCount += commands.size();
     }
 
     void RenderModule::ResetDebugDrawCounters()
     {
+        m_callCount = 0;
         m_instanceCallCount = 0;
         m_instanceObjectCount = 0;
         m_batchCallCount = 0;
@@ -442,7 +416,7 @@ namespace axiom
         m_graphicsDevice->SetClearColor(Vec4(0.0f, 0.0f, 0.0f, 1.0f));
         m_graphicsDevice->Clear();
         m_screenQuadShader->Bind();
-        m_screenQuadShader->UploadUniform("u_screenTexture", 0);
+        m_screenQuadShader->UploadUniform("u_ScreenTexture", 0);
         m_graphicsDevice->BindFrameBufferTexture(*m_frameBuffer, 0);
         m_graphicsDevice->DrawIndexed(m_screenQuadVB, m_screenQuadIB);
         m_graphicsDevice->SetDepthTestEnabled(true);
