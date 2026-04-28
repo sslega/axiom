@@ -5,12 +5,12 @@ void VertexShader(inout VertexInput input)
 }
 
 #include "axiom_fragment.glsl"
-#include "axiom_debug_modes.glsl"
 
-uniform int u_DebugMode;
+uniform sampler2D u_Texture;
 
 void FragmentShader(in VertexInput input, out FragmentInput output)
 {
-    if (u_DebugMode == DEBUG_DRAW_WORLD_NORMAL)
-        output.Color = input.WorldNormal * 0.5 + 0.5;
+    vec4 sample = texture(u_Texture, input.TexCoord);
+    output.Color = sample.rgb;
+    output.Opacity = sample.a;
 }

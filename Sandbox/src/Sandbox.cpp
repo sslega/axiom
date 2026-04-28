@@ -53,9 +53,9 @@ void Sandbox::OnApplicationRun()
     auto quadMesh = MakeShared<Quad>();
     auto triangleMesh = MakeShared<Triangle>();
     auto cubeMesh = MakeShared<Cube>();
-    auto shader = renderModule->GetShader("engine://Shaders/Texture.glsl");
-    auto litShader = renderModule->GetShader("engine://Shaders/LightModels.glsl");
-    auto vertexColorShader = renderModule->GetShader("engine://Shaders/VertexColor.glsl");
+    auto shader = renderModule->GetShader("project://Shaders/Texture.glsl");
+    auto litShader = renderModule->GetShader("project://Shaders/LightModels.glsl");
+    auto vertexColorShader = renderModule->GetShader("project://Shaders/VertexColor.glsl");
 
     auto& cameraEntity = scene.CreateEntity("MainCamera");
     {

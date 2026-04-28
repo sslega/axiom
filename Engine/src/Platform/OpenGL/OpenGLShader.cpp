@@ -25,6 +25,7 @@ namespace axiom
             glDeleteShader(vertexShader);
 
             Log::Error("Vertex shader compilation failed:\n{}", infoLog.data());
+            Log::Error("Source:\n{}", vertexSource);
             AX_ASSERT(false, "Vertex shader compilation failed");
             return;
         }
@@ -45,6 +46,7 @@ namespace axiom
             glDeleteShader(vertexShader);
 
             Log::Error("Fragment shader compilation failed:\n{}", infoLog.data());
+            Log::Error("Source:\n{}", fragmentSource);
             AX_ASSERT(false, "Fragment shader compilation failed");
             return;
         }
