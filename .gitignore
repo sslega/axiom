@@ -1,4 +1,6 @@
 .vscode/
+.claude/
 build/
 .claudeignore
 CLAUDE.md
+ROADMAP.md

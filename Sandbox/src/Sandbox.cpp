@@ -57,6 +57,8 @@ void Sandbox::OnApplicationRun()
     auto litShader = renderModule->GetShader("project://Shaders/LightModels.glsl");
     auto vertexColorShader = renderModule->GetShader("project://Shaders/VertexColor.glsl");
 
+    SharedPtr<MeshResource> bunny = resourceModule->Load<MeshResource>("project://Meshes/bunny.obj");
+
     auto& cameraEntity = scene.CreateEntity("MainCamera");
     {
         auto& transform = cameraEntity.CreateComponent<TransformComponent>();
@@ -80,16 +82,27 @@ void Sandbox::OnApplicationRun()
     m_litMaterial->SetUniform("u_LightColor", m_lightColor);
     m_litMaterial->SetUniform("u_Roughness", m_roughness);
 
-    Entity& boxEntity = scene.CreateEntity();
+    // Entity& boxEntity = scene.CreateEntity();
+    // {
+    //     auto& transform = boxEntity.CreateComponent<TransformComponent>();
+    //     transform.scale = 0.25f;
+    //     transform.position = {0, 0.25f, 0};
+    //     // transform.rotation = {0, ToRadians(45), 0};
+    //     m_cubeTransform = &transform;
+
+    //     auto& mesh = boxEntity.CreateComponent<MeshComponent>();
+    //     mesh.SetMesh(MakeShared<Cube>());
+    //     mesh.SetMaterial(m_litMaterial);
+    // }
+
+    Entity& bunnyEntity = scene.CreateEntity();
     {
-        auto& transform = boxEntity.CreateComponent<TransformComponent>();
-        transform.scale = 0.25f;
-        transform.position = {0, 0.25f, 0};
-        // transform.rotation = {0, ToRadians(45), 0};
+        auto& transform = bunnyEntity.CreateComponent<TransformComponent>();
+        transform.scale = 2.0f;
         m_cubeTransform = &transform;
 
-        auto& mesh = boxEntity.CreateComponent<MeshComponent>();
-        mesh.SetMesh(MakeShared<Cube>());
+        auto& mesh = bunnyEntity.CreateComponent<MeshComponent>();
+        mesh.SetMesh(bunny);
         mesh.SetMaterial(m_litMaterial);
     }
 
