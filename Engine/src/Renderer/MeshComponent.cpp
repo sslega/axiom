@@ -1,4 +1,5 @@
 #include "Renderer/MeshComponent.h"
+#include "MeshComponent.h"
 
 namespace axiom
 {
@@ -35,5 +36,4 @@ namespace axiom
     {
         m_isVisible = visible;
     }
-
 }

@@ -48,7 +48,8 @@ void Sandbox::OnRegisterModules()
 
 void Sandbox::OnApplicationRun()
 {
-    
+    sceneModule->LoadScene("project://Scenes/main.scene.json");
+    /*
     Scene& scene = sceneModule->GetActiveScene();
     auto quadMesh = MakeShared<Quad>();
     auto triangleMesh = MakeShared<Triangle>();
@@ -116,7 +117,7 @@ void Sandbox::OnApplicationRun()
         mesh.SetMesh(MakeShared<Quad>());
         mesh.SetMaterial(m_litMaterial);
     }
-
+    */
     GetApplicationWindow().AddEventListener(&Sandbox::OnResize, this);
 }
 
@@ -128,12 +129,12 @@ void Sandbox::OnResize(const WindowResizeEvent& event)
 
 void Sandbox::OnRender()
 {
-    if (m_cameraTransform)
-        m_litMaterial->SetUniform("u_CameraPos", m_cameraTransform->position);
+    // if (m_cameraTransform)
+    //     m_litMaterial->SetUniform("u_CameraPos", m_cameraTransform->position);
 
-    m_litMaterial->SetUniform("u_LightDir",   m_lightDirection);
-    m_litMaterial->SetUniform("u_LightColor", m_lightColor);
-    m_litMaterial->SetUniform("u_Roughness", m_roughness);
+    // m_litMaterial->SetUniform("u_LightDir",   m_lightDirection);
+    // m_litMaterial->SetUniform("u_LightColor", m_lightColor);
+    // m_litMaterial->SetUniform("u_Roughness", m_roughness);
 
     ImGui::Begin("Material Params");
     ImGui::ColorEdit3("Light Color", &m_lightColor.x);
@@ -157,6 +158,6 @@ void Sandbox::OnRender()
 
 void Sandbox::OnUpdate(float deltaTime)
 {
-    m_cubeRotation++;
-    m_cubeTransform->rotation.y = ToRadians(m_cubeRotation);
+    // m_cubeRotation++;
+    // m_cubeTransform->rotation.y = ToRadians(m_cubeRotation);
 }

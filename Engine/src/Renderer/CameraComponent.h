@@ -5,6 +5,8 @@
 
 namespace axiom
 {
+    class SceneLoader;
+    
     class CameraComponent : public Component
     {
     public:
@@ -23,6 +25,7 @@ namespace axiom
         static Matrix4 GetViewMatrix(Vec3 position, Vec3 rotation) { return Camera::GetViewMatrix(position, rotation); }
     
     protected:
+        friend class SceneLoader;
         Camera m_camera;
     };
 }

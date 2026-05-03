@@ -1,4 +1,5 @@
 #include "Scene/Component.h"
+#include "Component.h"
 
 namespace axiom
 {
@@ -6,6 +7,4 @@ namespace axiom
     {
         return *m_entity;
     }
-
 }
-

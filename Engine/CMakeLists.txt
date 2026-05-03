@@ -106,6 +106,18 @@ target_include_directories(stb PUBLIC
 )
 
 # =========================================================
+# nlohmann/json (header-only)
+# =========================================================
+
+FetchContent_Declare(nlohmann_json
+    GIT_REPOSITORY  https://github.com/nlohmann/json.git
+    GIT_TAG         v3.11.3
+    GIT_SHALLOW     TRUE
+    GIT_PROGRESS    TRUE
+)
+FetchContent_MakeAvailable(nlohmann_json)
+
+# =========================================================
 # Engine
 # =========================================================
 
@@ -142,6 +154,7 @@ target_link_libraries(Engine PUBLIC
     glfw
     imgui
     stb
+    nlohmann_json::nlohmann_json
     OpenGL::GL
 )
 

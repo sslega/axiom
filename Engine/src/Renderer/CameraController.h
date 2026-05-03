@@ -8,9 +8,10 @@ namespace axiom
 
     class CameraController: public Component
     {
+    public:
         float moveSpeed      = 0.5f;
         float lookSensitivity = 0.002f;
-
+        
         virtual void OnUpdate(float deltaTime) override;
     protected:
         TransformComponent* m_transformComponent;

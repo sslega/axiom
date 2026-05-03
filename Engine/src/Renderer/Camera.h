@@ -7,9 +7,9 @@ namespace axiom
 {
     class Camera
     {
-        enum class ProjectionType { Perspective, Orthographic };
-
     public:
+        enum class ProjectionType { Perspective, Orthographic };
+        
         Camera(float fovYRadians, float aspectRatio, float near, float far);
         Camera(float left, float right, float bottom, float top, float near, float far);
 

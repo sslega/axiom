@@ -6,6 +6,7 @@
 
 namespace axiom
 {
+
     void CameraController::OnUpdate(float deltaTime)
     {
         float dt = MillisecondsToSeconds(deltaTime);
