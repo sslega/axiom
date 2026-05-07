@@ -5,7 +5,7 @@
 namespace axiom
 {
     class MeshResource;
-    class Material;
+    class MaterialResource;
 
     class MeshComponent: public Component
     {
@@ -13,8 +13,8 @@ namespace axiom
         MeshComponent();
         void SetMesh(const SharedPtr<MeshResource>& mesh);
         const SharedPtr<MeshResource> GetMesh() const;
-        void SetMaterial(const SharedPtr<Material>& material);
-        const SharedPtr<Material> GetMaterial() const;
+        void SetMaterial(const SharedPtr<MaterialResource>& material);
+        const SharedPtr<MaterialResource> GetMaterial() const;
         bool IsVisible() const;
         void SetVisible(bool visible);
 
@@ -22,11 +22,8 @@ namespace axiom
         virtual void Serialize(Archive& ar) override;
 
     protected:
-        friend class SceneLoader;
         SharedPtr<MeshResource> m_mesh;
-        SharedPtr<Material> m_material;
-        //TODO: remove this m_materialID from member, it should be part of resource
-        String m_materialID;
+        SharedPtr<MaterialResource> m_material;
         bool m_isVisible = true;
     };
 }

@@ -10,7 +10,6 @@ namespace axiom
 {
     class ResourceModule;
     class RenderModule;
-    class Material;
 
     // using ComponentFactory = std::function<void(Entity&, const nlohmann::json&)>;
 
@@ -35,7 +34,6 @@ namespace axiom
         RenderModule& m_renderModule;
         FileSystemModule& m_fileSystemModule;
         // StringMap<ComponentFactory> m_factories;
-        StringMap<SharedPtr<Material>> m_materials;
     };
 
     class SceneModule: public ApplicationModule

@@ -2,7 +2,7 @@
 #include "Core/Application.h"
 #include "Renderer/Buffer.h"
 #include "Renderer/Shader.h"
-#include "Renderer/Material.h"
+#include "Resources/MaterialResource.h"
 #include "RenderModule.h"
 #include "Resources/ResourceModule.h"
 #include "Scene/SceneModule.h"
@@ -11,7 +11,7 @@
 #include "Scene/TransformComponent.h"
 #include "Core/Log.h"
 #include "Core/Types.h"
-#include "Renderer/Material.h"
+#include "Resources/MaterialResource.h"
 #include "FrameBuffer.h"
 #include <imgui.h>
 #include "Geometry/Quad.h"
@@ -111,7 +111,7 @@ namespace axiom
         }
         
         // 4. Dispatch Intanced meshesh, collect batch candidates
-        UnorderedMap<Material*, Vector<RenderCommand>> batchCandidates;
+        UnorderedMap<MaterialResource*, Vector<RenderCommand>> batchCandidates;
 
         for (auto& [key, transforms] : instanceGroups)
         {
@@ -210,7 +210,7 @@ namespace axiom
         ImGui::End();
     }
 
-    void RenderModule::Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Material>& material, const Matrix4& transform)
+    void RenderModule::Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<MaterialResource>& material, const Matrix4& transform)
     {
         auto& m = m_debugDrawMode > 0 ? m_debugDrawMaterial : material;
         m->SetUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
@@ -231,9 +231,9 @@ namespace axiom
         m_callCount++;
     }
 
-    SharedPtr<Material> RenderModule::GetMaterial(const String path)
+    SharedPtr<MaterialResource> RenderModule::GetMaterial(const String path)
     {
-        return MakeShared<Material>(GetShader(path));
+        return MakeShared<MaterialResource>(GetShader(path));
     }
 
     SharedPtr<Shader> RenderModule::GetShader(const String path)
@@ -303,7 +303,7 @@ namespace axiom
         return it != m_depthPassInstancedShaderCache.end() ? it->second : nullptr;
     }
 
-    void RenderModule::SubmitInstanced(const MeshBuffers& buffers, const SharedPtr<Material>& material, const Vector<Matrix4>& transforms)
+    void RenderModule::SubmitInstanced(const MeshBuffers& buffers, const SharedPtr<MaterialResource>& material, const Vector<Matrix4>& transforms)
     {
         auto& m = m_debugDrawMode > 0 ? m_debugDrawMaterial : material;
 
@@ -376,7 +376,7 @@ namespace axiom
         m_instanceObjectCount += transforms.size();
     }
 
-    void RenderModule::SubmitBatched(const SharedPtr<Material>& material, const Vector<RenderCommand>& commands)
+    void RenderModule::SubmitBatched(const SharedPtr<MaterialResource>& material, const Vector<RenderCommand>& commands)
     {
         Vector<Vertex> vertices;
         Vector<uint32> indices;
@@ -402,7 +402,7 @@ namespace axiom
 
         uint32 vbSize  = static_cast<uint32>(vertices.size() * sizeof(Vertex));
         uint32 ibCount = static_cast<uint32>(indices.size());
-        Material* key  = m.get();
+        MaterialResource* key  = m.get();
 
         if (!m_batchVBCache.count(key))
         {

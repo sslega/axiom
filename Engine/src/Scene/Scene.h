@@ -10,8 +10,7 @@ namespace axiom
         Scene(const String& name);
         ~Scene() = default;
 
-        Entity& CreateEntity();
-        Entity& CreateEntity(String name);
+        SharedPtr<Entity> CreateEntity();
         void DestroyEntity(Entity& entity);
 
         const String& GetName() const;
@@ -58,6 +57,6 @@ namespace axiom
         void EndFrame()              { OnEndFrame(); }
 
         String m_name;
-        UnorderedMap<Entity::ID, UniquePtr<Entity>> m_entities;
+        StringMap<SharedPtr<Entity>> m_entities;
     };
 }

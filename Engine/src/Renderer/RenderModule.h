@@ -14,7 +14,7 @@ namespace axiom
     class IndexBuffer;
     class VertexBuffer;
     class Shader;
-    class Material;
+    class MaterialResource;
     class RenderResourceFactory;
     class FrameBuffer;
 
@@ -23,10 +23,10 @@ namespace axiom
     public:
         RenderModule(Application& engine);
 
-        void Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Material>& material, const Matrix4& transform);
+        void Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<MaterialResource>& material, const Matrix4& transform);
         void Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Shader>& shader, const Matrix4& transform);
-        
-        SharedPtr<Material> GetMaterial(const String path);
+
+        SharedPtr<MaterialResource> GetMaterial(const String path);
         SharedPtr<Shader> GetShader(const String path);
 
         GraphicsDevice& GetGraphicsDevice() const;
@@ -66,7 +66,7 @@ namespace axiom
         struct RenderCommand
         {
             SharedPtr<MeshResource> mesh;
-            SharedPtr<Material> material;
+            SharedPtr<MaterialResource> material;
             Matrix4 transform;
         };
 
@@ -77,14 +77,14 @@ namespace axiom
         UnorderedMap<Shader*, SharedPtr<Shader>> m_depthPassShaderCache;
         UnorderedMap<Shader*, SharedPtr<Shader>> m_depthPassInstancedShaderCache;
 
-        using InstanceGroupKey  = std::pair<MeshResource*, Material*>;   // for OnRender grouping
-        using InstanceMaterialBufferKey = std::pair<VertexBuffer*, Material*>;   // for SubmitInstanced cache
+        using InstanceGroupKey  = std::pair<MeshResource*, MaterialResource*>;   // for OnRender grouping
+        using InstanceMaterialBufferKey = std::pair<VertexBuffer*, MaterialResource*>;   // for SubmitInstanced cache
         using InstanceShaderBufferKey = std::pair<VertexBuffer*, Shader*>;
 
         PairMap<InstanceMaterialBufferKey, SharedPtr<VertexBuffer>> m_instanceMaterialBufferCache;
         PairMap<InstanceShaderBufferKey, SharedPtr<VertexBuffer>> m_instanceShaderBufferCache;
-        UnorderedMap<Material*, SharedPtr<VertexBuffer>> m_batchVBCache;
-        UnorderedMap<Material*, SharedPtr<IndexBuffer>> m_batchIBCache;
+        UnorderedMap<MaterialResource*, SharedPtr<VertexBuffer>> m_batchVBCache;
+        UnorderedMap<MaterialResource*, SharedPtr<IndexBuffer>> m_batchIBCache;
 
         struct MeshBuffers { SharedPtr<VertexBuffer> vb; SharedPtr<IndexBuffer> ib; };
         UnorderedMap<MeshResource*, MeshBuffers> m_meshCache;
@@ -95,14 +95,14 @@ namespace axiom
         SharedPtr<Shader> GetOrCreateDepthPassShader(const SharedPtr<Shader>& shader);
         SharedPtr<Shader> GetOrCreateDepthPassInstancedShader(const SharedPtr<Shader>& shader);
 
-        void SubmitInstanced(const MeshBuffers& buffers, const SharedPtr<Material>& material, const Vector<Matrix4>& transforms);
+        void SubmitInstanced(const MeshBuffers& buffers, const SharedPtr<MaterialResource>& material, const Vector<Matrix4>& transforms);
         void SubmitInstanced(const MeshBuffers& buffers, const SharedPtr<Shader>& instancedShader, const Vector<Matrix4>& transforms);
-        void SubmitBatched(const SharedPtr<Material>& material, const Vector<RenderCommand>& commands);
+        void SubmitBatched(const SharedPtr<MaterialResource>& material, const Vector<RenderCommand>& commands);
         void ResetDebugDrawCounters();
 
         SharedPtr<Shader> m_screenQuadShader;        
         
-        SharedPtr<Material> m_debugDrawMaterial;
+        SharedPtr<MaterialResource> m_debugDrawMaterial;
 
         SharedPtr<VertexBuffer> m_screenQuadVB;
         SharedPtr<IndexBuffer> m_screenQuadIB;

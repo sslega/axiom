@@ -19,7 +19,6 @@
 #include "Renderer/GraphicsDevice.h"
 #include "Renderer/Camera.h"
 #include "Renderer/RenderModule.h"
-#include "Renderer/Material.h"
 #include "Renderer/MeshComponent.h"
 
 // Scene

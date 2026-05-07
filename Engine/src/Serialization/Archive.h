@@ -12,7 +12,6 @@ namespace axiom
     class Archive
     {
     public:
-
         Archive(nlohmann::json& node, Vector<UniquePtr<IResolvable>>& handles);
 
         template<typename T>
@@ -32,7 +31,7 @@ namespace axiom
 
         void RegisterHandle(UniquePtr<IResolvable> handle);
         void MergeHandlesInto(Archive& other);
-        
+
         template<typename T> friend struct Serializer;
     private:
         nlohmann::json& m_node;
@@ -43,28 +42,28 @@ namespace axiom
     struct Serializer;
 
     template<>
-    struct Serializer<float> 
+    struct Serializer<float>
     {
         static void Write(Archive& ar, const String& key, const float& value) { ar.m_node[key] = value; }
         static void Read(Archive& ar, const String& key, float& value) { value = ar.m_node[key].get<float>(); }
     };
 
     template<>
-    struct Serializer<int> 
+    struct Serializer<int>
     {
         static void Write(Archive& ar, const String& key, const int& value) { ar.m_node[key] = value; }
         static void Read(Archive& ar, const String& key, int& value){ value = ar.m_node[key].get<int>(); }
     };
 
     template<>
-    struct Serializer<bool> 
+    struct Serializer<bool>
     {
         static void Write(Archive& ar, const String& key, const bool& value) { ar.m_node[key] = value; }
         static void Read(Archive& ar, const String& key, bool& value){ value = ar.m_node[key].get<bool>(); }
     };
 
     template<>
-    struct Serializer<String> 
+    struct Serializer<String>
     {
         static void Write(Archive& ar, const String& key, const String& value) { ar.m_node[key] = value; }
         static void Read(Archive& ar, const String& key, String& value){ value = ar.m_node[key].get<String>(); }
@@ -99,7 +98,6 @@ namespace axiom
         }
     };
 
-
     template<>
     struct Serializer<Vec3>
     {
@@ -127,6 +125,5 @@ namespace axiom
             value = { arr[0].get<float>(), arr[1].get<float>(), arr[2].get<float>(), arr[3].get<float>() };
         }
     };
-
 
 } // namespace axiom

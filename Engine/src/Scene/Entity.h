@@ -2,6 +2,7 @@
 
 #include "Core/Types.h"
 #include "Scene/Component.h"
+#include "Core/Object.h"
 
 namespace axiom
 {
@@ -9,15 +10,10 @@ namespace axiom
     template<typename T>
     concept IsComponent = std::is_base_of<Component, T>::value;
 
-    class Entity
+    class Entity : public Object
     {
     public:
-        using ID = uint32_t;
-        Entity();
-        Entity(String name);
         ~Entity() = default;
-
-        const ID id;
 
         template <IsComponent T, typename... Args>
         T& CreateComponent(Args&&... args)
@@ -92,8 +88,5 @@ namespace axiom
         void BeginFrame()            { OnBeginFrame(); }
         void Render()                { OnRender(); }
         void EndFrame()              { OnEndFrame(); }
-
-        inline static ID s_nextId = 0;
-        String m_name;
     };
 }

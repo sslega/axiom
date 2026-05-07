@@ -27,16 +27,7 @@ protected:
     void OnUpdate(float deltaTime) override;
 
 private:
-    SharedPtr<VertexBuffer> m_triangleVB;
-    SharedPtr<IndexBuffer>  m_triangleIB;
-    SharedPtr<VertexBuffer> m_rectangleVB;
-    SharedPtr<IndexBuffer>  m_rectangleIB;
-    SharedPtr<Shader>       m_shader;
-    CameraComponent*        m_cameraComponent;
-    SharedPtr<Texture2D>    m_texture;
-
-    SharedPtr<Material> m_litMaterial;
-    TransformComponent* m_cameraTransform = nullptr;
+    CameraComponent* m_cameraComponent;
 
     Vec3 m_lightColor;
     Vec3 m_lightDirection;
@@ -46,9 +37,6 @@ private:
     bool m_instancingEnabled = true;
     int m_debugDrawMode = 0;
 
-    Vec3 m_trianglePosition;
-    Vec4 m_triangleColor;
-    float m_cubeRotation = 0;
     TransformComponent* m_cubeTransform;
 };
 

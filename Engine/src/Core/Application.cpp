@@ -5,6 +5,7 @@
 #include "Resources/GLShaderLoader.h"
 #include "Resources/Texture2DLoader.h"
 #include "Resources/OBJLoader.h"
+#include "Resources/MaterialLoader.h"
 #include "Core/FileSystemModule.h"
 #include "Scene/SceneModule.h"
 #include "ImGui/ImGuiModule.h"
@@ -134,6 +135,7 @@ namespace axiom
 
         sceneModule = RegisterModule<SceneModule>();
         renderModule = RegisterModule<RenderModule>();
+        resourceModule->RegisterLoader<MaterialLoader>(".mat", *renderModule);
         imGuiModule = RegisterModule<ImGuiModule>();
     }
 

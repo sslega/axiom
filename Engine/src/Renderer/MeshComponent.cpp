@@ -2,7 +2,7 @@
 #include "MeshComponent.h"
 #include "Serialization/Archive.h"
 #include "Resources/MeshResource.h"
-#include "Renderer/Material.h"
+#include "Resources/MaterialResource.h"
 
 namespace axiom
 {
@@ -20,12 +20,12 @@ namespace axiom
         return m_mesh;
     }
 
-    void MeshComponent::SetMaterial(const SharedPtr<Material>& material)
+    void MeshComponent::SetMaterial(const SharedPtr<MaterialResource>& material)
     {
         m_material = material;
     }
 
-    const SharedPtr<Material> MeshComponent::GetMaterial() const
+    const SharedPtr<MaterialResource> MeshComponent::GetMaterial() const
     {
         return m_material;
     }
@@ -39,17 +39,17 @@ namespace axiom
     {
         m_isVisible = visible;
     }
-    
-    void MeshComponent::Deserialize(Archive &ar)
+
+    void MeshComponent::Deserialize(Archive& ar)
     {
-        ar.Read("material", m_materialID);
+        ar.Read("material", m_material);
         ar.Read("visible", m_isVisible);
         ar.Read("mesh", m_mesh);
     }
 
-    void MeshComponent::Serialize(Archive &ar)
+    void MeshComponent::Serialize(Archive& ar)
     {
-        ar.Write("material", m_materialID);
+        ar.Write("material", m_material);
         ar.Write("visible", m_isVisible);
         ar.Write("mesh", m_mesh);
     }

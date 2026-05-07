@@ -18,6 +18,7 @@ namespace axiom
         virtual void Serialize(Archive& ar);
     
     protected:
+        friend class SceneLoader;
         String m_id;
         String m_name;
         String GenerateUUID();

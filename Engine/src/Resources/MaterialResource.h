@@ -1,20 +1,19 @@
 #pragma once
 #include "Core/Types.h"
-#include "Core/Object.h"
 #include "Math/Vector.h"
 #include "Math/Matrix4.h"
+#include "Resources/Resource.h"
 #include <variant>
 
 namespace axiom
 {
     class Shader;
-    class ShaderResource;
     class Texture2D;
 
-    class Material : public Object
+    class MaterialResource : public Resource
     {
     public:
-        Material(const SharedPtr<Shader> shader);
+        MaterialResource(const SharedPtr<Shader> shader);
 
         void Bind(const Vector<String>& defines = {});
         void Unbind();
@@ -23,7 +22,7 @@ namespace axiom
 
         template<typename T>
         void SetUniform(const String& name, const T& value)
-        { 
+        {
             m_uniforms[name] = value;
         }
 
@@ -33,4 +32,4 @@ namespace axiom
         StringMap<UniformValue> m_uniforms;
         StringMap<std::pair<SharedPtr<Texture2D>, uint32>> m_textures;
     };
-} // namespace axiom
+}

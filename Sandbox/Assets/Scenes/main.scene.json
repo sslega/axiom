@@ -1,19 +1,6 @@
 {
   "version": 1,
 
-  "materials": [
-    {
-      "id": "550e8400-e29b-41d4-a716-446655440000",
-      "name": "lit",
-      "shader": "project://Shaders/LightModels.glsl",
-      "uniforms": {
-        "u_LightDir":   [0.75, 1.0, 0.5],
-        "u_LightColor": [1.0, 0.9, 0.8],
-        "u_Roughness":  0.6
-      }
-    }
-  ],
-
   "entities": [
     {
       "name": "MainCamera",
@@ -51,7 +38,7 @@
         {
           "type": "MeshComponent",
           "mesh": "project://Meshes/bunny.obj",
-          "material": "550e8400-e29b-41d4-a716-446655440000"
+          "material": "engine://Materials/lit.mat"
         }
       ]
     }

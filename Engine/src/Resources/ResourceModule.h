@@ -23,11 +23,11 @@ namespace axiom
         }
         
 
-        template<typename T>
-        void RegisterLoader(const String& fileExtension)
+        template<typename T, typename... Args>
+        void RegisterLoader(const String& fileExtension, Args&&... args)
         {
             static_assert(std::is_base_of_v<ResourceLoader, T>, "T must derive from ResourceLoader");
-            m_loaders[fileExtension] = MakeUnique<T>(*this);
+            m_loaders[fileExtension] = MakeUnique<T>(*this, std::forward<Args>(args)...);
         }
 
     protected:
