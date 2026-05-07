@@ -32,12 +32,60 @@
         {
           "type": "TransformComponent",
           "position": [0.0, 0.0, 0.0],
-          "scale": [2.0, 2.0, 2.0],
+          "scale": [0.35, 0.35, 0.35],
           "rotation": [0.0, 0.0, 0.0]
         },
         {
           "type": "MeshComponent",
           "mesh": "project://Meshes/bunny.obj",
+          "material": "engine://Materials/lit.mat"
+        }
+      ]
+    },
+    {
+      "name": "Sphere",
+      "components": [
+        {
+          "type": "TransformComponent",
+          "position": [-1.0, 0.2, 0.0],
+          "scale": [0.2, 0.2, 0.2],
+          "rotation": [0.0, 0.0, 0.0]
+        },
+        {
+          "type": "MeshComponent",
+          "mesh": "engine://Meshes/sphere.obj",
+          "material": "engine://Materials/lit.mat"
+        }
+      ]
+    },
+    {
+      "name": "Cube",
+      "components": [
+        {
+          "type": "TransformComponent",
+          "position": [1.0, 0.2, 0.0],
+          "scale": [0.2, 0.2, 0.2],
+          "rotation": [0.0, 0.0, 0.0]
+        },
+        {
+          "type": "MeshComponent",
+          "mesh": "engine://Meshes/cube.obj",
+          "material": "engine://Materials/lit.mat"
+        }
+      ]
+    },
+    {
+      "name": "Plane",
+      "components": [
+        {
+          "type": "TransformComponent",
+          "position": [0.0, 0.0, 0.0],
+          "scale": [2.0, 2.0, 2.0],
+          "rotation": [0.0, 0.0, 0.0]
+        },
+        {
+          "type": "MeshComponent",
+          "mesh": "engine://Meshes/plane.obj",
           "material": "engine://Materials/lit.mat"
         }
       ]
