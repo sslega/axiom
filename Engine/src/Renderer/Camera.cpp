@@ -4,6 +4,7 @@
 
 namespace axiom
 {
+    //TODO: aspecrt artion should not be in the constructor
     Camera::Camera(float fovYRadians, float aspectRatio, float near, float far)
     {
         SetPerspective(fovYRadians, aspectRatio, near, far);

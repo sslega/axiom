@@ -1,5 +1,6 @@
 #include "Scene/Component.h"
 #include "Component.h"
+#include "Serialization/Archive.h"
 
 namespace axiom
 {

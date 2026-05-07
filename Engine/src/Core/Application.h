@@ -132,6 +132,7 @@ namespace axiom
         void RegisterModules();
         void InitializeModules();
         void ShutdownModules();
+        virtual void RegisterComponentFactories();
 
         inline static Application& GetCurrent() {
             AX_ASSERT(s_current, "No Application in scope");

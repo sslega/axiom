@@ -1,9 +1,10 @@
 #pragma once
 #include "Core/Types.h"
+#include "Resources/Resource.h"
 
 namespace axiom
 {
-    class ShaderResource
+    class ShaderResource : public Resource
     {
     public:
         ShaderResource(const String& vertexSource, const String& fragmentSource);

@@ -6,6 +6,7 @@
 #include "Core/Log.h"
 #include <regex>
 #include <map>
+#include "Resource.h"
 
 namespace axiom
 {
@@ -14,7 +15,7 @@ namespace axiom
     {
     }
 
-    SharedPtr<void> OBJLoader::CreateResource(const FileData &fileData)
+    SharedPtr<Resource> OBJLoader::CreateResource(const FileData &fileData)
     {
         String source(fileData.buffer.begin(), fileData.buffer.end());
 

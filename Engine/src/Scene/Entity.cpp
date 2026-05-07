@@ -15,6 +15,16 @@ namespace axiom
         m_name = "Entity_" + std::to_string(s_nextId);
     }
 
+    void Entity::AddComponent(UniquePtr<Component> component)
+    {
+        auto typeId = std::type_index(typeid(*component));
+        Component* ptr = component.get();
+        ptr->m_entity = this;
+        m_components[typeId] = std::move(component);
+        ptr->Register();
+        ptr->Initialize();
+    }
+
     void Entity::OnUnregister()
     {
         for (auto& [id, component] : m_components)

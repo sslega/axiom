@@ -45,12 +45,6 @@ namespace axiom
 
         Scene& GetActiveScene() const;
         inline void LoadScene(const String& path) { m_sceneLoader->Load(path); }
-
-        // template<typename T>
-        // void RegisterComponent(const String& key)
-        // {
-        //     m_sceneLoader->Register<T>(key);
-        // }
     
     protected:
         virtual void OnRegister()  override;

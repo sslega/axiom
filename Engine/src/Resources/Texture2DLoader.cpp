@@ -10,7 +10,7 @@ namespace axiom
     {
     }
 
-    SharedPtr<void> Texture2DLoader::CreateResource(const FileData& fileData)
+    SharedPtr<Resource> Texture2DLoader::CreateResource(const FileData& fileData)
     {
         int w, h, channels;
         stbi_set_flip_vertically_on_load(true);

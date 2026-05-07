@@ -5,6 +5,7 @@
 #include <filesystem>
 
 #include "Core/Types.h"
+#include "Resources/Resource.h"
 
 namespace axiom
 {
@@ -24,10 +25,10 @@ namespace axiom
         ResourceLoader(const ResourceModule& resourceModule);
         virtual ~ResourceLoader() = default;
         
-        SharedPtr<void> Load(const Path& path);
+        SharedPtr<Resource> Load(const Path& path);
     
     protected:
-        virtual SharedPtr<void> CreateResource(const FileData& fileData) = 0;
+        virtual SharedPtr<Resource> CreateResource(const FileData& fileData) = 0;
         FileData ReadFile(const Path& path);
         const ResourceModule& m_resourceModule;
     };

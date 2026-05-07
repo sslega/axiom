@@ -10,6 +10,7 @@ namespace axiom
     class CameraComponent : public Component
     {
     public:
+        CameraComponent();
         CameraComponent(float fovYRadians, float aspectRatio, float near, float far);
         CameraComponent(float left, float right, float bottom, float top, float near, float far);
 
@@ -23,6 +24,9 @@ namespace axiom
         
         inline const Matrix4& GetProjectionMatrix() const { return m_camera.GetProjectionMatrix(); }
         static Matrix4 GetViewMatrix(Vec3 position, Vec3 rotation) { return Camera::GetViewMatrix(position, rotation); }
+
+        virtual void Serialize(Archive& ar) override;
+        virtual void Deserialize(Archive& ar) override;
     
     protected:
         friend class SceneLoader;

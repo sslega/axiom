@@ -3,10 +3,10 @@
 #include "Scene/TransformComponent.h"
 #include "Input/Input.h"
 #include "Math/Math.h"
+#include "Serialization/Archive.h"
 
 namespace axiom
 {
-
     void CameraController::OnUpdate(float deltaTime)
     {
         float dt = MillisecondsToSeconds(deltaTime);
@@ -49,7 +49,19 @@ namespace axiom
         if (Input::IsKeyPressed(KeyCode::Q))
             m_transformComponent->position.y -= speed;
     }
-    
+
+    void CameraController::Deserialize(Archive &ar)
+    {
+        ar.Read("moveSpeed", moveSpeed);
+        ar.Read("lookSensitivity", lookSensitivity);
+    }
+
+    void CameraController::Serialize(Archive &ar)
+    {
+        ar.Write("moveSpeed", moveSpeed);
+        ar.Write("lookSensitivity", lookSensitivity);
+    }
+
     void CameraController::OnInitialize()
     {
         m_transformComponent = GetEntity().GetComponent<TransformComponent>();

@@ -1,10 +1,11 @@
 #pragma once
 
 #include "Core/Types.h"
+#include "Resources/Resource.h"
 
 namespace axiom
 {
-    class Texture2DResource
+    class Texture2DResource : public Resource
     {
     public:
         Texture2DResource(uint32 width, uint32 height, Vector<uint8> data);

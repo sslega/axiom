@@ -9,6 +9,6 @@ namespace axiom
         OBJLoader(const ResourceModule& resourceModule);
     
     protected:
-        SharedPtr<void> CreateResource(const FileData& fileData) override;
+        SharedPtr<Resource> CreateResource(const FileData& fileData) override;
     };
 }

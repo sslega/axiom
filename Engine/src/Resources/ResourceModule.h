@@ -6,9 +6,6 @@
 
 namespace axiom
 {
-    enum class ResourceType  { MeshResource, Texture, RenderShader };
-    enum class ResourceState { Unloaded, Loading, Ready, Failed };
-
     class FileSystemModule;
 
     class ResourceModule : public ApplicationModule

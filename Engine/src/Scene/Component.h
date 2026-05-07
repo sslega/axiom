@@ -1,16 +1,20 @@
 #pragma once
-#include "nlohmann/json.hpp"
+
+#include "Serialization/ClassRegistry.h"
+#include "Core/Object.h"
 
 namespace axiom
 {
     class Entity;
+    class Archive;
 
-    class Component
+    class Component : public Object
     {
     public:
         virtual ~Component() = default;
 
         Entity& GetEntity() const;
+        
 
     protected:
         virtual void OnRegister()   {}

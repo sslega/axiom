@@ -13,6 +13,9 @@ namespace axiom
         Vec3 rotation {0.0f, 0.0f, 0.0f};
         Vec3 scale {1.0f, 1.0f, 1.0f};
 
+        virtual void Serialize(Archive& ar) override;
+        virtual void Deserialize(Archive& ar) override;
+
         inline Matrix4 GetTransform() const
         {
             return Matrix4::Translate(position)

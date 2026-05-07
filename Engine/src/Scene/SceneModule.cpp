@@ -16,6 +16,7 @@
 #include "Geometry/Quad.h"
 #include "Geometry/Cube.h"
 #include "Math/Math.h"
+#include "Serialization/Archive.h"
 
 namespace axiom
 {
@@ -35,11 +36,11 @@ namespace axiom
         int version = jsonData["version"].get<int>();
         for(auto& jsonMaterial : jsonData["materials"])
         {
-            String name = jsonMaterial["name"].get<String>();
+            String materialID = jsonMaterial["id"].get<String>();
             String shaderPath = jsonMaterial["shader"].get<String>();
             SharedPtr<Shader> shader = m_renderModule.GetShader(shaderPath);
             SharedPtr<Material> material = MakeShared<Material>(shader);
-            m_materials[name] = material;
+            m_materials[materialID] = material;
             for (auto& [uniformName, uniformValue] : jsonMaterial["uniforms"].items())
             {
                 if (uniformValue.is_number())
@@ -69,100 +70,34 @@ namespace axiom
             }
 
         }
+        
+        Vector<UniquePtr<IResolvable>> handles;
+        
         for (auto& entityJson : jsonData["entities"])
         {
             Entity& entity = m_scene.CreateEntity(entityJson["name"]);
             for (auto& componentJson : entityJson["components"])
             {
-                String type = componentJson["type"].get<std::string>();
-                // auto it = m_factories.find(type);
-                // AX_ASSERT(it != m_factories.end(), "Class factory not found for loaded scene!");
-                // it->second(entity, componentJson);
-                if(type == "transform")
-                {
-                    TransformComponent& component = entity.CreateComponent<TransformComponent>();
-                    if (componentJson.contains("position"))
-                    {
-                        auto& p = componentJson["position"];
-                        Vec3 position = { p[0].get<float>(), p[1].get<float>(), p[2].get<float>() };
-                        component.position = position;
-                    }
-
-                    if (componentJson.contains("scale"))
-                    {
-                        auto& p = componentJson["scale"];
-                        Vec3 scale = { p[0].get<float>(), p[1].get<float>(), p[2].get<float>() };
-                        component.scale = scale;
-                    }
-
-                    if (componentJson.contains("rotation"))
-                    {
-                        auto& p = componentJson["rotation"];
-                        Vec3 rotation = { p[0].get<float>(), p[1].get<float>(), p[2].get<float>() };
-                        rotation.x = ToRadians(rotation.x);
-                        rotation.y = ToRadians(rotation.y);
-                        rotation.z = ToRadians(rotation.z);
-                        component.rotation = rotation;
-                    }
-                }
-                if(type == "camera")
-                {
-                    float near = componentJson["near"].get<float>();
-                    float far = componentJson["far"].get<float>();
-                    float fov = componentJson["fov"].get<float>();
-                    float aspectRatio = 800.0f / 600.0f; // REMOVE THIS
-                    CameraComponent& component = entity.CreateComponent<CameraComponent>(ToRadians(fov), aspectRatio, near, far);
-                    // if (componentJson.contains("projection"))
-                    // {
-                    //     String projectionType = componentJson["projection"].get<String>();
-                    //     component.m_camera.SetProjectionType(projectionType == "perspective" ? Camera::ProjectionType::Perspective : Camera::ProjectionType::Orthographic);
-                    // }
-                    // if (componentJson.contains("fov"))
-                    // {
-                    //     component.m_camera.SetFoV(componentJson["fov"].get<float>());
-                    // }
-                    // if (componentJson.contains("near"))
-                    // {
-                    //     component.m_camera.SetFoV(componentJson["near"].get<float>());
-                    // }
-                    // if (componentJson.contains("far"))
-                    // {
-                    //     component.m_camera.SetFoV(componentJson["far"].get<float>());
-                    // }
-                }
-                if(type == "camera_controller")
-                {
-                    CameraController& component = entity.CreateComponent<CameraController>();
-                    if (componentJson.contains("move_speed"))
-                    {
-                        component.moveSpeed = componentJson["move_speed"].get<float>();
-                    }
-                    if (componentJson.contains("look_sensitivity"))
-                    {
-                        component.lookSensitivity = componentJson["look_sensitivity"].get<float>();
-                    }
-                }
-                if(type == "mesh")
-                {
-                    MeshComponent& component = entity.CreateComponent<MeshComponent>();
-                    if (componentJson.contains("path"))
-                    {
-                        String path = componentJson["path"].get<String>();
-                        SharedPtr<MeshResource> mesh;
-                        if(path == "builtin://Quad") mesh = MakeShared<Quad>();
-                        else if(path == "builtin://Cube") mesh = MakeShared<Cube>();
-                        else mesh = m_resourceModule.Load<MeshResource>(path);
-                        component.SetMesh(mesh);
-                    }
-                    if (componentJson.contains("material"))
-                    {
-                        String materialName = componentJson["material"].get<String>();  
-                        component.SetMaterial(m_materials[materialName]);
-                    }
-                }
+                String type = componentJson["type"].get<String>();
+                UniquePtr<Component> component = ClassRegistry::Get().Create(type);
+                Archive ar(componentJson, handles);
+                component->Deserialize(ar);
+                entity.AddComponent(std::move(component));
             }
         }
 
+        for (auto& handle : handles)
+        {
+            handle->Resolve(m_resourceModule);
+        }
+
+        // Temporary hack to make asset referencing working
+        for (auto* mc : m_scene.GetComponents<MeshComponent>())
+        {
+            auto it = m_materials.find(mc->m_materialID);
+            if (it != m_materials.end())
+                mc->SetMaterial(it->second);
+        }
     }
 
     SceneModule::SceneModule(Application& application)

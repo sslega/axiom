@@ -11,6 +11,12 @@
 #include "Input/Input.h"
 #include "Core/Log.h"
 #include <imgui.h>
+#include "Application.h"
+
+#include "Scene/TransformComponent.h"
+#include "Renderer/CameraComponent.h"
+#include "Renderer/CameraController.h"
+#include "Renderer/MeshComponent.h"
 
 namespace axiom
 {
@@ -46,6 +52,7 @@ namespace axiom
     {
         Log::Info("Starting Axiom Application...");
 
+        RegisterComponentFactories();
         RegisterModules();
         OnRegisterModules();
         InitializeModules();
@@ -148,6 +155,14 @@ namespace axiom
             Log::Info("Shutting down module: {}", it->name());
             m_engineModules[*it]->Shutdown();
         }
+    }
+
+    void Application::RegisterComponentFactories()
+    {
+        ClassRegistry::Get().Register("TransformComponent", [] { return MakeUnique<TransformComponent>(); });
+        ClassRegistry::Get().Register("CameraComponent", [] { return MakeUnique<CameraComponent>(); });
+        ClassRegistry::Get().Register("CameraController", [] { return MakeUnique<CameraController>(); });
+        ClassRegistry::Get().Register("MeshComponent", [] { return MakeUnique<MeshComponent>(); });
     }
 
     const GraphicsDevice::API Application::GetRenderAPI() const

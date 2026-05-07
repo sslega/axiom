@@ -36,6 +36,9 @@ namespace axiom
             componentPtr->Initialize();
             return *componentPtr;
         }
+        
+        //TODO: think about AddComponent vs CreateComponent<T>
+        void AddComponent(UniquePtr<Component> component);
 
         template <IsComponent T>
         void DestroyComponent()

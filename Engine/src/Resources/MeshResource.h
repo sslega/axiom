@@ -2,11 +2,12 @@
 
 #include "Core/Types.h"
 #include "Renderer/Vertex.h"
+#include "Resource.h"
 
 namespace axiom
 {
 
-    class MeshResource
+    class MeshResource : public Resource
     {
     public:
         MeshResource();

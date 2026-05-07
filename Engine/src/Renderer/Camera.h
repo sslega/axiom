@@ -19,10 +19,20 @@ namespace axiom
         void SetOrthographic(float left, float right, float bottom, float top, float near = -1.0f, float far = 1.0f);
         void SetPerspective(float fovYRadians, float aspectRatio, float near = 0.1f, float far = 1000.0f);
         void SetAspectRatio(float aspectRatio);
-        void SetOrthoSize(float halfHeight);
-        inline float GetOrthoSize() const { return m_orthoSize; }
+        
         void SetFoV(float fovYRadians);
         inline float GetFoV() const { return m_fovY; };
+        inline float GetNear() const { return m_perspNear; }
+        inline float GetFar() const { return m_perspFar; }
+
+        void SetOrthoSize(float halfHeight);
+        inline float GetOrthoSize() const { return m_orthoSize; }
+        inline float GetOrthoNear() const { return m_orthoNear; }
+        inline float GetOrthoFar() const { return m_orthoFar; }
+        inline float GetOrthoLeft() const { return m_orthoLeft; }
+        inline float GetOrthoRight() const { return m_orthoRight; }
+        inline float GetOrthoTop() const { return m_orthoTop; }
+        inline float GetOrthoBottom() const { return m_orthoBottom; }
         
         inline const Matrix4& GetProjectionMatrix() const { return m_projectionMatrix; };
         static Matrix4 GetViewMatrix(Vec3 position, Vec3 rotation);

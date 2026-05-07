@@ -3,12 +3,13 @@
 
   "materials": [
     {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
       "name": "lit",
       "shader": "project://Shaders/LightModels.glsl",
       "uniforms": {
         "u_LightDir":   [0.75, 1.0, 0.5],
         "u_LightColor": [1.0, 0.9, 0.8],
-        "u_Roughness":  0.3
+        "u_Roughness":  0.6
       }
     }
   ],
@@ -18,18 +19,20 @@
       "name": "MainCamera",
       "components": [
         {
-          "type": "transform",
-          "position": [0.0, 0.25, 2.0]
+          "type": "TransformComponent",
+          "position": [0.0, 0.25, 2.0],
+          "scale": [1.0, 1.0, 1.0],
+          "rotation": [0.0, 0.0, 0.0]
         },
         {
-          "type": "camera",
-          "projection": "perspective",
+          "type": "CameraComponent",
+          "projectionType": "perspective",
           "fov":  60.0,
           "near": 0.1,
           "far":  1000.0
         },
         {
-          "type": "camera_controller",
+          "type": "CameraController",
           "move_speed":       0.5,
           "look_sensitivity": 0.002
         }
@@ -40,29 +43,15 @@
       "name": "Bunny",
       "components": [
         {
-          "type": "transform",
-          "scale": [2.0, 2.0, 2.0]
+          "type": "TransformComponent",
+          "position": [0.0, 0.0, 0.0],
+          "scale": [2.0, 2.0, 2.0],
+          "rotation": [0.0, 0.0, 0.0]
         },
         {
-          "type": "mesh",
-          "path":     "project://Meshes/bunny.obj",
-          "material": "lit"
-        }
-      ]
-    },
-
-    {
-      "name": "Floor",
-      "components": [
-        {
-          "type": "transform",
-          "rotation": [-90.0, 0.0, 0.0],
-          "scale":    [5.0, 5.0, 5.0]
-        },
-        {
-          "type": "mesh",
-          "path":     "builtin://Quad",
-          "material": "lit"
+          "type": "MeshComponent",
+          "mesh": "project://Meshes/bunny.obj",
+          "material": "550e8400-e29b-41d4-a716-446655440000"
         }
       ]
     }

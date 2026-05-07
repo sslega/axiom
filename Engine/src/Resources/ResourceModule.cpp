@@ -4,6 +4,7 @@
 #include "Core/Application.h"
 #include "Core/FileSystemModule.h"
 #include "ResourceModule.h"
+#include "Resource.h"
 
 namespace axiom
 {
@@ -36,11 +37,11 @@ namespace axiom
         }
 
         Path physicalPath = Resolve(virtualPath);
-        // Path physicalPath = 
             
         ResourceLoader* loader = GetLoader(physicalPath);
 
-        SharedPtr<void> resource = loader->Load(physicalPath);
+        SharedPtr<Resource> resource = loader->Load(physicalPath);
+        resource->m_path = virtualPath;
         m_resources[virtualPath] = resource;
         return resource;
     }

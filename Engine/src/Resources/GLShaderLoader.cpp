@@ -1,6 +1,7 @@
 #include "Resources/GLShaderLoader.h"
 #include "Resources/ShaderResource.h"
 #include "Resources/ResourceModule.h"
+#include "Resources/Resource.h"
 #include "Core/Types.h"
 #include "Core/Assert.h"
 
@@ -11,7 +12,7 @@ namespace axiom
     {
     }
 
-    SharedPtr<void> GLShaderLoader::CreateResource(const FileData &fileData)
+    SharedPtr<Resource> GLShaderLoader::CreateResource(const FileData &fileData)
     {
 
         String source(fileData.buffer.begin(), fileData.buffer.end());

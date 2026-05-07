@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/Types.h"
+#include "Core/Object.h"
 #include "Math/Vector.h"
 #include "Math/Matrix4.h"
 #include <variant>
@@ -10,7 +11,7 @@ namespace axiom
     class ShaderResource;
     class Texture2D;
 
-    class Material
+    class Material : public Object
     {
     public:
         Material(const SharedPtr<Shader> shader);

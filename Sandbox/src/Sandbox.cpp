@@ -49,75 +49,62 @@ void Sandbox::OnRegisterModules()
 void Sandbox::OnApplicationRun()
 {
     sceneModule->LoadScene("project://Scenes/main.scene.json");
-    /*
-    Scene& scene = sceneModule->GetActiveScene();
-    auto quadMesh = MakeShared<Quad>();
-    auto triangleMesh = MakeShared<Triangle>();
-    auto cubeMesh = MakeShared<Cube>();
-    auto shader = renderModule->GetShader("project://Shaders/Texture.glsl");
-    auto litShader = renderModule->GetShader("project://Shaders/LightModels.glsl");
-    auto vertexColorShader = renderModule->GetShader("project://Shaders/VertexColor.glsl");
-
-    SharedPtr<MeshResource> bunny = resourceModule->Load<MeshResource>("project://Meshes/bunny.obj");
-
-    auto& cameraEntity = scene.CreateEntity("MainCamera");
-    {
-        auto& transform = cameraEntity.CreateComponent<TransformComponent>();
-        transform.position = Vec3(0.0f, 0.25f, 2.0f);
-        m_cameraTransform = &transform;
-        float aspectRatio = GetApplicationWindow().GetAspectRatio();
-        m_cameraComponent = &cameraEntity.CreateComponent<CameraComponent>(ToRadians(60.0f), aspectRatio, 0.1f, 1000.0f);
-        cameraEntity.CreateComponent<CameraController>();
-    }
     
+    // Scene& scene = sceneModule->GetActiveScene();
+    // auto quadMesh = MakeShared<Quad>();
+    // auto triangleMesh = MakeShared<Triangle>();
+    // auto cubeMesh = MakeShared<Cube>();
+    // auto shader = renderModule->GetShader("project://Shaders/Texture.glsl");
+    // auto litShader = renderModule->GetShader("project://Shaders/LightModels.glsl");
+    // auto vertexColorShader = renderModule->GetShader("project://Shaders/VertexColor.glsl");
 
-    auto textureResource = resourceModule->Load<Texture2DResource>("engine://Textures/heresy.png");
-    m_texture = renderModule->GetGraphicsDevice().CreateTexture2D(*textureResource);
+    // SharedPtr<MeshResource> bunny = resourceModule->Load<MeshResource>("project://Meshes/bunny.obj");
 
-    m_lightDirection = Vec3{ 0.75, 1.0, 0.5 };
-    m_lightColor = Vec3{ 1.0f, 0.9f,  0.8f };
-    m_roughness = 0.3f;
-    
-    m_litMaterial = MakeShared<Material>(litShader);
-    m_litMaterial->SetUniform("u_LightDir",   m_lightDirection);
-    m_litMaterial->SetUniform("u_LightColor", m_lightColor);
-    m_litMaterial->SetUniform("u_Roughness", m_roughness);
-
-    // Entity& boxEntity = scene.CreateEntity();
+    // auto& cameraEntity = scene.CreateEntity("MainCamera");
     // {
-    //     auto& transform = boxEntity.CreateComponent<TransformComponent>();
-    //     transform.scale = 0.25f;
-    //     transform.position = {0, 0.25f, 0};
-    //     // transform.rotation = {0, ToRadians(45), 0};
+    //     auto& transform = cameraEntity.CreateComponent<TransformComponent>();
+    //     transform.position = Vec3(0.0f, 0.25f, 2.0f);
+    //     m_cameraTransform = &transform;
+    //     float aspectRatio = GetApplicationWindow().GetAspectRatio();
+    //     m_cameraComponent = &cameraEntity.CreateComponent<CameraComponent>(ToRadians(60.0f), aspectRatio, 0.1f, 1000.0f);
+    //     cameraEntity.CreateComponent<CameraController>();
+    // }
+    
+
+    // auto textureResource = resourceModule->Load<Texture2DResource>("engine://Textures/heresy.png");
+    // m_texture = renderModule->GetGraphicsDevice().CreateTexture2D(*textureResource);
+
+    // m_lightDirection = Vec3{ 0.75, 1.0, 0.5 };
+    // m_lightColor = Vec3{ 1.0f, 0.9f,  0.8f };
+    // m_roughness = 0.3f;
+    
+    // m_litMaterial = MakeShared<Material>(litShader);
+    // m_litMaterial->SetUniform("u_LightDir",   m_lightDirection);
+    // m_litMaterial->SetUniform("u_LightColor", m_lightColor);
+    // m_litMaterial->SetUniform("u_Roughness", m_roughness);
+
+    // Entity& bunnyEntity = scene.CreateEntity();
+    // {
+    //     auto& transform = bunnyEntity.CreateComponent<TransformComponent>();
+    //     transform.scale = 2.0f;
     //     m_cubeTransform = &transform;
 
-    //     auto& mesh = boxEntity.CreateComponent<MeshComponent>();
-    //     mesh.SetMesh(MakeShared<Cube>());
+    //     auto& mesh = bunnyEntity.CreateComponent<MeshComponent>();
+    //     mesh.SetMesh(bunny);
     //     mesh.SetMaterial(m_litMaterial);
     // }
 
-    Entity& bunnyEntity = scene.CreateEntity();
-    {
-        auto& transform = bunnyEntity.CreateComponent<TransformComponent>();
-        transform.scale = 2.0f;
-        m_cubeTransform = &transform;
+    // Entity& planeEntity = scene.CreateEntity();
+    // {
+    //     auto& transform = planeEntity.CreateComponent<TransformComponent>();
+    //     transform.scale = {5.0f, 5.0f, 5.0f};
+    //     transform.rotation = {ToRadians(-90), 0, 0};
 
-        auto& mesh = bunnyEntity.CreateComponent<MeshComponent>();
-        mesh.SetMesh(bunny);
-        mesh.SetMaterial(m_litMaterial);
-    }
+    //     auto& mesh = planeEntity.CreateComponent<MeshComponent>();
+    //     mesh.SetMesh(MakeShared<Quad>());
+    //     mesh.SetMaterial(m_litMaterial);
+    // }
 
-    Entity& planeEntity = scene.CreateEntity();
-    {
-        auto& transform = planeEntity.CreateComponent<TransformComponent>();
-        transform.scale = {5.0f, 5.0f, 5.0f};
-        transform.rotation = {ToRadians(-90), 0, 0};
-
-        auto& mesh = planeEntity.CreateComponent<MeshComponent>();
-        mesh.SetMesh(MakeShared<Quad>());
-        mesh.SetMaterial(m_litMaterial);
-    }
-    */
     GetApplicationWindow().AddEventListener(&Sandbox::OnResize, this);
 }
 

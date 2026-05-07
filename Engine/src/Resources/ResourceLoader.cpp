@@ -1,6 +1,7 @@
 #include "Resources/ResourceLoader.h"
 #include "Core/Assert.h"
 #include "Core/FileSystemModule.h"
+#include "Resource.h"
 
 namespace axiom
 {
@@ -10,7 +11,7 @@ namespace axiom
     {
     }
 
-    SharedPtr<void> ResourceLoader::Load(const Path& physicalPath)
+    SharedPtr<Resource> ResourceLoader::Load(const Path& physicalPath)
     {
         FileData data = ReadFile(physicalPath);
         return CreateResource(data);
