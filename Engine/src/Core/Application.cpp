@@ -19,6 +19,7 @@
 #include "Renderer/CameraComponent.h"
 #include "Renderer/CameraController.h"
 #include "Renderer/MeshComponent.h"
+#include "Renderer/LightComponent.h"
 
 namespace axiom
 {
@@ -173,6 +174,7 @@ namespace axiom
         ClassRegistry::Get().Register("CameraComponent", [] { return MakeUnique<CameraComponent>(); });
         ClassRegistry::Get().Register("CameraController", [] { return MakeUnique<CameraController>(); });
         ClassRegistry::Get().Register("MeshComponent", [] { return MakeUnique<MeshComponent>(); });
+        ClassRegistry::Get().Register("DirectionalLightComponent", [] { return MakeUnique<DirectionalLightComponent>(); });
     }
 
     const GraphicsDevice::API Application::GetRenderAPI() const

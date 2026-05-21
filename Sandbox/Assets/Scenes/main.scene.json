@@ -89,6 +89,22 @@
           "material": "engine://Materials/lit.mat"
         }
       ]
+    },
+    {
+      "name": "DirectionalLight",
+      "components": [
+        {
+          "type": "TransformComponent",
+          "position": [0.0, 0.0, 0.0],
+          "scale": [1.0, 1.0, 1.0],
+          "rotation": [-45, 135.0, 0.0]
+        },
+        {
+          "type": "DirectionalLightComponent",
+          "color": [1.0, 0.95, 0.85],
+          "intensity": 2.0
+        }
+      ]
     }
   ]
 }

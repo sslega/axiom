@@ -9,13 +9,16 @@ void VertexShader(inout VertexInput input)
 #define COOK_TORRANCE
 #include "axiom_light_models.glsl"
 
+#ifdef HAS_DIRECTIONAL_LIGHT 
 uniform vec3  u_LightDir;
 uniform vec3  u_LightColor;
+#endif
 uniform vec3  u_CameraPos;
 uniform float u_Roughness;
 
 void FragmentShader(in VertexInput input, out FragmentInput output)
 {
+#ifdef HAS_DIRECTIONAL_LIGHT
     vec3  N         = normalize(input.WorldNormal);
     vec3  L         = normalize(u_LightDir);
     vec3  V         = normalize(u_CameraPos - input.WorldPosition);
@@ -23,4 +26,7 @@ void FragmentShader(in VertexInput input, out FragmentInput output)
     float Shininess = 1.0 - u_Roughness;
 
     output.Color = CalculateLight(N, L, V, u_LightColor, Albedo, Shininess);
+#else
+    output.Color = vec3(0.8, 0.8, 0.8);
+#endif
 }

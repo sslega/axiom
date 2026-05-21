@@ -7,6 +7,7 @@
 #include "Scene/WorldSubsystem.h"
 #include "Renderer/CameraComponent.h"
 #include "Renderer/MeshComponent.h"
+#include "Renderer/LightComponent.h"
 #include "Scene/TransformComponent.h"
 #include "Core/Log.h"
 #include "Core/Types.h"
@@ -169,14 +170,39 @@ namespace axiom
         WorldSubsystem& worldSubsystem = GetSubsystem<WorldSubsystem>();
 
         Scene& scene = worldSubsystem.GetActiveScene();
-        Vector<CameraComponent*> cameras = scene.GetComponents<CameraComponent>();
 
+        Vector<CameraComponent*> cameras = scene.GetComponents<CameraComponent>();
         AX_ASSERT(!cameras.empty(), "No active Camera!");
         CameraComponent* cameraComponent = cameras[0];
-        TransformComponent* transform = cameraComponent->GetEntity().GetComponent<TransformComponent>();
+        TransformComponent* cameraTransform = cameraComponent->GetEntity().GetComponent<TransformComponent>();
         cameraComponent->SetAspectRatio(GetApp().GetApplicationWindow().GetAspectRatio());
-        Matrix4 viewMatrix = transform ? Camera::GetViewMatrix(transform->position, transform->rotation) : Matrix4::Identity();
+        Matrix4 viewMatrix = cameraTransform ? Camera::GetViewMatrix(cameraTransform->position, cameraTransform->rotation) : Matrix4::Identity();
         m_sceneData.viewProjectionMatrix = cameraComponent->GetProjectionMatrix() * viewMatrix;
+
+        m_sceneData.cameraPosition = cameraTransform->position;
+        
+        Vector<DirectionalLightComponent*> directionalLight = scene.GetComponents<DirectionalLightComponent>();
+        if(directionalLight.size() > 1)
+        {
+            Log::Error("More than one DirectionalLightComponent present!");
+        }
+
+        if(!directionalLight.empty())
+        {
+            DirectionalLightComponent* light = directionalLight[0];
+            TransformComponent* lightTransform = light->GetEntity().GetComponent<TransformComponent>();
+            AX_ASSERT(lightTransform, "No TransformComponent present with DirectionalLightComponent!");
+            m_sceneData.hasDirectionalLight = true;
+            m_sceneData.lightColor = light->color * light->intensity;
+            m_sceneData.lightDirection = lightTransform->Forward();
+        }
+        else
+        {
+            m_sceneData.hasDirectionalLight = false;
+            m_sceneData.lightColor = Vec3(0);
+            m_sceneData.lightDirection = Vec3(1,0,0);
+        }
+        
         m_graphicsDevice->SetDepthWriteEnabled(true);
         m_graphicsDevice->SetDepthFunction(DepthFunction::Less);
         m_graphicsDevice->SetClearColor(Vec4(0.25f, 0.25f, 0.25f, 1.0f));
@@ -211,12 +237,22 @@ namespace axiom
 
     void RenderSubsystem::Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<MaterialResource>& material, const Matrix4& transform)
     {
+
         auto& m = m_debugDrawMode > 0 ? m_debugDrawMaterial : material;
         m->SetUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
         m->SetUniform("u_LocalToWorld", transform);
         m->SetUniform("u_WorldToLocal", transform.Inverse());
         m->SetUniform("u_DebugMode", m_debugDrawMode);
-        m->Bind();
+        if(m_sceneData.hasDirectionalLight)
+        {
+            m->SetUniform("u_LightDir", m_sceneData.lightDirection);    
+            m->SetUniform("u_LightColor", m_sceneData.lightColor);
+            m->SetUniform("u_CameraPos", m_sceneData.cameraPosition);
+            
+            m_sceneData.defines.push_back("HAS_DIRECTIONAL_LIGHT");
+        }
+
+        m->Bind(m_sceneData.defines);
         m_graphicsDevice->DrawIndexed(vb, ib);
         m_callCount++;
     }
@@ -228,7 +264,7 @@ namespace axiom
         shader->UploadUniform("u_LocalToWorld", transform);
         m_graphicsDevice->DrawIndexed(vb, ib);
         m_callCount++;
-    }
+}
 
     SharedPtr<MaterialResource> RenderSubsystem::GetMaterial(const String path)
     {

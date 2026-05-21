@@ -61,6 +61,14 @@ namespace axiom
         struct SceneData
         {
             Matrix4 viewProjectionMatrix;
+            
+            bool hasDirectionalLight = false;
+            Vec3 lightDirection;
+            Vec3 lightColor;
+
+            Vec3 cameraPosition;
+
+            Vector<String> defines;
         };
 
         struct RenderCommand
