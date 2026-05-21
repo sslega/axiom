@@ -1,20 +1,15 @@
 #include "Input/Input.h"
-#include "Core/Types.h"
 #include "Platform/ApplicationWindow.h"
 #include "Platform/GLFW/GLFWInput.h"
 #include "Core/Assert.h"
 
 namespace axiom
 {
+    IInput* Input::s_instance = nullptr;
 
-    axiom::Input::Input(const ApplicationWindow& window)
-    : m_window(window)
+    UniquePtr<IInput> IInput::Create(const ApplicationWindow& window)
     {
-    }
-
-    UniquePtr<Input> axiom::Input::Create(const ApplicationWindow& window)
-    {
-        switch (window.GetBackend()) 
+        switch (window.GetBackend())
         {
             case ApplicationWindowBackend::GLFW: return MakeUnique<GLFWInput>(window);
         }

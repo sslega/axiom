@@ -7,17 +7,17 @@ namespace axiom
 {
     class ApplicationWindow;
 
-    class GLFWInput : public Input
+    class GLFWInput : public IInput
     {
     public:
         GLFWInput(const ApplicationWindow& window);
 
     protected:
-        bool  IsKeyPressedInternal(KeyCode key) const override;
-        bool  IsMouseButtonPressedInternal(MouseCode button) const override;
-        Vec2  GetMousePositionInternal() const override;
-        float GetScrollDeltaInternal() const override;
-        void SetCursorLockedInternal(bool locked) override;
+        bool  IsKeyPressed(KeyCode key) const override;
+        bool  IsMouseButtonPressed(MouseCode button) const override;
+        Vec2  GetMousePosition() const override;
+        float GetScrollDelta() const override;
+        void SetCursorLocked(bool locked) override;
     private:
         mutable float m_scrollDelta = 0.0f;
         GLFWwindow* m_nativeWindow;

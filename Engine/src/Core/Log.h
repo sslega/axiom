@@ -1,8 +1,6 @@
 #pragma once
 
 #include "Core/Types.h"
-#include "Core/Application.h"
-#include "Core/Global.h"
 #include <format>
 
 namespace axiom
@@ -10,21 +8,28 @@ namespace axiom
     class Log
     {
     public:
+
         template<typename... Args>
         static void Info(const char* fmt, Args&&... args)
         {
-            GLog->InfoInternal(std::vformat(fmt, std::make_format_args(args...)));
+            s_instance->InfoInternal(std::vformat(fmt, std::make_format_args(args...)));
         }
 
         template<typename... Args>
         static void Error(const char* fmt, Args&&... args)
         {
-            GLog->ErrorInternal(std::vformat(fmt, std::make_format_args(args...)));
+            s_instance->ErrorInternal(std::vformat(fmt, std::make_format_args(args...)));
         }
 
     protected:
         virtual void InfoInternal(StringView message) = 0;
         virtual void ErrorInternal(StringView message) = 0;
+
+    private:
+        static void SetInstance(Log* instance) { s_instance = instance; }
+        inline static Log* s_instance = nullptr;
+
+        friend class Application;
     };
 
     class ConsoleLog : public Log

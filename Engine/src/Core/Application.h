@@ -17,7 +17,7 @@
 
 namespace axiom
 {
-    class Input;
+    class IInput;
     class Log;
     class FileSubsystem;
     class ResourceSubsystem;
@@ -75,7 +75,7 @@ namespace axiom
         TypeMap<UniquePtr<ApplicationSubsystem>> m_applicationSubsystems;
         Vector<std::type_index> m_subsystemOrder; // tracks registration order
 
-        UniquePtr<Input> m_input;
+        UniquePtr<IInput> m_input;
         UniquePtr<Log> m_log;
 
         FileSubsystem* fileSubsystem = nullptr;
@@ -129,11 +129,6 @@ namespace axiom
         void InitializeSubsystems();
         void ShutdownSubsystems();
         virtual void RegisterComponentFactories();
-
-        // inline static Application& GetCurrent() {
-        //     AX_ASSERT(s_current, "No Application in scope");
-        //     return *s_current;
-        // }
 
         static Application* s_current;
         TimePoint m_lastUpdateTime;

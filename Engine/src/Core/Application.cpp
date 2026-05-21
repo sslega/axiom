@@ -41,17 +41,19 @@ namespace axiom
 
         m_lastUpdateTime = std::chrono::steady_clock::now();
 
-        m_input = Input::Create(*m_applicationWindow);
+        m_input = IInput::Create(*m_applicationWindow);
         m_log = MakeUnique<ConsoleLog>();
 
         GApplication = this;
-        GLog = m_log.get();
-        GInput = m_input.get();
         GApplicationWindow = m_applicationWindow.get();
+        Log::SetInstance(m_log.get());
+        Input::SetInstance(m_input.get());
     }
 
     Application::~Application()
     {
+        Input::SetInstance(nullptr);
+        Log::SetInstance(nullptr);
         s_current = nullptr;
     }
 

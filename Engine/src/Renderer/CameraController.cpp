@@ -4,6 +4,7 @@
 #include "Input/Input.h"
 #include "Math/Math.h"
 #include "Serialization/Archive.h"
+#include "Core/Assert.h"
 
 namespace axiom
 {
@@ -62,7 +63,7 @@ namespace axiom
         ar.Write("lookSensitivity", lookSensitivity);
     }
 
-    void CameraController::FileSubsystem()
+    void CameraController::OnInitialize()
     {
         m_transformComponent = GetEntity().GetComponent<TransformComponent>();
         AX_ASSERT(m_transformComponent, "TransformComponent required!");
