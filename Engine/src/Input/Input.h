@@ -4,6 +4,7 @@
 #include "Input/Keyboard.h"
 #include "Input/Mouse.h"
 #include "Core/Application.h"
+#include "Core/Global.h"
 
 namespace axiom
 {
@@ -17,27 +18,27 @@ namespace axiom
         static UniquePtr<Input> Create(const ApplicationWindow& window);
         static bool IsKeyPressed(KeyCode key)
         {
-            return Application::Get().GetInput().IsKeyPressedInternal(key);
+            return GInput->IsKeyPressedInternal(key);
         }
 
         static bool IsMouseButtonPressed(MouseCode button)
         {
-            return Application::Get().GetInput().IsMouseButtonPressedInternal(button);
+            return GInput->IsMouseButtonPressedInternal(button);
         }
 
         static Vec2 GetMousePosition()
         {
-            return Application::Get().GetInput().GetMousePositionInternal();
+            return GInput->GetMousePositionInternal();
         }
 
         static void SetCursorLocked(bool locked)
         {
-             Application::Get().GetInput().SetCursorLockedInternal(locked);
+            GInput->SetCursorLockedInternal(locked);
         }
 
         static float GetScrollDelta()
         {
-            return Application::Get().GetInput().GetScrollDeltaInternal();
+            return GInput->GetScrollDeltaInternal();
         }
 
     protected:

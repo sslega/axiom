@@ -45,10 +45,6 @@ namespace axiom
 
         const GraphicsDevice::API GetRenderAPI() const;
         ApplicationWindow& GetApplicationWindow();
-        Input& GetInput() const { return *m_input; }
-        Log& GetLog() const { return *m_log; }
-
-        static inline Application& Get() { return *s_current; }
 
         template <typename T>
         T& GetSubsystem()
@@ -134,10 +130,10 @@ namespace axiom
         void ShutdownSubsystems();
         virtual void RegisterComponentFactories();
 
-        inline static Application& GetCurrent() {
-            AX_ASSERT(s_current, "No Application in scope");
-            return *s_current;
-        }
+        // inline static Application& GetCurrent() {
+        //     AX_ASSERT(s_current, "No Application in scope");
+        //     return *s_current;
+        // }
 
         static Application* s_current;
         TimePoint m_lastUpdateTime;

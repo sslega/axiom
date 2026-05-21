@@ -13,6 +13,7 @@
 #include "Core/Log.h"
 #include <imgui.h>
 #include "Application.h"
+#include "Global.h"
 
 #include "Scene/TransformComponent.h"
 #include "Renderer/CameraComponent.h"
@@ -42,6 +43,11 @@ namespace axiom
 
         m_input = Input::Create(*m_applicationWindow);
         m_log = MakeUnique<ConsoleLog>();
+
+        GApplication = this;
+        GLog = m_log.get();
+        GInput = m_input.get();
+        GApplicationWindow = m_applicationWindow.get();
     }
 
     Application::~Application()
