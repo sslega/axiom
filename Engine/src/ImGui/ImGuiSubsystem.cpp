@@ -1,7 +1,7 @@
-#include "ImGui/ImGuiModule.h"
+#include "ImGui/ImGuiSubsystem.h"
 #include "Core/Application.h"
 #include "Platform/ApplicationWindow.h"
-#include "Renderer/RenderModule.h"
+#include "Renderer/RenderSubsystem.h"
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
@@ -9,12 +9,12 @@
 
 namespace axiom
 {
-    ImGuiModule::ImGuiModule(Application& application)
-    : ApplicationModule(application)
+    ImGuiSubsystem::ImGuiSubsystem(Application& application)
+    : ApplicationSubsystem(application)
     {
     }
 
-    void ImGuiModule::OnInitialize()
+    void ImGuiSubsystem::OnInitialize()
     {
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
@@ -30,27 +30,27 @@ namespace axiom
         ImGui_ImplOpenGL3_Init("#version 330");
     }
 
-    void ImGuiModule::OnShutdown()
+    void ImGuiSubsystem::OnShutdown()
     {
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
     }
 
-    void ImGuiModule::OnBeginFrame()
+    void ImGuiSubsystem::OnBeginFrame()
     {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
     }
 
-    void ImGuiModule::OnRender()
+    void ImGuiSubsystem::OnRender()
     {
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
-    void ImGuiModule::OnEndFrame()
+    void ImGuiSubsystem::OnEndFrame()
     {
     
     }

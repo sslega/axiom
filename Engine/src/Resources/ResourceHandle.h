@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Resources/ResourceModule.h"
+#include "Resources/ResourceSubsystem.h"
 #include "Core/Types.h"
 
 namespace axiom
@@ -13,7 +13,7 @@ namespace axiom
     };
 
     struct IResolvable {
-        virtual void Resolve(ResourceModule& resourceModule) = 0;
+        virtual void Resolve(ResourceSubsystem& resourceModule) = 0;
         virtual ~IResolvable() = default;
     };
 
@@ -28,7 +28,7 @@ namespace axiom
         {
         };
 
-        void Resolve(ResourceModule& resourceModule) override
+        void Resolve(ResourceSubsystem& resourceModule) override
         {
             m_target = resourceModule.Load<T>(path);
             state = m_target ? ResourceState::Resolved : ResourceState::Failed;

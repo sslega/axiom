@@ -9,7 +9,7 @@ namespace axiom
     public:
         const String& GetPath() const { return m_path; }
     private:
-        friend class ResourceModule;
+        friend class ResourceSubsystem;
         String m_path;
     };
 

@@ -1,18 +1,18 @@
 #pragma once
 
 #include "Core/Types.h"
-#include "Core/ApplicationModule.h"
+#include "Core/ApplicationSubsystem.h"
 #include "Resources/ResourceLoader.h"
 
 namespace axiom
 {
-    class FileSystemModule;
+    class FileSubsystem;
 
-    class ResourceModule : public ApplicationModule
+    class ResourceSubsystem : public ApplicationSubsystem
     {
     public:
-        ResourceModule(Application& engine);
-        ~ResourceModule();
+        ResourceSubsystem(Application& engine);
+        ~ResourceSubsystem();
 
         Path Resolve(const String& virtualPath) const;
         
@@ -34,7 +34,7 @@ namespace axiom
         void OnInitialize() override;
         
     private:
-        FileSystemModule* fileSystemModule;
+        FileSubsystem* fileSystemModule;
 
         StringMap<UniquePtr<ResourceLoader>> m_loaders;
         StringMap<SharedPtr<void>> m_resources;

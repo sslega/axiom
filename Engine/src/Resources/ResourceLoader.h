@@ -9,7 +9,7 @@
 
 namespace axiom
 {
-    class ResourceModule;
+    class ResourceSubsystem;
     
     struct FileData
     {
@@ -22,7 +22,7 @@ namespace axiom
     class ResourceLoader
     {
     public:
-        ResourceLoader(const ResourceModule& resourceModule);
+        ResourceLoader(const ResourceSubsystem& resourceModule);
         virtual ~ResourceLoader() = default;
         
         SharedPtr<Resource> Load(const Path& path);
@@ -30,7 +30,7 @@ namespace axiom
     protected:
         virtual SharedPtr<Resource> CreateResource(const FileData& fileData) = 0;
         FileData ReadFile(const Path& path);
-        const ResourceModule& m_resourceModule;
+        const ResourceSubsystem& m_resourceModule;
     };
     
 }

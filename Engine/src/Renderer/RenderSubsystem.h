@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/ApplicationModule.h"
+#include "Core/ApplicationSubsystem.h"
 #include "Renderer/RenderTypes.h"
 #include "Renderer/RenderMesh.h"
 #include "Resources/MeshResource.h"
@@ -18,10 +18,10 @@ namespace axiom
     class RenderResourceFactory;
     class FrameBuffer;
 
-    class RenderModule : public ApplicationModule
+    class RenderSubsystem : public ApplicationSubsystem
     {
     public:
-        RenderModule(Application& engine);
+        RenderSubsystem(Application& engine);
 
         void Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<MaterialResource>& material, const Matrix4& transform);
         void Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Shader>& shader, const Matrix4& transform);

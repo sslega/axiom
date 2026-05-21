@@ -38,7 +38,7 @@ namespace axiom
     protected:
         virtual void OnRegister()   {}
         virtual void OnUnregister() {}
-        virtual void OnInitialize() {}
+        virtual void FileSubsystem() {}
         virtual void OnShutdown()   {}
         virtual void OnUpdate(float deltaTime);
         virtual void OnBeginFrame();
@@ -46,10 +46,10 @@ namespace axiom
         virtual void OnEndFrame();
 
     private:
-        friend class SceneModule;
+        friend class WorldSubsystem;
         void Register()              { OnRegister(); }
         void Unregister()            { OnUnregister(); }
-        void Initialize()            { OnInitialize(); }
+        void Initialize()            { FileSubsystem(); }
         void Shutdown()              { OnShutdown(); }
         void Update(float deltaTime) { OnUpdate(deltaTime); }
         void BeginFrame()            { OnBeginFrame(); }

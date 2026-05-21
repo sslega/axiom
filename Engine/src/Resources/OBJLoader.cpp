@@ -10,7 +10,7 @@
 
 namespace axiom
 {
-    OBJLoader::OBJLoader(const ResourceModule &resourceModule)
+    OBJLoader::OBJLoader(const ResourceSubsystem &resourceModule)
     : ResourceLoader(resourceModule)
     {
     }

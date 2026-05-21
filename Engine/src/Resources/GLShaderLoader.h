@@ -8,7 +8,7 @@ namespace axiom
     class GLShaderLoader : public ResourceLoader
     {
     public:
-        GLShaderLoader(const ResourceModule& resourceModule);
+        GLShaderLoader(const ResourceSubsystem& resourceModule);
     
     protected:
         virtual SharedPtr<Resource> CreateResource(const FileData& fileData) override;

@@ -1,15 +1,15 @@
 #pragma once
 
 #include "Core/Types.h"
-#include "Core/ApplicationModule.h"
+#include "Core/ApplicationSubsystem.h"
 
 namespace axiom
 {
-    class FileSystemModule : public ApplicationModule
+    class FileSubsystem : public ApplicationSubsystem
     {
     public:
-        FileSystemModule(Application& application);
-        ~FileSystemModule() = default;
+        FileSubsystem(Application& application);
+        ~FileSubsystem() = default;
 
         void Mount(const String& virtualPath, const Path& physicalPath);
         bool MountExists(const String &mountPoint) const;

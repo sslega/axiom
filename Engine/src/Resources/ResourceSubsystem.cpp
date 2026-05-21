@@ -1,34 +1,33 @@
-#include "Resources/ResourceModule.h"
+#include "ResourceSubsystem.h"
 #include "Core/Types.h"
 #include "Core/Assert.h"
 #include "Core/Application.h"
-#include "Core/FileSystemModule.h"
-#include "ResourceModule.h"
+#include "Core/FileSubsystem.h"
 #include "Resource.h"
 
 namespace axiom
 {
-    ResourceModule::ResourceModule(Application& application)
-    :ApplicationModule(application)
+    ResourceSubsystem::ResourceSubsystem(Application& application)
+    :ApplicationSubsystem(application)
     {
     }
     
-    ResourceModule::~ResourceModule()
+    ResourceSubsystem::~ResourceSubsystem()
     {
         
     }
 
-    Path ResourceModule::Resolve(const String& virtualPath) const
+    Path ResourceSubsystem::Resolve(const String& virtualPath) const
     {
         return fileSystemModule->Resolve(virtualPath);
     }
     
-    void ResourceModule::OnInitialize()
+    void ResourceSubsystem::OnInitialize()
     {
-        fileSystemModule = &GetModule<FileSystemModule>();
+        fileSystemModule = &GetSubsystem<FileSubsystem>();
     }
 
-    SharedPtr<void> ResourceModule::LoadInternal(const String& virtualPath)
+    SharedPtr<void> ResourceSubsystem::LoadInternal(const String& virtualPath)
     {
         auto it = m_resources.find(virtualPath);
         if (it != m_resources.end())
@@ -46,7 +45,7 @@ namespace axiom
         return resource;
     }
 
-    ResourceLoader* ResourceModule::GetLoader(Path path)
+    ResourceLoader* ResourceSubsystem::GetLoader(Path path)
     {
         String fileExtension = path.extension().string();
         auto it = m_loaders.find(fileExtension);

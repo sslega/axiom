@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Core/ApplicationModule.h"
+#include "Core/ApplicationSubsystem.h"
 
 namespace axiom
 {
-    class ImGuiModule : public ApplicationModule
+    class ImGuiSubsystem : public ApplicationSubsystem
     {
     public:
-        ImGuiModule(Application& application);
+        ImGuiSubsystem(Application& application);
 
     protected:
         void OnInitialize() override;

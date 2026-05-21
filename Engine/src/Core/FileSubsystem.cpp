@@ -1,16 +1,16 @@
-#include "Core/FileSystemModule.h"
+#include "Core/FileSubsystem.h"
 #include "Core/Assert.h"
 #include <filesystem>
 
 namespace axiom
 {
-    FileSystemModule::FileSystemModule(Application& application)
-    :ApplicationModule(application)
+    FileSubsystem::FileSubsystem(Application& application)
+    :ApplicationSubsystem(application)
     {
 
     };
 
-    void FileSystemModule::Mount(const String& virtualPath, const Path& physicalPath)
+    void FileSubsystem::Mount(const String& virtualPath, const Path& physicalPath)
     {
         AX_ASSERT(!virtualPath.empty(), "Mount point name is empty");
         AX_ASSERT(std::filesystem::exists(physicalPath), "Physical path does not exist");
@@ -18,14 +18,14 @@ namespace axiom
         m_mountPoints[virtualPathLowerCase] = physicalPath;
     }
 
-    bool FileSystemModule::MountExists(const String& mountPoint) const
+    bool FileSubsystem::MountExists(const String& mountPoint) const
     {
         String mountPointLowerCase = ToLower(mountPoint);
         auto it = m_mountPoints.find(mountPointLowerCase);
         return it != m_mountPoints.end();
     }
 
-    Path FileSystemModule::Resolve(const String& virtualPath) const
+    Path FileSubsystem::Resolve(const String& virtualPath) const
     {
         String virtualPathLowerCase = ToLower(virtualPath);
 
@@ -41,13 +41,13 @@ namespace axiom
         return it->second / relativePath;
     }
 
-    void FileSystemModule::OnInitialize()
+    void FileSubsystem::OnInitialize()
     {
         AX_ASSERT(MountExists("engine"), "Engine folder not mount.");
         AX_ASSERT(MountExists("project"), "Project folder not mount.");
     }
 
-    String FileSystemModule::ToLower(const String& str) const
+    String FileSubsystem::ToLower(const String& str) const
     {
         String result = str;
         std::transform(result.begin(), result.end(), result.begin(),

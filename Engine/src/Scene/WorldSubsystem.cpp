@@ -1,9 +1,8 @@
-#include "Scene/SceneModule.h"
-#include "SceneModule.h"
+#include "Scene/WorldSubsystem.h"
 #include "Core/Assert.h"
-#include "Resources/ResourceModule.h"
-#include "Renderer/RenderModule.h"
-#include "Core/FileSystemModule.h"
+#include "Resources/ResourceSubsystem.h"
+#include "Renderer/RenderSubsystem.h"
+#include "Core/FileSubsystem.h"
 #include "nlohmann/json.hpp"
 
 #include "Scene/Component.h"
@@ -15,7 +14,7 @@
 
 namespace axiom
 {
-    SceneLoader::SceneLoader(Scene& scene, ResourceModule& resourceModule, RenderModule& renderModule, FileSystemModule& fileSystemModule)
+    SceneLoader::SceneLoader(Scene& scene, ResourceSubsystem& resourceModule, RenderSubsystem& renderModule, FileSubsystem& fileSystemModule)
     : m_scene(scene)
     , m_resourceModule(resourceModule)
     , m_renderModule(renderModule)
@@ -52,55 +51,55 @@ namespace axiom
         }
     }
 
-    SceneModule::SceneModule(Application& application)
-    : ApplicationModule(application)
+    WorldSubsystem::WorldSubsystem(Application& application)
+    : ApplicationSubsystem(application)
     {
         m_activeScene = MakeUnique<Scene>("Scene");
     }
 
-    Scene& SceneModule::GetActiveScene() const
+    Scene& WorldSubsystem::GetActiveScene() const
     {
         AX_ASSERT(m_activeScene, "Scene cannot be null!");
         return *m_activeScene.get();
     }
 
-    void SceneModule::OnRegister()
+    void WorldSubsystem::OnRegister()
     {
         m_activeScene->Register();
     }
 
-    void SceneModule::OnInitialize()
+    void WorldSubsystem::OnInitialize()
     {
-        ResourceModule& resources = GetModule<ResourceModule>();
-        RenderModule& render = GetModule<RenderModule>();
-        FileSystemModule& fileSystemModule = GetModule<FileSystemModule>();
+        ResourceSubsystem& resources = GetSubsystem<ResourceSubsystem>();
+        RenderSubsystem& render = GetSubsystem<RenderSubsystem>();
+        FileSubsystem& fileSystemModule = GetSubsystem<FileSubsystem>();
 
         m_sceneLoader = MakeUnique<SceneLoader>(*m_activeScene, resources, render, fileSystemModule);
 
         m_activeScene->Initialize();
     }
 
-    void SceneModule::OnShutdown()
+    void WorldSubsystem::OnShutdown()
     {
         m_activeScene->Shutdown();
     }
 
-    void SceneModule::OnUpdate(float deltaTime)
+    void WorldSubsystem::OnUpdate(float deltaTime)
     {
         m_activeScene->Update(deltaTime);
     }
 
-    void SceneModule::OnBeginFrame()
+    void WorldSubsystem::OnBeginFrame()
     {
         m_activeScene->BeginFrame();
     }
 
-    void SceneModule::OnRender()
+    void WorldSubsystem::OnRender()
     {
         m_activeScene->Render();
     }
 
-    void SceneModule::OnEndFrame()
+    void WorldSubsystem::OnEndFrame()
     {
         m_activeScene->EndFrame();
     }

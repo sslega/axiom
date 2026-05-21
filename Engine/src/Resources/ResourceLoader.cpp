@@ -1,12 +1,12 @@
 #include "Resources/ResourceLoader.h"
 #include "Core/Assert.h"
-#include "Core/FileSystemModule.h"
+#include "Core/FileSubsystem.h"
 #include "Resource.h"
 
 namespace axiom
 {
 
-    ResourceLoader::ResourceLoader(const ResourceModule& resourceModule)
+    ResourceLoader::ResourceLoader(const ResourceSubsystem& resourceModule)
     : m_resourceModule(resourceModule)
     {
     }

@@ -1,14 +1,14 @@
 #include "Core/Application.h"
 #include "Platform/ApplicationWindow.h"
-#include "Renderer/RenderModule.h"
-#include "Resources/ResourceModule.h"
+#include "Renderer/RenderSubsystem.h"
+#include "Resources/ResourceSubsystem.h"
 #include "Resources/GLShaderLoader.h"
 #include "Resources/Texture2DLoader.h"
 #include "Resources/OBJLoader.h"
 #include "Resources/MaterialLoader.h"
-#include "Core/FileSystemModule.h"
-#include "Scene/SceneModule.h"
-#include "ImGui/ImGuiModule.h"
+#include "Core/FileSubsystem.h"
+#include "Scene/WorldSubsystem.h"
+#include "ImGui/ImGuiSubsystem.h"
 #include "Input/Input.h"
 #include "Core/Log.h"
 #include <imgui.h>
@@ -54,9 +54,9 @@ namespace axiom
         Log::Info("Starting Axiom Application...");
 
         RegisterComponentFactories();
-        RegisterModules();
+        RegisterSubsystems();
         OnRegisterModules();
-        InitializeModules();
+        InitializeSubsystems();
         OnInitializeModules();
 
         OnApplicationRun();
@@ -68,7 +68,7 @@ namespace axiom
             Render();
         }
 
-        ShutdownModules();
+        ShutdownSubsystems();
         m_applicationWindow->CloseWindow();
 
         return 0;
@@ -88,9 +88,9 @@ namespace axiom
 
         m_applicationWindow->Update();
 
-        for (auto& id : m_moduleOrder)
+        for (auto& id : m_subsystemOrder)
         {
-            m_engineModules[id]->Update(deltaTime);
+            m_applicationSubsystems[id]->Update(deltaTime);
         }
         OnUpdate(deltaTime);
     }
@@ -99,23 +99,23 @@ namespace axiom
     {
         OnBeginFrame();
 
-        for (auto& id : m_moduleOrder)
+        for (auto& id : m_subsystemOrder)
         {
-            m_engineModules[id]->BeginFrame();
+            m_applicationSubsystems[id]->BeginFrame();
         }
         
         OnRender();
 
-        for (auto& id : m_moduleOrder)
+        for (auto& id : m_subsystemOrder)
         {
-            m_engineModules[id]->Render();
+            m_applicationSubsystems[id]->Render();
         }
         
         OnEndFrame();
 
-        for (auto& id : m_moduleOrder)
+        for (auto& id : m_subsystemOrder)
         {
-            m_engineModules[id]->EndFrame();
+            m_applicationSubsystems[id]->EndFrame();
         }
     }
 
@@ -123,39 +123,39 @@ namespace axiom
     {
     }
 
-    void Application::RegisterModules()
+    void Application::RegisterSubsystems()
     {
-        fileSystemModule = RegisterModule<FileSystemModule>();
+        fileSubsystem = RegisterSubsystem<FileSubsystem>();
         
-        resourceModule = RegisterModule<ResourceModule>();
-        resourceModule->RegisterLoader<GLShaderLoader>(".glsl");
-        resourceModule->RegisterLoader<Texture2DLoader>(".png");
-        resourceModule->RegisterLoader<Texture2DLoader>(".jpg");
-        resourceModule->RegisterLoader<OBJLoader>(".obj");
+        resourceSubsystem = RegisterSubsystem<ResourceSubsystem>();
+        resourceSubsystem->RegisterLoader<GLShaderLoader>(".glsl");
+        resourceSubsystem->RegisterLoader<Texture2DLoader>(".png");
+        resourceSubsystem->RegisterLoader<Texture2DLoader>(".jpg");
+        resourceSubsystem->RegisterLoader<OBJLoader>(".obj");
 
-        sceneModule = RegisterModule<SceneModule>();
-        renderModule = RegisterModule<RenderModule>();
-        resourceModule->RegisterLoader<MaterialLoader>(".mat", *renderModule);
-        imGuiModule = RegisterModule<ImGuiModule>();
+        worldSubsystem = RegisterSubsystem<WorldSubsystem>();
+        renderSubsystem = RegisterSubsystem<RenderSubsystem>();
+        resourceSubsystem->RegisterLoader<MaterialLoader>(".mat", *renderSubsystem);
+        imGuiSubsystem = RegisterSubsystem<ImGuiSubsystem>();
     }
 
-    void Application::InitializeModules()
+    void Application::InitializeSubsystems()
     {
         Log::Info("Initializing engine modules...");
-        for (auto& id : m_moduleOrder)
+        for (auto& id : m_subsystemOrder)
         {
             Log::Info("Initializing module: {}", id.name());
-            m_engineModules[id]->Initialize();
+            m_applicationSubsystems[id]->Initialize();
         }
     }
 
-    void Application::ShutdownModules()
+    void Application::ShutdownSubsystems()
     {
         Log::Info("Shutting down engine modules...");
-        for (auto it = m_moduleOrder.rbegin(); it != m_moduleOrder.rend(); ++it)
+        for (auto it = m_subsystemOrder.rbegin(); it != m_subsystemOrder.rend(); ++it)
         {
             Log::Info("Shutting down module: {}", it->name());
-            m_engineModules[*it]->Shutdown();
+            m_applicationSubsystems[*it]->Shutdown();
         }
     }
 

@@ -5,7 +5,7 @@
 
 namespace axiom
 {
-    Texture2DLoader::Texture2DLoader(const ResourceModule &resourceModule)
+    Texture2DLoader::Texture2DLoader(const ResourceSubsystem &resourceModule)
     : ResourceLoader(resourceModule)
     {
     }

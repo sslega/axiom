@@ -62,7 +62,7 @@ namespace axiom
         ar.Write("lookSensitivity", lookSensitivity);
     }
 
-    void CameraController::OnInitialize()
+    void CameraController::FileSubsystem()
     {
         m_transformComponent = GetEntity().GetComponent<TransformComponent>();
         AX_ASSERT(m_transformComponent, "TransformComponent required!");

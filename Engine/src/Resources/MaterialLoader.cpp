@@ -1,13 +1,13 @@
 #include "Resources/MaterialLoader.h"
 #include "Resources/MaterialResource.h"
-#include "Renderer/RenderModule.h"
+#include "Renderer/RenderSubsystem.h"
 #include "Renderer/Shader.h"
 #include "nlohmann/json.hpp"
 #include "Math/Vector.h"
 
 namespace axiom
 {
-    MaterialLoader::MaterialLoader(const ResourceModule& resourceModule, RenderModule& renderModule)
+    MaterialLoader::MaterialLoader(const ResourceSubsystem& resourceModule, RenderSubsystem& renderModule)
     : ResourceLoader(resourceModule)
     , m_renderModule(renderModule)
     {

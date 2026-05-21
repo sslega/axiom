@@ -6,7 +6,7 @@ namespace axiom
     class OBJLoader : public ResourceLoader
     {
     public:
-        OBJLoader(const ResourceModule& resourceModule);
+        OBJLoader(const ResourceSubsystem& resourceModule);
     
     protected:
         SharedPtr<Resource> CreateResource(const FileData& fileData) override;

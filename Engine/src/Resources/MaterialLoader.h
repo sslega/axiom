@@ -3,15 +3,15 @@
 
 namespace axiom
 {
-    class RenderModule;
+    class RenderSubsystem;
 
     class MaterialLoader : public ResourceLoader
     {
     public:
-        MaterialLoader(const ResourceModule& resourceModule, RenderModule& renderModule);
+        MaterialLoader(const ResourceSubsystem& resourceModule, RenderSubsystem& renderModule);
     protected:
         SharedPtr<Resource> CreateResource(const FileData& fileData) override;
     private:
-        RenderModule& m_renderModule;
+        RenderSubsystem& m_renderModule;
     };
 }

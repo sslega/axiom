@@ -1,11 +1,10 @@
-#include "Renderer/RenderModule.h"
+#include "RenderSubsystem.h"
 #include "Core/Application.h"
 #include "Renderer/Buffer.h"
 #include "Renderer/Shader.h"
 #include "Resources/MaterialResource.h"
-#include "RenderModule.h"
-#include "Resources/ResourceModule.h"
-#include "Scene/SceneModule.h"
+#include "Resources/ResourceSubsystem.h"
+#include "Scene/WorldSubsystem.h"
 #include "Renderer/CameraComponent.h"
 #include "Renderer/MeshComponent.h"
 #include "Scene/TransformComponent.h"
@@ -18,12 +17,12 @@
 
 namespace axiom
 {
-    RenderModule::RenderModule(Application& application)
-    : ApplicationModule(application)
+    RenderSubsystem::RenderSubsystem(Application& application)
+    : ApplicationSubsystem(application)
     {
     }
 
-    void RenderModule::OnInitialize()
+    void RenderSubsystem::OnInitialize()
     {
         auto API = GetRenderAPI();
         auto& window = GetApp().GetApplicationWindow();
@@ -41,29 +40,29 @@ namespace axiom
         m_debugDrawMaterial = GetMaterial("engine://Shaders/DebugDraw.glsl");
     }
 
-    void RenderModule::OnShutdown()
+    void RenderSubsystem::OnShutdown()
     {
     }
 
-    void RenderModule::OnUpdate(float deltaTime)
+    void RenderSubsystem::OnUpdate(float deltaTime)
     {
     }
 
-    void RenderModule::OnBeginFrame()
+    void RenderSubsystem::OnBeginFrame()
     {
         ResetDebugDrawCounters();
         BeginScene();
     }
 
-    void RenderModule::OnRender()
+    void RenderSubsystem::OnRender()
     {    
         auto now = std::chrono::steady_clock::now();
         m_dt = std::chrono::duration<float>(now - m_lastRenderTime).count();
         m_lastRenderTime = now;
 
-        SceneModule& sceneModule = GetModule<SceneModule>();
+        WorldSubsystem& worldSubsystem = GetSubsystem<WorldSubsystem>();
 
-        Scene& scene = sceneModule.GetActiveScene();
+        Scene& scene = worldSubsystem.GetActiveScene();
         auto meshComponents = scene.GetComponents<MeshComponent>();
 
         Vector<RenderCommand> renderCommands;
@@ -153,23 +152,23 @@ namespace axiom
 
     }
 
-    void RenderModule::OnEndFrame()
+    void RenderSubsystem::OnEndFrame()
     {
         EndScene(); 
     }
 
-    GraphicsDevice& RenderModule::GetGraphicsDevice() const
+    GraphicsDevice& RenderSubsystem::GetGraphicsDevice() const
     {
         return *m_graphicsDevice;
     }
 
-    void RenderModule::BeginScene()
+    void RenderSubsystem::BeginScene()
     {
         m_frameBuffer->Bind();
 
-        SceneModule& sceneModule = GetModule<SceneModule>();
+        WorldSubsystem& worldSubsystem = GetSubsystem<WorldSubsystem>();
 
-        Scene& scene = sceneModule.GetActiveScene();
+        Scene& scene = worldSubsystem.GetActiveScene();
         Vector<CameraComponent*> cameras = scene.GetComponents<CameraComponent>();
 
         AX_ASSERT(!cameras.empty(), "No active Camera!");
@@ -184,12 +183,12 @@ namespace axiom
         m_graphicsDevice->Clear();
     }
 
-    void RenderModule::EndScene()
+    void RenderSubsystem::EndScene()
     {
         m_graphicsDevice->SwapBuffers();
     }
 
-    void RenderModule::OnGUI()
+    void RenderSubsystem::OnGUI()
     {
         uint8 fps = static_cast<uint8>(1.0f / m_dt);
 
@@ -210,7 +209,7 @@ namespace axiom
         ImGui::End();
     }
 
-    void RenderModule::Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<MaterialResource>& material, const Matrix4& transform)
+    void RenderSubsystem::Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<MaterialResource>& material, const Matrix4& transform)
     {
         auto& m = m_debugDrawMode > 0 ? m_debugDrawMaterial : material;
         m->SetUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
@@ -222,7 +221,7 @@ namespace axiom
         m_callCount++;
     }
 
-    void RenderModule::Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Shader>& shader, const Matrix4& transform)
+    void RenderSubsystem::Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Shader>& shader, const Matrix4& transform)
     {
         shader->Bind();
         shader->UploadUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
@@ -231,12 +230,12 @@ namespace axiom
         m_callCount++;
     }
 
-    SharedPtr<MaterialResource> RenderModule::GetMaterial(const String path)
+    SharedPtr<MaterialResource> RenderSubsystem::GetMaterial(const String path)
     {
         return MakeShared<MaterialResource>(GetShader(path));
     }
 
-    SharedPtr<Shader> RenderModule::GetShader(const String path)
+    SharedPtr<Shader> RenderSubsystem::GetShader(const String path)
     {
         auto it = m_shaderCache.find(path);
         if(it == m_shaderCache.end())
@@ -254,13 +253,13 @@ namespace axiom
         return it->second;
     }
 
-    SharedPtr<Shader> RenderModule::CreateShader(const String path)
+    SharedPtr<Shader> RenderSubsystem::CreateShader(const String path)
     {
-        auto shaderResource = GetModule<ResourceModule>().Load<ShaderResource>(path);
+        auto shaderResource = GetSubsystem<ResourceSubsystem>().Load<ShaderResource>(path);
         return GetGraphicsDevice().CreateShader(*shaderResource);
     }
 
-    RenderModule::MeshBuffers RenderModule::GetOrCreateBuffers(const SharedPtr<MeshResource> &mesh)
+    RenderSubsystem::MeshBuffers RenderSubsystem::GetOrCreateBuffers(const SharedPtr<MeshResource> &mesh)
     {
         auto it = m_meshCache.find(mesh.get());
         if (it != m_meshCache.end()) return it->second;
@@ -272,16 +271,16 @@ namespace axiom
         return buffers;
     }
 
-    SharedPtr<Shader> RenderModule::CreateDepthPassShader(const String path)
+    SharedPtr<Shader> RenderSubsystem::CreateDepthPassShader(const String path)
     {
-        auto shaderResource = GetModule<ResourceModule>().Load<ShaderResource>(path);
+        auto shaderResource = GetSubsystem<ResourceSubsystem>().Load<ShaderResource>(path);
         const String depthFrag = "#version 330 core\nvoid main() {}\n";
         return GetGraphicsDevice().CreateShader(shaderResource->GetVertexSource(), depthFrag);
     }
 
-    SharedPtr<Shader> RenderModule::CreateDepthPassInstancedShader(const String path)
+    SharedPtr<Shader> RenderSubsystem::CreateDepthPassInstancedShader(const String path)
     {
-        auto shaderResource = GetModule<ResourceModule>().Load<ShaderResource>(path);
+        auto shaderResource = GetSubsystem<ResourceSubsystem>().Load<ShaderResource>(path);
         const String& vertSrc = shaderResource->GetVertexSource();
         size_t newline = vertSrc.find('\n', vertSrc.find("#version"));
         String instancedVert = vertSrc.substr(0, newline + 1)
@@ -291,19 +290,19 @@ namespace axiom
         return GetGraphicsDevice().CreateShader(instancedVert, depthFrag);
     }
 
-    SharedPtr<Shader> RenderModule::GetOrCreateDepthPassShader(const SharedPtr<Shader> &shader)
+    SharedPtr<Shader> RenderSubsystem::GetOrCreateDepthPassShader(const SharedPtr<Shader> &shader)
     {
         auto it = m_depthPassShaderCache.find(shader.get());
         return it != m_depthPassShaderCache.end() ? it->second : nullptr;
     }
 
-    SharedPtr<Shader> RenderModule::GetOrCreateDepthPassInstancedShader(const SharedPtr<Shader> &shader)
+    SharedPtr<Shader> RenderSubsystem::GetOrCreateDepthPassInstancedShader(const SharedPtr<Shader> &shader)
     {
         auto it = m_depthPassInstancedShaderCache.find(shader.get());
         return it != m_depthPassInstancedShaderCache.end() ? it->second : nullptr;
     }
 
-    void RenderModule::SubmitInstanced(const MeshBuffers& buffers, const SharedPtr<MaterialResource>& material, const Vector<Matrix4>& transforms)
+    void RenderSubsystem::SubmitInstanced(const MeshBuffers& buffers, const SharedPtr<MaterialResource>& material, const Vector<Matrix4>& transforms)
     {
         auto& m = m_debugDrawMode > 0 ? m_debugDrawMaterial : material;
 
@@ -349,7 +348,7 @@ namespace axiom
         m_instanceObjectCount += transforms.size();
     }
 
-    void RenderModule::SubmitInstanced(const MeshBuffers& buffers, const SharedPtr<Shader>& instancedShader, const Vector<Matrix4>& transforms)
+    void RenderSubsystem::SubmitInstanced(const MeshBuffers& buffers, const SharedPtr<Shader>& instancedShader, const Vector<Matrix4>& transforms)
     {
         uint32 byteSize = static_cast<uint32>(transforms.size() * sizeof(Matrix4));
         auto cacheKey = std::make_pair(buffers.vb.get(), instancedShader.get());
@@ -376,7 +375,7 @@ namespace axiom
         m_instanceObjectCount += transforms.size();
     }
 
-    void RenderModule::SubmitBatched(const SharedPtr<MaterialResource>& material, const Vector<RenderCommand>& commands)
+    void RenderSubsystem::SubmitBatched(const SharedPtr<MaterialResource>& material, const Vector<RenderCommand>& commands)
     {
         Vector<Vertex> vertices;
         Vector<uint32> indices;
@@ -435,7 +434,7 @@ namespace axiom
         m_batchObjectCount += commands.size();
     }
 
-    void RenderModule::ResetDebugDrawCounters()
+    void RenderSubsystem::ResetDebugDrawCounters()
     {
         m_callCount = 0;
         m_instanceCallCount = 0;
@@ -444,7 +443,7 @@ namespace axiom
         m_batchObjectCount = 0;
     }
 
-    void RenderModule::RenderToScreen()
+    void RenderSubsystem::RenderToScreen()
     {
         m_frameBuffer->Unbind();
         m_graphicsDevice->SetDepthTestEnabled(false);
@@ -457,7 +456,7 @@ namespace axiom
         m_graphicsDevice->SetDepthTestEnabled(true);
     }
 
-    GraphicsDevice::API RenderModule::GetRenderAPI() const
+    GraphicsDevice::API RenderSubsystem::GetRenderAPI() const
     {
         return GetApp().GetRenderAPI();
     }

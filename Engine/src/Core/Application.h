@@ -3,7 +3,7 @@
 #include "Core/Types.h"
 #include "Core/Assert.h"
 #include "Application.h"
-#include "ApplicationModule.h"
+#include "ApplicationSubsystem.h"
 #include "Platform/ApplicationWindow.h"
 #include "Renderer/RenderTypes.h"
 #include "Renderer/GraphicsDevice.h"
@@ -19,11 +19,11 @@ namespace axiom
 {
     class Input;
     class Log;
-    class FileSystemModule;
-    class ResourceModule;
-    class SceneModule;
-    class RenderModule;
-    class ImGuiModule;
+    class FileSubsystem;
+    class ResourceSubsystem;
+    class WorldSubsystem;
+    class RenderSubsystem;
+    class ImGuiSubsystem;
 
 
     struct AppConfig
@@ -51,42 +51,42 @@ namespace axiom
         static inline Application& Get() { return *s_current; }
 
         template <typename T>
-        T& GetModule()
+        T& GetSubsystem()
         {
-            auto it = m_engineModules.find(TypeID<T>());
-            AX_ASSERT(it != m_engineModules.end(), "Module not registered");
+            auto it = m_applicationSubsystems.find(TypeID<T>());
+            AX_ASSERT(it != m_applicationSubsystems.end(), "Module not registered");
             return *reinterpret_cast<T*>(it->second.get());
         }
 
         template <typename T>
-        const T& GetModule() const
+        const T& GetSubsystem() const
         {
-            auto it = m_engineModules.find(TypeID<T>());
-            AX_ASSERT(it != m_engineModules.end(), "Module not registered");
+            auto it = m_applicationSubsystems.find(TypeID<T>());
+            AX_ASSERT(it != m_applicationSubsystems.end(), "Module not registered");
             return *reinterpret_cast<const T*>(it->second.get());
         }
 
         template <typename T>
-        bool HasModule() const
+        bool HasSubsystem() const
         {
-            return m_engineModules.find(TypeID<T>()) != m_engineModules.end();
+            return m_applicationSubsystems.find(TypeID<T>()) != m_applicationSubsystems.end();
         }
 
     protected:
         
         AppConfig m_appConfig;
         UniquePtr<ApplicationWindow> m_applicationWindow;
-        TypeMap<UniquePtr<ApplicationModule>> m_engineModules;
-        Vector<std::type_index> m_moduleOrder; // tracks registration order
+        TypeMap<UniquePtr<ApplicationSubsystem>> m_applicationSubsystems;
+        Vector<std::type_index> m_subsystemOrder; // tracks registration order
 
         UniquePtr<Input> m_input;
         UniquePtr<Log> m_log;
 
-        FileSystemModule* fileSystemModule = nullptr;
-        ResourceModule* resourceModule = nullptr;
-        SceneModule* sceneModule = nullptr;
-        RenderModule* renderModule = nullptr;
-        ImGuiModule* imGuiModule = nullptr;
+        FileSubsystem* fileSubsystem = nullptr;
+        ResourceSubsystem* resourceSubsystem = nullptr;
+        WorldSubsystem* worldSubsystem = nullptr;
+        RenderSubsystem* renderSubsystem = nullptr;
+        ImGuiSubsystem* imGuiSubsystem = nullptr;
 
         // User override hooks — override these in your Application subclass
         virtual void OnApplicationRun() {}
@@ -98,29 +98,29 @@ namespace axiom
         virtual void OnInitializeModules() {}
 
         template <typename T>
-        T* RegisterModule()
+        T* RegisterSubsystem()
         {
-            Log::Info("Registering module: {}", typeid(T).name());
+            Log::Info("Registering subsystem: {}", typeid(T).name());
             UniquePtr<T> module = MakeUnique<T>(*this);
             T* ptr = module.get();
             std::type_index id = TypeID<T>();
-            m_engineModules[id] = std::move(module);
-            m_moduleOrder.push_back(id);
+            m_applicationSubsystems[id] = std::move(module);
+            m_subsystemOrder.push_back(id);
             ptr->Register();
             return ptr;
         }
 
         template <typename T>
-        void UnregisterModule()
+        void UnregisterSubsystem()
         {
             std::type_index id = TypeID<T>();
-            auto it = m_engineModules.find(id);
-            if (it != m_engineModules.end())
+            auto it = m_applicationSubsystems.find(id);
+            if (it != m_applicationSubsystems.end())
                 it->second->Unregister();
-            m_engineModules.erase(id);
-            m_moduleOrder.erase(
-                std::remove(m_moduleOrder.begin(), m_moduleOrder.end(), id),
-                m_moduleOrder.end()
+            m_applicationSubsystems.erase(id);
+            m_subsystemOrder.erase(
+                std::remove(m_subsystemOrder.begin(), m_subsystemOrder.end(), id),
+                m_subsystemOrder.end()
             );
         }
 
@@ -129,9 +129,9 @@ namespace axiom
         void PoolEvents();
         void Update();
         void Render();
-        void RegisterModules();
-        void InitializeModules();
-        void ShutdownModules();
+        void RegisterSubsystems();
+        void InitializeSubsystems();
+        void ShutdownSubsystems();
         virtual void RegisterComponentFactories();
 
         inline static Application& GetCurrent() {

@@ -7,7 +7,7 @@
 
 namespace axiom
 {
-    class ResourceModule;
+    class ResourceSubsystem;
 
     class Archive
     {

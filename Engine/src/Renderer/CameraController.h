@@ -19,7 +19,7 @@ namespace axiom
         
     protected:
         TransformComponent* m_transformComponent;
-        virtual void OnInitialize() override;
+        virtual void FileSubsystem() override;
     
     private:
         Vec2 m_lastMouse = {0, 0};

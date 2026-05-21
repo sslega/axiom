@@ -1,13 +1,13 @@
 #include "Resources/GLShaderLoader.h"
 #include "Resources/ShaderResource.h"
-#include "Resources/ResourceModule.h"
+#include "Resources/ResourceSubsystem.h"
 #include "Resources/Resource.h"
 #include "Core/Types.h"
 #include "Core/Assert.h"
 
 namespace axiom
 {
-    GLShaderLoader::GLShaderLoader(const ResourceModule& resourceModule)
+    GLShaderLoader::GLShaderLoader(const ResourceSubsystem& resourceModule)
     : ResourceLoader(resourceModule)
     {
     }

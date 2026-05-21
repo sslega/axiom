@@ -2,7 +2,7 @@
 
 // Core
 #include "Core/Application.h"
-#include "Core/ApplicationModule.h"
+#include "Core/ApplicationSubsystem.h"
 #include "Core/Types.h"
 #include "Core/Log.h"
 
@@ -18,11 +18,11 @@
 // Rendering
 #include "Renderer/GraphicsDevice.h"
 #include "Renderer/Camera.h"
-#include "Renderer/RenderModule.h"
+#include "Renderer/RenderSubsystem.h"
 #include "Renderer/MeshComponent.h"
 
 // Scene
-#include "Scene/SceneModule.h"
+#include "Scene/WorldSubsystem.h"
 #include "Scene/Scene.h"
 #include "Scene/TransformComponent.h"
 
@@ -32,10 +32,10 @@
 #include "Math/Matrix4.h"
 
 // File system
-#include "Core/FileSystemModule.h"
+#include "Core/FileSubsystem.h"
 
 // Resources
-#include "Resources/ResourceModule.h"
+#include "Resources/ResourceSubsystem.h"
 
 // ImGui
 #include <imgui.h>

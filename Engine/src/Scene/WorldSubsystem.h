@@ -1,6 +1,6 @@
 #pragma once
 #include "Core/Application.h"
-#include "Core/ApplicationModule.h"
+#include "Core/ApplicationSubsystem.h"
 #include "Core/Types.h"
 #include "Scene/Scene.h"
 #include "Scene/Entity.h"
@@ -8,15 +8,15 @@
 
 namespace axiom
 {
-    class ResourceModule;
-    class RenderModule;
+    class ResourceSubsystem;
+    class RenderSubsystem;
 
     // using ComponentFactory = std::function<void(Entity&, const nlohmann::json&)>;
 
     class SceneLoader
     {
     public:
-        SceneLoader(Scene& scene, ResourceModule& resourceModule, RenderModule& renderModule, FileSystemModule& fileSystemModule);
+        SceneLoader(Scene& scene, ResourceSubsystem& resourceModule, RenderSubsystem& renderModule, FileSubsystem& fileSystemModule);
 
         void Load(const String& path);
 
@@ -27,23 +27,23 @@ namespace axiom
         //         e.CreateComponent<T>().Load(j);
         //     };
         // }
-    
+
     private:
         Scene& m_scene;
-        ResourceModule& m_resourceModule;
-        RenderModule& m_renderModule;
-        FileSystemModule& m_fileSystemModule;
+        ResourceSubsystem& m_resourceModule;
+        RenderSubsystem& m_renderModule;
+        FileSubsystem& m_fileSystemModule;
         // StringMap<ComponentFactory> m_factories;
     };
 
-    class SceneModule: public ApplicationModule
+    class WorldSubsystem : public ApplicationSubsystem
     {
     public:
-        SceneModule(Application& application);
+        WorldSubsystem(Application& application);
 
         Scene& GetActiveScene() const;
         inline void LoadScene(const String& path) { m_sceneLoader->Load(path); }
-    
+
     protected:
         virtual void OnRegister()  override;
         virtual void OnInitialize() override;

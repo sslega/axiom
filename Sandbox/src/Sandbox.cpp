@@ -41,14 +41,14 @@ Sandbox::Sandbox(AppConfig appConfig)
 
 void Sandbox::OnRegisterModules()
 {
-    FileSystemModule& fileSystemModule = GetModule<FileSystemModule>();
+    FileSubsystem& fileSystemModule = GetSubsystem<FileSubsystem>();
     fileSystemModule.Mount("Engine", AX_ENGINE_DIR);
     fileSystemModule.Mount("Project", AX_PROJECT_DIR);
 }
 
 void Sandbox::OnApplicationRun()
 {
-    sceneModule->LoadScene("project://Scenes/main.scene.json");
+    worldSubsystem->LoadScene("project://Scenes/main.scene.json");
 
     GetApplicationWindow().AddEventListener(&Sandbox::OnResize, this);
 }
@@ -83,9 +83,9 @@ void Sandbox::OnRender()
     ImGui::End();
 
 
-    renderModule->SetDebugDrawMode(m_debugDrawMode);
-    renderModule->SetBatchingEnabled(m_batchingEnabled);
-    renderModule->SetInstancingEnabled(m_instancingEnabled);
+    renderSubsystem->SetDebugDrawMode(m_debugDrawMode);
+    renderSubsystem->SetBatchingEnabled(m_batchingEnabled);
+    renderSubsystem->SetInstancingEnabled(m_instancingEnabled);
 }
 
 void Sandbox::OnUpdate(float deltaTime)
