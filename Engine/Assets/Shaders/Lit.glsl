@@ -12,6 +12,8 @@ void VertexShader(inout VertexInput input)
 #ifdef HAS_DIRECTIONAL_LIGHT 
 uniform vec3  u_LightDir;
 uniform vec3  u_LightColor;
+uniform sampler2D u_ShadowMap;
+uniform mat4 u_LightViewProjection;
 #endif
 uniform vec3  u_CameraPos;
 uniform float u_Roughness;
@@ -25,7 +27,13 @@ void FragmentShader(in VertexInput input, out FragmentInput output)
     vec3  Albedo    = vec3(0.8, 0.8, 0.8);
     float Shininess = 1.0 - u_Roughness;
 
-    output.Color = CalculateLight(N, L, V, u_LightColor, Albedo, Shininess);
+    vec3 lightSpaceNDC = (u_LightViewProjection * vec4(input.WorldPosition, 1.0)).xyz;
+    vec3 texCoords = (lightSpaceNDC * 0.5 + 0.5);
+    vec4 shadowSample = texture(u_ShadowMap, texCoords.xy);
+    float bias = 0.005;
+    float shadowFactor = texCoords.z > shadowSample.r + bias ? 0.0 : 1.0;
+    
+    output.Color = shadowFactor * CalculateLight(N, L, V, u_LightColor, Albedo, Shininess);
 #else
     output.Color = vec3(0.8, 0.8, 0.8);
 #endif

@@ -40,6 +40,7 @@ namespace axiom
 
         virtual SharedPtr<FrameBuffer> CreateFrameBuffer(const FramebufferSpec& spec) const override;
         virtual void BindFrameBufferTexture(FrameBuffer& frameBuffer, uint32 slot) override;
+        virtual void SetViewport(uint32 x, uint32 y, uint32 width, uint32 height) override;
         
         virtual void SetDepthTestEnabled(bool enabled) override;
         virtual void SetColorWriteEnabled(bool enabled) override;

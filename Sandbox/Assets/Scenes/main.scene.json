@@ -38,7 +38,7 @@
         {
           "type": "MeshComponent",
           "mesh": "project://Meshes/bunny.obj",
-          "material": "engine://Materials/lit.mat"
+          "material": "engine://Materials/Lit.mat"
         }
       ]
     },
@@ -54,7 +54,7 @@
         {
           "type": "MeshComponent",
           "mesh": "engine://Meshes/sphere.obj",
-          "material": "engine://Materials/lit.mat"
+          "material": "engine://Materials/Lit.mat"
         }
       ]
     },
@@ -70,7 +70,7 @@
         {
           "type": "MeshComponent",
           "mesh": "engine://Meshes/cube.obj",
-          "material": "engine://Materials/lit.mat"
+          "material": "engine://Materials/Lit.mat"
         }
       ]
     },
@@ -86,7 +86,7 @@
         {
           "type": "MeshComponent",
           "mesh": "engine://Meshes/plane.obj",
-          "material": "engine://Materials/lit.mat"
+          "material": "engine://Materials/Lit.mat"
         }
       ]
     },

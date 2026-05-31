@@ -29,10 +29,6 @@ protected:
 private:
     CameraComponent* m_cameraComponent;
 
-    Vec3 m_lightColor;
-    Vec3 m_lightDirection;
-    float m_roughness = 0.5f;
-
     bool m_batchingEnabled = true;
     bool m_instancingEnabled = true;
     int m_debugDrawMode = 0;

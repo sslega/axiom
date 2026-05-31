@@ -6,6 +6,7 @@ namespace axiom
     {
         uint32 width;
         uint32 height;
+        bool depthOnly {false};
     };
 
     class FrameBuffer
@@ -16,13 +17,16 @@ namespace axiom
         virtual void Unbind() = 0;
         virtual void Resize(uint32 width, uint32 height) = 0;
         virtual uint32 GetColorAttachmentID() const = 0;
+        virtual uint32 GetDepthAttachmentID() const = 0;
         virtual uint32 GetNativeHandle() const = 0;
 
         uint32 GetWidth() const { return m_width; }
         uint32 GetHeight() const { return m_height; }
+        bool IsDepthOnly() const {return m_depthOnly; }
     protected:
         uint32 m_width;
         uint32 m_height;
+        bool m_depthOnly;
     };
 }
 

@@ -6,5 +6,6 @@ namespace axiom
     {
         m_width = spec.width;
         m_height = spec.height;
+        m_depthOnly = spec.depthOnly;
     }
 }

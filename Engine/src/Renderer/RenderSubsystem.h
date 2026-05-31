@@ -7,6 +7,7 @@
 #include "Resources/ShaderResource.h"
 #include "Renderer/GraphicsDevice.h"
 #include "Renderer/Camera.h"
+#include "Renderer/View.h"
 #include "Core/Timestep.h"
 
 namespace axiom
@@ -58,9 +59,10 @@ namespace axiom
         SharedPtr<Shader> CreateShader(const String path);
 
     private:
-        struct SceneData
+        struct RenderSceneData
         {
             Matrix4 viewProjectionMatrix;
+            Matrix4 lightViewProjectionMatrix;
             
             bool hasDirectionalLight = false;
             Vec3 lightDirection;
@@ -79,8 +81,9 @@ namespace axiom
         };
 
         UniquePtr<GraphicsDevice> m_graphicsDevice;
-        SceneData m_sceneData;
         
+        RenderSceneData m_renderSceneData;
+
         StringMap<SharedPtr<Shader>> m_shaderCache;
         UnorderedMap<Shader*, SharedPtr<Shader>> m_depthPassShaderCache;
         UnorderedMap<Shader*, SharedPtr<Shader>> m_depthPassInstancedShaderCache;
@@ -116,7 +119,14 @@ namespace axiom
         SharedPtr<IndexBuffer> m_screenQuadIB;
         void RenderToScreen();
 
+        void RenderShadowPass(const Matrix4& lightProjectionMatrix, const Vector<RenderCommand>& commands);
+        void RenderScenePass(const Matrix4& viewProjectionMatrix, const Vector<RenderCommand>& commands);
+
+        Vector<View> BuildViews(Scene& scene);
+        void ExecuteView(const View& view, const Vector<RenderCommand>& commands);
+
         SharedPtr<FrameBuffer> m_frameBuffer;
+        SharedPtr<FrameBuffer> m_shadowMapFrameBuffer;
 
         uint32 m_callCount = 0;
         uint32 m_instanceCallCount = 0;

@@ -61,19 +61,6 @@ void Sandbox::OnResize(const WindowResizeEvent& event)
 
 void Sandbox::OnRender()
 {
-    // if (m_cameraTransform)
-    //     m_litMaterial->SetUniform("u_CameraPos", m_cameraTransform->position);
-
-    // m_litMaterial->SetUniform("u_LightDir",   m_lightDirection);
-    // m_litMaterial->SetUniform("u_LightColor", m_lightColor);
-    // m_litMaterial->SetUniform("u_Roughness", m_roughness);
-
-    ImGui::Begin("Material Params");
-    ImGui::ColorEdit3("Light Color", &m_lightColor.x);
-    ImGui::SliderFloat3("Light Direction", &m_lightDirection.x, 0, 1);
-    ImGui::SliderFloat("Roughness", &m_roughness, 0, 1);
-    ImGui::End();
-
     const char* debugModes[]{"None","World Normal"};
 
     ImGui::Begin("Render Settings");

@@ -14,11 +14,12 @@ namespace axiom
         virtual void Unbind() override;
         virtual void Resize(uint32 width, uint32 height) override;
         virtual uint32 GetColorAttachmentID() const override { return m_textureColorBuffer; }
+        virtual uint32 GetDepthAttachmentID() const override { return m_textureDepthBuffer;}
         virtual uint32 GetNativeHandle() const override { return m_frameBuffer; }
     
     private:
         uint32 m_frameBuffer;
         uint32 m_textureColorBuffer;
-        uint32 m_depthRenderBuffer;
+        uint32 m_textureDepthBuffer;
     };
 }

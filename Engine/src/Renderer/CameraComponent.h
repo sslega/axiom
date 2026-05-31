@@ -23,7 +23,6 @@ namespace axiom
         inline float GetFoV() const { return m_camera.GetFoV(); }
         
         inline const Matrix4& GetProjectionMatrix() const { return m_camera.GetProjectionMatrix(); }
-        static Matrix4 GetViewMatrix(Vec3 position, Vec3 rotation) { return Camera::GetViewMatrix(position, rotation); }
 
         virtual void Serialize(Archive& ar) override;
         virtual void Deserialize(Archive& ar) override;

@@ -35,7 +35,6 @@ namespace axiom
         inline float GetOrthoBottom() const { return m_orthoBottom; }
         
         inline const Matrix4& GetProjectionMatrix() const { return m_projectionMatrix; };
-        static Matrix4 GetViewMatrix(Vec3 position, Vec3 rotation);
 
     private:
         ProjectionType m_projectionType = ProjectionType::Perspective;

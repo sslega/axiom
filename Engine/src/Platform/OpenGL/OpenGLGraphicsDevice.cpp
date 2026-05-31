@@ -182,7 +182,13 @@ namespace axiom
     void OpenGLGraphicsDevice::BindFrameBufferTexture(FrameBuffer& frameBuffer, uint32 slot)
     {
         glActiveTexture(GL_TEXTURE0 + slot);
-        glBindTexture(GL_TEXTURE_2D, frameBuffer.GetColorAttachmentID());
+        uint32 textureId = frameBuffer.IsDepthOnly() ? frameBuffer.GetDepthAttachmentID() : frameBuffer.GetColorAttachmentID();
+        glBindTexture(GL_TEXTURE_2D, textureId);
+    }
+
+    void OpenGLGraphicsDevice::SetViewport(uint32 x, uint32 y, uint32 width, uint32 height)
+    {
+        glViewport(0, 0, width, height);
     }
 
     uint32 OpenGLGraphicsDevice::GetOrCreateVAO(const SharedPtr<VertexBuffer> &vertexBuffer)

@@ -32,7 +32,6 @@ namespace axiom
         static UniquePtr<GraphicsDevice> Create(GraphicsDevice::API api, const ApplicationWindow& window);
 
         // Resource creation
-        // virtual UniquePtr<GraphicsDevice> CreateGraphicsDevice() = 0;
         virtual SharedPtr<VertexBuffer> CreateVertexBuffer(float* vertices, uint32 byteSize) const = 0;
         virtual SharedPtr<VertexBuffer> CreateVertexBuffer(const MeshResource& mesh) const = 0;
         virtual SharedPtr<VertexBuffer> CreateDynamicVertexBuffer(uint32 byteSize) const = 0;
@@ -55,6 +54,7 @@ namespace axiom
         virtual void DrawIndexed(const SharedPtr<VertexBuffer>& vertexBuffer, const SharedPtr<IndexBuffer>& indexBuffer) = 0;
         virtual void DrawIndexedInstanced(const SharedPtr<VertexBuffer>& vertexBuffer, const SharedPtr<IndexBuffer>& indexBuffer, const SharedPtr<VertexBuffer>& instanceBuffer, uint32 instanceCount) = 0;
         virtual void BindFrameBufferTexture(FrameBuffer& frameBuffer, uint32 slot) = 0;
+        virtual void SetViewport(uint32 x, uint32 y, uint32 width, uint32 height) = 0;
 
         virtual void SetDepthTestEnabled(bool enabled) = 0;
         virtual void SetColorWriteEnabled(bool enabled) = 0;

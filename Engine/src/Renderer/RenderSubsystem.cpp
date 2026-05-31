@@ -34,6 +34,12 @@ namespace axiom
         fbSpec.height = window.GetHeight();
         m_frameBuffer = m_graphicsDevice->CreateFrameBuffer(fbSpec);
 
+        FramebufferSpec fbShadowSpec;
+        fbShadowSpec.width = 1024;
+        fbShadowSpec.height = 1024;
+        fbShadowSpec.depthOnly = true;
+        m_shadowMapFrameBuffer = m_graphicsDevice->CreateFrameBuffer(fbShadowSpec);
+
         Quad quad;
         m_screenQuadVB = m_graphicsDevice->CreateVertexBuffer(quad);
         m_screenQuadIB = m_graphicsDevice->CreateIndexBuffer(quad);
@@ -61,13 +67,13 @@ namespace axiom
         m_dt = std::chrono::duration<float>(now - m_lastRenderTime).count();
         m_lastRenderTime = now;
 
+        
         WorldSubsystem& worldSubsystem = GetSubsystem<WorldSubsystem>();
 
         Scene& scene = worldSubsystem.GetActiveScene();
         auto meshComponents = scene.GetComponents<MeshComponent>();
 
         Vector<RenderCommand> renderCommands;
-        // 1. Collect
         for(MeshComponent* meshComponent : meshComponents)
         {
             if (!meshComponent->IsVisible()) continue;
@@ -76,81 +82,14 @@ namespace axiom
             renderCommands.push_back({ meshComponent->GetMesh(), meshComponent->GetMaterial(), tc ? tc->GetTransform() : Matrix4::Identity() });
         }
 
-        // 2. Depth Pre-Pass
-        m_graphicsDevice->SetColorWriteEnabled(false);
-        m_graphicsDevice->SetDepthWriteEnabled(true);
-
-        UnorderedMap<MeshResource*, Vector<Matrix4>> depthGroups;
-        for (const auto& cmd : renderCommands)
-            depthGroups[cmd.mesh.get()].push_back(cmd.transform);
-
-        for (const auto& [meshPtr, transforms] : depthGroups)
+        Vector<View> views = BuildViews(scene);
+        for(auto& view : views)
         {
-            auto it = std::find_if(renderCommands.begin(), renderCommands.end(),
-                [meshPtr](const RenderCommand& c) { return c.mesh.get() == meshPtr; });
-            auto buffers = GetOrCreateBuffers(it->mesh);
-            auto& materialShader = it->material->GetShader();
-
-            if (transforms.size() > 1)
-                SubmitInstanced(buffers, GetOrCreateDepthPassInstancedShader(materialShader), transforms);
-            else
-                Submit(buffers.vb, buffers.ib, GetOrCreateDepthPassShader(materialShader), transforms[0]);
-        }
-
-        m_graphicsDevice->SetColorWriteEnabled(true);
-        m_graphicsDevice->SetDepthWriteEnabled(false);
-        m_graphicsDevice->SetDepthFunction(DepthFunction::LessEqual);
-
-        //TODO: Clean up instancing/batching toggle flags
-        // 3. Group by (mesh, material)
-        PairMap<InstanceGroupKey, Vector<Matrix4>> instanceGroups;
-        for (auto& renderCommand : renderCommands)
-        {
-            InstanceGroupKey groupKey{ renderCommand.mesh.get(), renderCommand.material.get() };
-            instanceGroups[groupKey].push_back(renderCommand.transform);
-        }
-        
-        // 4. Dispatch Intanced meshesh, collect batch candidates
-        UnorderedMap<MaterialResource*, Vector<RenderCommand>> batchCandidates;
-
-        for (auto& [key, transforms] : instanceGroups)
-        {
-            auto it = std::find_if(renderCommands.begin(), renderCommands.end(), [&](const RenderCommand& c){
-                return c.mesh.get() == key.first && c.material.get() == key.second;
-            });
-            auto buffers = GetOrCreateBuffers(it->mesh);
-            if (transforms.size() > 1 && m_instancingEnabled)
-            {
-                SubmitInstanced(buffers, it->material, transforms);
-            }
-            else
-            {
-                for(auto& t : transforms)
-                {
-                    batchCandidates[key.second].push_back({ it->mesh, it->material, t });
-                }
-            }
-        }
-
-
-        // 5. Draw batch and everything else
-        for (auto& [matPtr, cmds] : batchCandidates)
-        {
-            if (cmds.size() > 1 && m_batchingEnabled)
-                SubmitBatched(cmds[0].material, cmds);
-            else
-            {
-                for(auto& c : cmds)
-                {
-                    auto buffers = GetOrCreateBuffers(c.mesh);
-                    Submit(buffers.vb, buffers.ib, c.material, c.transform);
-                }
-            }
+            ExecuteView(view, renderCommands);
         }
 
         OnGUI();
         RenderToScreen();
-
     }
 
     void RenderSubsystem::OnEndFrame()
@@ -165,8 +104,6 @@ namespace axiom
 
     void RenderSubsystem::BeginScene()
     {
-        m_frameBuffer->Bind();
-
         WorldSubsystem& worldSubsystem = GetSubsystem<WorldSubsystem>();
 
         Scene& scene = worldSubsystem.GetActiveScene();
@@ -176,10 +113,9 @@ namespace axiom
         CameraComponent* cameraComponent = cameras[0];
         TransformComponent* cameraTransform = cameraComponent->GetEntity().GetComponent<TransformComponent>();
         cameraComponent->SetAspectRatio(GetApp().GetApplicationWindow().GetAspectRatio());
-        Matrix4 viewMatrix = cameraTransform ? Camera::GetViewMatrix(cameraTransform->position, cameraTransform->rotation) : Matrix4::Identity();
-        m_sceneData.viewProjectionMatrix = cameraComponent->GetProjectionMatrix() * viewMatrix;
-
-        m_sceneData.cameraPosition = cameraTransform->position;
+        Matrix4 viewMatrix = cameraTransform ? cameraTransform->GetViewMatrix() : Matrix4::Identity();
+        m_renderSceneData.viewProjectionMatrix = cameraComponent->GetProjectionMatrix() * viewMatrix;
+        m_renderSceneData.cameraPosition = cameraTransform->position;
         
         Vector<DirectionalLightComponent*> directionalLight = scene.GetComponents<DirectionalLightComponent>();
         if(directionalLight.size() > 1)
@@ -192,21 +128,24 @@ namespace axiom
             DirectionalLightComponent* light = directionalLight[0];
             TransformComponent* lightTransform = light->GetEntity().GetComponent<TransformComponent>();
             AX_ASSERT(lightTransform, "No TransformComponent present with DirectionalLightComponent!");
-            m_sceneData.hasDirectionalLight = true;
-            m_sceneData.lightColor = light->color * light->intensity;
-            m_sceneData.lightDirection = lightTransform->Forward();
+            m_renderSceneData.hasDirectionalLight = true;
+            m_renderSceneData.lightColor = light->color * light->intensity;
+            m_renderSceneData.lightDirection = lightTransform->Forward();
+            Vec3 shadowCameraPos = m_renderSceneData.lightDirection * 5.0f;
+            
+            Matrix4 lightProjectionMatrix = Matrix4::Ortho(-3.0f, 3.0f, -3.0f, 3.0f, 0.1f, 10.0f);
+            Matrix4 lightViewMatrix = Matrix4::LookAt(shadowCameraPos, lightTransform->position, Vec3(0, 1, 0));
+
+            m_renderSceneData.lightViewProjectionMatrix = lightProjectionMatrix * lightViewMatrix;
         }
         else
         {
-            m_sceneData.hasDirectionalLight = false;
-            m_sceneData.lightColor = Vec3(0);
-            m_sceneData.lightDirection = Vec3(1,0,0);
+            m_renderSceneData.hasDirectionalLight = false;
+            m_renderSceneData.lightColor = Vec3(0);
+            m_renderSceneData.lightDirection = Vec3(1,0,0);
+            
+            m_renderSceneData.lightViewProjectionMatrix = Matrix4::Identity();
         }
-        
-        m_graphicsDevice->SetDepthWriteEnabled(true);
-        m_graphicsDevice->SetDepthFunction(DepthFunction::Less);
-        m_graphicsDevice->SetClearColor(Vec4(0.25f, 0.25f, 0.25f, 1.0f));
-        m_graphicsDevice->Clear();
     }
 
     void RenderSubsystem::EndScene()
@@ -233,26 +172,37 @@ namespace axiom
         ImGui::Text("Batched calls: %d", GetBatchCallCount());
         ImGui::Text("Batched objects: %d", GetBatchObjectCount());
         ImGui::End();
+        
+        if(m_renderSceneData.hasDirectionalLight)
+        {
+            uint32 depthId = m_shadowMapFrameBuffer->GetDepthAttachmentID();
+            ImGui::Begin("ShadowMap");
+            ImGui::Image((ImTextureID)(uintptr_t)depthId, ImVec2(256, 256), ImVec2(0,1), ImVec2(1,0));
+            ImGui::End();
+        }
     }
 
     void RenderSubsystem::Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<MaterialResource>& material, const Matrix4& transform)
     {
 
         auto& m = m_debugDrawMode > 0 ? m_debugDrawMaterial : material;
-        m->SetUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
+        m->SetUniform("u_ViewProjection", m_renderSceneData.viewProjectionMatrix);
         m->SetUniform("u_LocalToWorld", transform);
         m->SetUniform("u_WorldToLocal", transform.Inverse());
         m->SetUniform("u_DebugMode", m_debugDrawMode);
-        if(m_sceneData.hasDirectionalLight)
+        if(m_renderSceneData.hasDirectionalLight)
         {
-            m->SetUniform("u_LightDir", m_sceneData.lightDirection);    
-            m->SetUniform("u_LightColor", m_sceneData.lightColor);
-            m->SetUniform("u_CameraPos", m_sceneData.cameraPosition);
+            m->SetUniform("u_LightDir", m_renderSceneData.lightDirection);    
+            m->SetUniform("u_LightColor", m_renderSceneData.lightColor);
+            m->SetUniform("u_CameraPos", m_renderSceneData.cameraPosition);
+            m->SetUniform("u_LightViewProjection", m_renderSceneData.lightViewProjectionMatrix);
+            m->SetUniform("u_ShadowMap", 1);  // texture slot 1
+            m_graphicsDevice->BindFrameBufferTexture(*m_shadowMapFrameBuffer, 1);
             
-            m_sceneData.defines.push_back("HAS_DIRECTIONAL_LIGHT");
+            m_renderSceneData.defines.push_back("HAS_DIRECTIONAL_LIGHT");
         }
 
-        m->Bind(m_sceneData.defines);
+        m->Bind(m_renderSceneData.defines);
         m_graphicsDevice->DrawIndexed(vb, ib);
         m_callCount++;
     }
@@ -260,7 +210,7 @@ namespace axiom
     void RenderSubsystem::Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Shader>& shader, const Matrix4& transform)
     {
         shader->Bind();
-        shader->UploadUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
+        shader->UploadUniform("u_ViewProjection", m_renderSceneData.viewProjectionMatrix);
         shader->UploadUniform("u_LocalToWorld", transform);
         m_graphicsDevice->DrawIndexed(vb, ib);
         m_callCount++;
@@ -374,9 +324,9 @@ namespace axiom
         instanceBuffer->SetData(instanceData.data(), byteSize);
 
         // Bind the INSTANCED variant — uploads all material uniforms to the correct GL program
-        m->SetUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
+        m->SetUniform("u_ViewProjection", m_renderSceneData.viewProjectionMatrix);
         m->Bind({"INSTANCED"});
-        // material->GetShader()->GetVariant({"INSTANCED"})->UploadUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
+        // material->GetShader()->GetVariant({"INSTANCED"})->UploadUniform("u_ViewProjection", m_renderSceneData.viewProjectionMatrix);
         
         m_graphicsDevice->DrawIndexedInstanced(buffers.vb, buffers.ib, instanceBuffer, static_cast<uint32>(transforms.size()));
         m_callCount++;
@@ -404,7 +354,7 @@ namespace axiom
         SharedPtr<VertexBuffer>& instanceBuffer = it->second;
         instanceBuffer->SetData(transforms.data(), byteSize);
         instancedShader->Bind();
-        instancedShader->UploadUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
+        instancedShader->UploadUniform("u_ViewProjection", m_renderSceneData.viewProjectionMatrix);
         m_graphicsDevice->DrawIndexedInstanced(buffers.vb, buffers.ib, instanceBuffer, static_cast<uint32>(transforms.size()));
         m_callCount++;
         m_instanceCallCount++;
@@ -459,9 +409,9 @@ namespace axiom
 
         Submit(vb, ib, m, Matrix4::Identity());
 
-        // m->SetUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
+        // m->SetUniform("u_ViewProjection", m_renderSceneData.viewProjectionMatrix);
         // m->Bind();
-        // m->GetShader()->UploadUniform("u_ViewProjection", m_sceneData.viewProjectionMatrix);
+        // m->GetShader()->UploadUniform("u_ViewProjection", m_renderSceneData.viewProjectionMatrix);
         // m->GetShader()->UploadUniform("u_LocalToWorld", Matrix4::Identity());
         
         // m_graphicsDevice->DrawIndexed(m_batchVBCache[key], m_batchIBCache[key]);
@@ -490,6 +440,142 @@ namespace axiom
         m_graphicsDevice->BindFrameBufferTexture(*m_frameBuffer, 0);
         m_graphicsDevice->DrawIndexed(m_screenQuadVB, m_screenQuadIB);
         m_graphicsDevice->SetDepthTestEnabled(true);
+    }
+
+    void RenderSubsystem::RenderShadowPass(const Matrix4& viewProjectionMatrix, const Vector<RenderCommand>& commands)
+    {
+        //TODO: Add batching/instancing
+        for (const auto& cmd : commands)
+        {
+            auto buffers = GetOrCreateBuffers(cmd.mesh);
+            //TODO: wrap it around Submit later on 
+            auto shader = GetOrCreateDepthPassShader(cmd.material->GetShader());
+            shader->Bind();
+            shader->UploadUniform("u_ViewProjection", viewProjectionMatrix);
+            shader->UploadUniform("u_LocalToWorld", cmd.transform);
+            m_graphicsDevice->DrawIndexed(buffers.vb, buffers.ib);
+            m_callCount++;
+        }
+    }
+
+    void RenderSubsystem::RenderScenePass(const Matrix4& viewProjectionMatrix, const Vector<RenderCommand>& commands)
+    {
+        // 2. Depth Pre-Pass
+        m_graphicsDevice->SetColorWriteEnabled(false);
+        m_graphicsDevice->SetDepthWriteEnabled(true);
+
+        UnorderedMap<MeshResource*, Vector<Matrix4>> depthGroups;
+        for (const auto& cmd : commands)
+            depthGroups[cmd.mesh.get()].push_back(cmd.transform);
+
+        for (const auto& [meshPtr, transforms] : depthGroups)
+        {
+            auto it = std::find_if(commands.begin(), commands.end(),
+                [meshPtr](const RenderCommand& c) { return c.mesh.get() == meshPtr; });
+            auto buffers = GetOrCreateBuffers(it->mesh);
+            auto& materialShader = it->material->GetShader();
+
+            if (transforms.size() > 1)
+                SubmitInstanced(buffers, GetOrCreateDepthPassInstancedShader(materialShader), transforms);
+            else
+                Submit(buffers.vb, buffers.ib, GetOrCreateDepthPassShader(materialShader), transforms[0]);
+        }
+
+        m_graphicsDevice->SetColorWriteEnabled(true);
+        m_graphicsDevice->SetDepthWriteEnabled(false);
+        m_graphicsDevice->SetDepthFunction(DepthFunction::LessEqual);
+
+        //TODO: Clean up instancing/batching toggle flags
+        // 3. Group by (mesh, material)
+        PairMap<InstanceGroupKey, Vector<Matrix4>> instanceGroups;
+        for (auto& renderCommand : commands)
+        {
+            InstanceGroupKey groupKey{ renderCommand.mesh.get(), renderCommand.material.get() };
+            instanceGroups[groupKey].push_back(renderCommand.transform);
+        }
+        
+        // 4. Dispatch Intanced meshesh, collect batch candidates
+        UnorderedMap<MaterialResource*, Vector<RenderCommand>> batchCandidates;
+
+        for (auto& [key, transforms] : instanceGroups)
+        {
+            auto it = std::find_if(commands.begin(), commands.end(), [&](const RenderCommand& c){
+                return c.mesh.get() == key.first && c.material.get() == key.second;
+            });
+            auto buffers = GetOrCreateBuffers(it->mesh);
+            if (transforms.size() > 1 && m_instancingEnabled)
+            {
+                SubmitInstanced(buffers, it->material, transforms);
+            }
+            else
+            {
+                for(auto& t : transforms)
+                {
+                    batchCandidates[key.second].push_back({ it->mesh, it->material, t });
+                }
+            }
+        }
+
+        // 5. Draw batch and everything else
+        for (auto& [matPtr, cmds] : batchCandidates)
+        {
+            if (cmds.size() > 1 && m_batchingEnabled)
+                SubmitBatched(cmds[0].material, cmds);
+            else
+            {
+                for(auto& c : cmds)
+                {
+                    auto buffers = GetOrCreateBuffers(c.mesh);
+                    Submit(buffers.vb, buffers.ib, c.material, c.transform);
+                }
+            }
+        }
+    }
+
+    Vector<View> RenderSubsystem::BuildViews(Scene &scene)
+    {
+        Vector<View> views;
+        // Directional Shadowmap
+        if(m_renderSceneData.hasDirectionalLight)
+        {
+            View view = View();
+            view.debugName = "ShadowPass";
+            view.passType = PassType::DepthOnly;
+            view.renderTarget = m_shadowMapFrameBuffer;
+            view.viewProjection = m_renderSceneData.lightViewProjectionMatrix;
+            views.push_back(view);
+        }
+        // SceneColor
+        {
+            View view = View();
+            view.debugName = "SceneColor";
+            view.passType = PassType::Full;
+            view.renderTarget = m_frameBuffer;
+            view.viewProjection = m_renderSceneData.viewProjectionMatrix;
+            views.push_back(view);
+        }
+
+        return views;
+    }
+
+    void RenderSubsystem::ExecuteView(const View& view, const Vector<RenderCommand>& commands)
+    {
+        m_graphicsDevice->SetColorWriteEnabled(true);
+        m_graphicsDevice->SetDepthWriteEnabled(true);
+        m_graphicsDevice->SetDepthFunction(DepthFunction::Less);
+        view.renderTarget->Bind();
+        m_graphicsDevice->SetViewport(0, 0, view.renderTarget->GetWidth(), view.renderTarget->GetHeight());
+        m_graphicsDevice->Clear();
+
+        switch (view.passType)
+        {
+        case PassType::DepthOnly:
+            RenderShadowPass(view.viewProjection, commands);
+            break;
+        case PassType::Full:
+            RenderScenePass(view.viewProjection, commands);
+            break;
+        }
     }
 
     GraphicsDevice::API RenderSubsystem::GetRenderAPI() const

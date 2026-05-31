@@ -25,6 +25,11 @@ namespace axiom
                 * Matrix4::Scale(scale);
         }
 
+        inline Matrix4 GetViewMatrix() const 
+        {
+            return Matrix4::GetViewMatrix(position, rotation);
+        }
+
         Vec3 LocalToWorld(Vec3 localDir) const
         {
             Matrix4 rot = Matrix4::Rotate({1,0,0}, rotation.x)

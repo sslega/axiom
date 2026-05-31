@@ -183,5 +183,13 @@ namespace axiom
             m(3,3) = 1.0f;
             return m;
         }
+
+        static Matrix4 GetViewMatrix(Vec3 position, Vec3 rotation)
+        {
+            return Matrix4::Rotate({0,0,1}, -rotation.z)
+                * Matrix4::Rotate({1,0,0}, -rotation.x)
+                * Matrix4::Rotate({0,1,0}, -rotation.y)
+                * Matrix4::Translate({-position.x, -position.y, -position.z});
+        }
     };
 }
