@@ -135,27 +135,8 @@ namespace axiom
             Vec3 eye = -m_renderSceneData.lightDirection;
             Vec3 center = Vec3(0,0,0);
             Matrix4 lightViewMatrix = Matrix4::LookAt(eye, center, Vec3(0, 1, 0));
-
-            Vector<Vec3> frustumCorners = GetFrustumCornersWorldSpace(m_renderSceneData.viewProjectionMatrix.Inverse());
-            float minX = FLT_MAX;
-            float minY = FLT_MAX;
-            float minZ = FLT_MAX;
-            float maxX = -FLT_MAX;
-            float maxY = -FLT_MAX;
-            float maxZ = -FLT_MAX;
-            for(Vec3& frustumCorner : frustumCorners)
-            {
-                Vec3 lightSpaceCorner  = lightViewMatrix.TransformPoint(frustumCorner);
-                minX = std::min(minX, lightSpaceCorner.x);
-                maxX = std::max(maxX, lightSpaceCorner.x);
-                minY = std::min(minY, lightSpaceCorner.y);
-                maxY = std::max(maxY, lightSpaceCorner.y);
-                minZ = std::min(minZ, lightSpaceCorner.z);
-                maxZ = std::max(maxZ, lightSpaceCorner.z);
-            }
-
-            Matrix4 lightProjectionMatrix = Matrix4::Ortho(minX, maxX, minY, maxY, -minZ, -maxZ);
-
+            
+            Matrix4 lightProjectionMatrix = ComputeShadowProjection(lightViewMatrix, m_renderSceneData.viewProjectionMatrix);
             m_renderSceneData.lightViewProjectionMatrix = lightProjectionMatrix * lightViewMatrix;
         }
         else
@@ -565,6 +546,37 @@ namespace axiom
             corners[i] = invViewProj.TransformPoint(corners[i]);
         }
         return corners;
+    }
+
+    Matrix4 RenderSubsystem::ComputeShadowProjection(const Matrix4 &lightViewMatrix, const Matrix4 &cameraViewProjection)
+    {
+        Vector<Vec3> frustumCorners = GetFrustumCornersWorldSpace(m_renderSceneData.viewProjectionMatrix.Inverse());
+        Vec3 frustumCenter = 0;
+        float frustumDistance = 0;
+        float minZ = FLT_MAX;
+        float maxZ = -FLT_MAX;
+        for(Vec3& frustumCorner : frustumCorners)
+        {
+            Vec3 lightSpaceCorner  = lightViewMatrix.TransformPoint(frustumCorner);
+            minZ = std::min(minZ, lightSpaceCorner.z);
+            maxZ = std::max(maxZ, lightSpaceCorner.z);
+            frustumCenter += frustumCorner;
+        }
+        frustumCenter /= frustumCorners.size();
+        Vec3 lightSpaceCenter = lightViewMatrix.TransformPoint(frustumCenter);
+
+        for(Vec3& frustumCorner : frustumCorners)
+        {
+            // This can be in world space, distance is identical in light space and world space
+            frustumDistance = std::max(frustumDistance, Length(frustumCorner - frustumCenter));
+        }
+
+        Matrix4 lightProjectionMatrix = Matrix4::Ortho(
+            lightSpaceCenter.x - frustumDistance, lightSpaceCenter.x + frustumDistance, 
+            lightSpaceCenter.y - frustumDistance, lightSpaceCenter.y + frustumDistance, 
+            -minZ, -maxZ);
+
+        return lightProjectionMatrix;
     }
 
     Vector<View> RenderSubsystem::BuildViews(Scene &scene)
