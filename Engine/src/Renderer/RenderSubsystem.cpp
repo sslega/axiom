@@ -210,19 +210,19 @@ namespace axiom
         m->SetUniform("u_LocalToWorld", transform);
         m->SetUniform("u_WorldToLocal", transform.Inverse());
         m->SetUniform("u_DebugMode", m_debugDrawMode);
+        Vector<String> defines;
         if(m_renderSceneData.hasDirectionalLight)
         {
-            m->SetUniform("u_LightDir", m_renderSceneData.lightDirection);    
+            m->SetUniform("u_LightDir", m_renderSceneData.lightDirection);
             m->SetUniform("u_LightColor", m_renderSceneData.lightColor);
             m->SetUniform("u_CameraPos", m_renderSceneData.cameraPosition);
             m->SetUniform("u_LightViewProjection", m_renderSceneData.lightViewProjectionMatrix);
             m->SetUniform("u_ShadowMap", 1);  // texture slot 1
             m_graphicsDevice->BindFrameBufferTexture(*m_shadowMapFrameBuffer, 1);
-            
-            m_renderSceneData.defines.push_back("HAS_DIRECTIONAL_LIGHT");
+            defines.push_back("HAS_DIRECTIONAL_LIGHT");
         }
 
-        m->Bind(m_renderSceneData.defines);
+        m->Bind(defines);
         m_graphicsDevice->DrawIndexed(vb, ib);
         m_callCount++;
     }

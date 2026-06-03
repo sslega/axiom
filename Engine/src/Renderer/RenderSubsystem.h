@@ -69,8 +69,6 @@ namespace axiom
             Vec3 lightColor;
 
             Vec3 cameraPosition;
-
-            Vector<String> defines;
         };
 
         struct RenderCommand
