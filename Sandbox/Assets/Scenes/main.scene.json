@@ -16,7 +16,7 @@
           "projectionType": "perspective",
           "fov":  60.0,
           "near": 0.1,
-          "far":  1000.0
+          "far":  10.0
         },
         {
           "type": "CameraController",

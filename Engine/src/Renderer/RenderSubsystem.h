@@ -122,6 +122,8 @@ namespace axiom
         void RenderShadowPass(const Matrix4& lightProjectionMatrix, const Vector<RenderCommand>& commands);
         void RenderScenePass(const Matrix4& viewProjectionMatrix, const Vector<RenderCommand>& commands);
 
+        Vector<Vec3> GetFrustumCornersWorldSpace(const Matrix4& invViewProj);
+
         Vector<View> BuildViews(Scene& scene);
         void ExecuteView(const View& view, const Vector<RenderCommand>& commands);
 

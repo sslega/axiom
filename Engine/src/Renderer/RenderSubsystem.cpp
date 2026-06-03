@@ -15,6 +15,7 @@
 #include "FrameBuffer.h"
 #include <imgui.h>
 #include "Geometry/Quad.h"
+#include <algorithm>
 
 namespace axiom
 {
@@ -131,10 +132,29 @@ namespace axiom
             m_renderSceneData.hasDirectionalLight = true;
             m_renderSceneData.lightColor = light->color * light->intensity;
             m_renderSceneData.lightDirection = lightTransform->Forward();
-            Vec3 shadowCameraPos = m_renderSceneData.lightDirection * 5.0f;
-            
-            Matrix4 lightProjectionMatrix = Matrix4::Ortho(-3.0f, 3.0f, -3.0f, 3.0f, 0.1f, 10.0f);
-            Matrix4 lightViewMatrix = Matrix4::LookAt(shadowCameraPos, lightTransform->position, Vec3(0, 1, 0));
+            Vec3 eye = -m_renderSceneData.lightDirection;
+            Vec3 center = Vec3(0,0,0);
+            Matrix4 lightViewMatrix = Matrix4::LookAt(eye, center, Vec3(0, 1, 0));
+
+            Vector<Vec3> frustumCorners = GetFrustumCornersWorldSpace(m_renderSceneData.viewProjectionMatrix.Inverse());
+            float minX = FLT_MAX;
+            float minY = FLT_MAX;
+            float minZ = FLT_MAX;
+            float maxX = -FLT_MAX;
+            float maxY = -FLT_MAX;
+            float maxZ = -FLT_MAX;
+            for(Vec3& frustumCorner : frustumCorners)
+            {
+                Vec3 lightSpaceCorner  = lightViewMatrix.TransformPoint(frustumCorner);
+                minX = std::min(minX, lightSpaceCorner.x);
+                maxX = std::max(maxX, lightSpaceCorner.x);
+                minY = std::min(minY, lightSpaceCorner.y);
+                maxY = std::max(maxY, lightSpaceCorner.y);
+                minZ = std::min(minZ, lightSpaceCorner.z);
+                maxZ = std::max(maxZ, lightSpaceCorner.z);
+            }
+
+            Matrix4 lightProjectionMatrix = Matrix4::Ortho(minX, maxX, minY, maxY, -minZ, -maxZ);
 
             m_renderSceneData.lightViewProjectionMatrix = lightProjectionMatrix * lightViewMatrix;
         }
@@ -532,6 +552,21 @@ namespace axiom
         }
     }
 
+    Vector<Vec3> RenderSubsystem::GetFrustumCornersWorldSpace(const Matrix4& invViewProj)
+    {
+        Vector<Vec3> corners = {
+            {-1, -1, -1}, {1, -1, -1},
+            {-1,  1, -1}, {1,  1, -1},
+            {-1, -1,  1}, {1, -1,  1},
+            {-1,  1,  1}, {1,  1,  1}
+        };
+        for(int i = 0; i < corners.size(); ++i)
+        {
+            corners[i] = invViewProj.TransformPoint(corners[i]);
+        }
+        return corners;
+    }
+
     Vector<View> RenderSubsystem::BuildViews(Scene &scene)
     {
         Vector<View> views;
@@ -560,6 +595,8 @@ namespace axiom
 
     void RenderSubsystem::ExecuteView(const View& view, const Vector<RenderCommand>& commands)
     {
+        if(!view.renderTarget) return;
+        
         m_graphicsDevice->SetColorWriteEnabled(true);
         m_graphicsDevice->SetDepthWriteEnabled(true);
         m_graphicsDevice->SetDepthFunction(DepthFunction::Less);

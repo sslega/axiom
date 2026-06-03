@@ -78,24 +78,24 @@ namespace axiom
         // Factory methods
         // -----------------------------------------------------------------------
 
-        Vec3 TransformPoint(Vec3 p) const
+        Vec4 Transform(Vec4 p) const
         {
-            return Vec3(
-                (*this)(0,0)*p.x + (*this)(0,1)*p.y + (*this)(0,2)*p.z + (*this)(0,3),
-                (*this)(1,0)*p.x + (*this)(1,1)*p.y + (*this)(1,2)*p.z + (*this)(1,3),
-                (*this)(2,0)*p.x + (*this)(2,1)*p.y + (*this)(2,2)*p.z + (*this)(2,3)
-            );
+            float x = (*this)(0,0)*p.x + (*this)(0,1)*p.y + (*this)(0,2)*p.z + (*this)(0,3)*p.w;
+            float y = (*this)(1,0)*p.x + (*this)(1,1)*p.y + (*this)(1,2)*p.z + (*this)(1,3)*p.w;
+            float z = (*this)(2,0)*p.x + (*this)(2,1)*p.y + (*this)(2,2)*p.z + (*this)(2,3)*p.w;
+            float w = (*this)(3,0)*p.x + (*this)(3,1)*p.y + (*this)(3,2)*p.z + (*this)(3,3)*p.w;
+            return Vec4(x, y, z, w);
         }
 
-        // Transforms a direction vector (w=0 — translation is ignored).
-        // For normals, pass the inverse matrix: inverseTransform.TransformDirection(normal).
+        Vec3 TransformPoint(Vec3 p) const
+        {
+            Vec4 result = Transform(Vec4(p.x, p.y, p.z, 1.0f));
+            return result.xyz() * (1.0f / result.w);
+        }
+
         Vec3 TransformDirection(Vec3 d) const
         {
-            return Vec3(
-                (*this)(0,0)*d.x + (*this)(0,1)*d.y + (*this)(0,2)*d.z,
-                (*this)(1,0)*d.x + (*this)(1,1)*d.y + (*this)(1,2)*d.z,
-                (*this)(2,0)*d.x + (*this)(2,1)*d.y + (*this)(2,2)*d.z
-            );
+            return Transform(Vec4(d.x, d.y, d.z, 0.0f)).xyz();
         }
 
         static Matrix4 Identity()
