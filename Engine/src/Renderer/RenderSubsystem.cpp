@@ -36,8 +36,8 @@ namespace axiom
         m_frameBuffer = m_graphicsDevice->CreateFrameBuffer(fbSpec);
 
         FramebufferSpec fbShadowSpec;
-        fbShadowSpec.width = 1024;
-        fbShadowSpec.height = 1024;
+        fbShadowSpec.width = 2048;
+        fbShadowSpec.height = 2048;
         fbShadowSpec.depthOnly = true;
         m_shadowMapFrameBuffer = m_graphicsDevice->CreateFrameBuffer(fbShadowSpec);
 
@@ -552,7 +552,7 @@ namespace axiom
     {
         Vector<Vec3> frustumCorners = GetFrustumCornersWorldSpace(m_renderSceneData.viewProjectionMatrix.Inverse());
         Vec3 frustumCenter = 0;
-        float frustumDistance = 0;
+        float frustumRadius = 0;
         float minZ = FLT_MAX;
         float maxZ = -FLT_MAX;
         for(Vec3& frustumCorner : frustumCorners)
@@ -568,12 +568,19 @@ namespace axiom
         for(Vec3& frustumCorner : frustumCorners)
         {
             // This can be in world space, distance is identical in light space and world space
-            frustumDistance = std::max(frustumDistance, Length(frustumCorner - frustumCenter));
+            frustumRadius = std::max(frustumRadius, Length(frustumCorner - frustumCenter));
         }
 
+        float texelSize = (2 * frustumRadius) / m_shadowMapFrameBuffer->GetWidth();
+        lightSpaceCenter = Vec3(
+            std::round(lightSpaceCenter.x / texelSize) * texelSize,
+            std::round(lightSpaceCenter.y / texelSize) * texelSize,
+            lightSpaceCenter.z
+        );
+
         Matrix4 lightProjectionMatrix = Matrix4::Ortho(
-            lightSpaceCenter.x - frustumDistance, lightSpaceCenter.x + frustumDistance, 
-            lightSpaceCenter.y - frustumDistance, lightSpaceCenter.y + frustumDistance, 
+            lightSpaceCenter.x - frustumRadius, lightSpaceCenter.x + frustumRadius, 
+            lightSpaceCenter.y - frustumRadius, lightSpaceCenter.y + frustumRadius, 
             -minZ, -maxZ);
 
         return lightProjectionMatrix;

@@ -15,12 +15,12 @@
           "type": "CameraComponent",
           "projectionType": "perspective",
           "fov":  60.0,
-          "near": 0.1,
-          "far":  10.0
+          "near": 0.01,
+          "far":  5.0
         },
         {
           "type": "CameraController",
-          "move_speed":       0.5,
+          "move_speed":       1.0,
           "look_sensitivity": 0.002
         }
       ]
