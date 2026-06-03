@@ -132,7 +132,7 @@ namespace axiom
             m_renderSceneData.hasDirectionalLight = true;
             m_renderSceneData.lightColor = light->color * light->intensity;
             m_renderSceneData.lightDirection = lightTransform->Forward();
-            Vec3 eye = -m_renderSceneData.lightDirection;
+            Vec3 eye = m_renderSceneData.lightDirection;
             Vec3 center = Vec3(0,0,0);
             Matrix4 lightViewMatrix = Matrix4::LookAt(eye, center, Vec3(0, 1, 0));
             
@@ -178,7 +178,7 @@ namespace axiom
         {
             uint32 depthId = m_shadowMapFrameBuffer->GetDepthAttachmentID();
             ImGui::Begin("ShadowMap");
-            ImGui::Image((ImTextureID)(uintptr_t)depthId, ImVec2(256, 256), ImVec2(0,1), ImVec2(1,0));
+            ImGui::Image((ImTextureID)(uintptr_t)depthId, ImVec2(512, 512), ImVec2(0,1), ImVec2(1,0));
             ImGui::End();
         }
     }
@@ -578,10 +578,13 @@ namespace axiom
             lightSpaceCenter.z
         );
 
+        float nearPullback = 10.0f;
+        float farPullback  = 10.0f;
+
         Matrix4 lightProjectionMatrix = Matrix4::Ortho(
             lightSpaceCenter.x - frustumRadius, lightSpaceCenter.x + frustumRadius, 
             lightSpaceCenter.y - frustumRadius, lightSpaceCenter.y + frustumRadius, 
-            -minZ, -maxZ);
+            -maxZ - nearPullback, -minZ + farPullback);
 
         return lightProjectionMatrix;
     }

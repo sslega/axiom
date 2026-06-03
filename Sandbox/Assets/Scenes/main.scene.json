@@ -95,7 +95,7 @@
       "components": [
         {
           "type": "TransformComponent",
-          "position": [0.0, 0.0, 0.0],
+          "position": [0.0, 1.0, 0.0],
           "scale": [1.0, 1.0, 1.0],
           "rotation": [-45, 135.0, 0.0]
         },

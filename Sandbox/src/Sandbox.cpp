@@ -23,8 +23,8 @@ UniquePtr<Application> CreateApplication()
     appConfig.renderAPI = GraphicsDevice::API::OpenGL;
     
     AppWindowConfig windowConfig;
-    windowConfig.width = 800;
-    windowConfig.height = 600;
+    windowConfig.width = 1280;
+    windowConfig.height = 720;
     windowConfig.title = "Yet Another Game Engine";
     windowConfig.vsync = true;
     windowConfig.fullscreen = false;
