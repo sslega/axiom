@@ -120,14 +120,14 @@ namespace axiom
         );
     }
 
-    SharedPtr<Shader> OpenGLGraphicsDevice::CreateShader(const String& vertexSource, const String& fragmentSource) const
+    SharedPtr<Shader> OpenGLGraphicsDevice::CreateShader(const String& vertexSource, const String& fragmentSource, const Vector<String>& sourceMap) const
     {
-        return MakeShared<OpenGLShader>(vertexSource, fragmentSource);
+        return MakeShared<OpenGLShader>(vertexSource, fragmentSource, sourceMap);
     }
 
     SharedPtr<Shader> OpenGLGraphicsDevice::CreateShader(const ShaderResource &shaderResource) const
     {
-        return CreateShader(shaderResource.GetVertexSource(), shaderResource.GetFragmentSource());
+        return CreateShader(shaderResource.GetVertexSource(), shaderResource.GetFragmentSource(), shaderResource.GetSourceMap());
     }
 
     SharedPtr<Texture2D> OpenGLGraphicsDevice::CreateTexture2D(const String& path) const

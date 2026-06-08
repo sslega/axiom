@@ -37,11 +37,13 @@ namespace axiom
         virtual void InfoInternal(StringView message) override
         {
             printf("[INFO] %.*s\n", (int)message.size(), message.data());
+            fflush(stdout);
         }
 
         virtual void ErrorInternal(StringView message) override
         {
             printf("[ERROR] %.*s\n", (int)message.size(), message.data());
+            fflush(stdout);
         }
     };
 }

@@ -40,7 +40,7 @@ namespace axiom
         virtual SharedPtr<IndexBuffer>  CreateIndexBuffer(const MeshResource& mesh) const = 0;
         virtual SharedPtr<IndexBuffer>  CreateDynamicIndexBuffer(uint32 maxCount) const = 0;
         
-        virtual SharedPtr<Shader> CreateShader(const String& vertexSource, const String& fragmentSource) const = 0;
+        virtual SharedPtr<Shader> CreateShader(const String& vertexSource, const String& fragmentSource,  const Vector<String>& sourceMap = {}) const = 0;
         virtual SharedPtr<Shader> CreateShader(const ShaderResource& shaderResource) const = 0;
         
         virtual SharedPtr<Texture2D> CreateTexture2D(const String& path) const = 0;

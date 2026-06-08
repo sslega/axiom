@@ -3,11 +3,14 @@
 #include <glad/glad.h>
 #include <algorithm>
 #include "OpenGLShader.h"
+#include <regex>
 
 namespace axiom
 {
-    OpenGLShader::OpenGLShader(const String &vertexSource, const String &fragmentSource)
-    : m_vertexSource(vertexSource), m_fragmentSource(fragmentSource)
+    OpenGLShader::OpenGLShader(const String &vertexSource, const String &fragmentSource, const Vector<String>& sourceMap)
+    : m_vertexSource(vertexSource)
+    , m_fragmentSource(fragmentSource)
+    , m_sourceMap(sourceMap)
     {
         GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
         const GLchar *source = (const GLchar *)vertexSource.c_str();
@@ -23,9 +26,10 @@ namespace axiom
             std::vector<GLchar> infoLog(maxLength);
             glGetShaderInfoLog(vertexShader, maxLength, &maxLength, infoLog.data());
             glDeleteShader(vertexShader);
-
-            Log::Error("Vertex shader compilation failed:\n{}", infoLog.data());
-            Log::Error("Source:\n{}", vertexSource);
+            String errorLog = String(infoLog.data());
+            errorLog = ResolveSourceIndices(errorLog, sourceMap);
+            Log::Error("Vertex shader compilation failed:\n{}", errorLog);
+            // Log::Error("Source:\n{}", vertexSource);
             AX_ASSERT(false, "Vertex shader compilation failed");
             return;
         }
@@ -44,9 +48,10 @@ namespace axiom
             glGetShaderInfoLog(fragmentShader, maxLength, &maxLength, infoLog.data());
             glDeleteShader(fragmentShader);
             glDeleteShader(vertexShader);
-
-            Log::Error("Fragment shader compilation failed:\n{}", infoLog.data());
-            Log::Error("Source:\n{}", fragmentSource);
+            String errorLog = String(infoLog.data());
+            errorLog = ResolveSourceIndices(errorLog, sourceMap);
+            Log::Error("Fragment shader compilation failed:\n{}", errorLog);
+            // Log::Error("Source:\n{}", fragmentSource);
             AX_ASSERT(false, "Fragment shader compilation failed");
             return;
         }
@@ -145,8 +150,35 @@ namespace axiom
             return result + src.substr(newline + 1);
         };
 
-        auto variant = MakeShared<OpenGLShader>(injectDefines(m_vertexSource), injectDefines(m_fragmentSource));
+        auto variant = MakeShared<OpenGLShader>(injectDefines(m_vertexSource), injectDefines(m_fragmentSource), m_sourceMap);
         m_variantCache[key] = variant;
         return variant;
+    }
+
+    String OpenGLShader::ResolveSourceIndices(const String& errorLog, const Vector<String>& sourceMap) const
+    {
+        std::regex log_regex(R"((\d+)\((\d+)\))");
+        auto begin = std::sregex_iterator(errorLog.begin(), errorLog.end(), log_regex);
+        auto end   = std::sregex_iterator();
+
+        if (begin == end) return errorLog;
+
+        String result;
+        std::smatch match;
+        for (auto it = begin; it != end; ++it)
+        {
+            match = *it;
+            result += match.prefix();          // text before this match
+            int index = std::stoi(match[1]);   // source index N
+            String line = match[2];            // line number
+            if (index < (int)sourceMap.size())
+                result += sourceMap[index] + "(" + line + ")";
+            else
+                result += match[0];            // unknown index, keep as-is
+        }
+        
+        result += match.suffix();
+    
+        return result;
     }
 }

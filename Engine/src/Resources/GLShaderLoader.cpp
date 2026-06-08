@@ -4,7 +4,8 @@
 #include "Resources/Resource.h"
 #include "Core/Types.h"
 #include "Core/Assert.h"
-
+#include <regex>
+#include "GLShaderLoader.h"
 namespace axiom
 {
     GLShaderLoader::GLShaderLoader(const ResourceSubsystem& resourceModule)
@@ -16,13 +17,19 @@ namespace axiom
     {
 
         String source(fileData.buffer.begin(), fileData.buffer.end());
-        ResolveIncludes(source);
+        
+        Vector<String> sourceMap;
+        sourceMap.push_back(fileData.path.filename().string());
+        int nextSourceIndex = 1;
+        int currentSourceIndex = 0;
+        ResolveIncludes(source, sourceMap, nextSourceIndex, currentSourceIndex);
+        
         String vert, frag;
         ParseSource(source, vert, frag);
-        return MakeShared<ShaderResource>(vert, frag);
+        return MakeShared<ShaderResource>(vert, frag, sourceMap);
     }
 
-    void GLShaderLoader::ParseSource(const String &source, String &vertexSource, String &fragmentSource) const
+    void GLShaderLoader::ParseSource(const String &source, String &vertexSource, String& fragmentSource) const
     {
         const String typeToken = "#type";
         size_t pos = 0;
@@ -65,11 +72,12 @@ namespace axiom
         }
     }
 
-    void GLShaderLoader::ResolveIncludes(String& source)
+    void GLShaderLoader::ResolveIncludes(String& source, Vector<String>& sourceMap, int& nextSourceIndex, int currentSourceIndex)
     {
         String result;
         std::istringstream stream(source);
         String line;
+        uint32 lineNumber = 1;
         while (std::getline(stream, line))
         {
             if (line.starts_with("#include"))
@@ -78,21 +86,27 @@ namespace axiom
                 size_t start = line.find('"') + 1;
                 size_t end   = line.rfind('"');
                 // TODO: support project shader dir as well
-                String includeVirtualPath = "engine://Shaders/Include/" + line.substr(start, end - start);
+                String filename = line.substr(start, end - start);
+                String includeVirtualPath = "engine://Shaders/Include/" + filename;
 
                 Path physicalPath = m_resourceModule.Resolve(includeVirtualPath);
+
+                uint32 includeIndex = nextSourceIndex++;
+                result += "#line 1 " + std::to_string(includeIndex) + "\n";
+                sourceMap.push_back(filename);
                 
                 FileData data = ReadFile(physicalPath);
                 String includeSource(data.buffer.begin(), data.buffer.end());
-                ResolveIncludes(includeSource);  // recurse for nested includes
+                ResolveIncludes(includeSource, sourceMap, nextSourceIndex, includeIndex);  // recurse for nested includes
                 result += includeSource + '\n';  // replace the #include line with file contents;
+                result += "#line " +  std::to_string(lineNumber + 1) + " " +  std::to_string(currentSourceIndex) + "\n";
             }
             else
             {
                 result += line + '\n';  // keep the line as-is
             }
+            lineNumber++;
         }
         source = result;
     }
 }
-

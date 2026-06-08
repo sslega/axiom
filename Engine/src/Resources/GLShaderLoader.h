@@ -14,8 +14,6 @@ namespace axiom
         virtual SharedPtr<Resource> CreateResource(const FileData& fileData) override;
     private:
         void ParseSource(const String& source, String& vertexSource, String& fragmentSource) const;
-        void ResolveIncludes(String& source);
-
-        UnorderedSet<String> m_includes;
+        void ResolveIncludes(String& source, Vector<String>& sourceMap, int& nextSourceIndex, int currentSourceIndex);
     };
 }

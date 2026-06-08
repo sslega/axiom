@@ -32,7 +32,7 @@ namespace axiom
         virtual SharedPtr<IndexBuffer>  CreateIndexBuffer(uint32* indices, uint32 count) const override;
         virtual SharedPtr<IndexBuffer>  CreateDynamicIndexBuffer(uint32 maxCount) const override;
         
-        SharedPtr<Shader> CreateShader(const String& vertexSource, const String& fragmentSource) const override;
+        SharedPtr<Shader> CreateShader(const String& vertexSource, const String& fragmentSource, const Vector<String>& sourceMap = {}) const override;
         SharedPtr<Shader> CreateShader(const ShaderResource& shaderResource) const override;
         
         SharedPtr<Texture2D> CreateTexture2D(const String& path) const override;

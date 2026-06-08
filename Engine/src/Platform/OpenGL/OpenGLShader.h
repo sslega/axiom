@@ -6,7 +6,7 @@ namespace axiom
     class OpenGLShader : public Shader
     {
     public:
-        OpenGLShader(const String& vertexSource, const String& fragmentSource);
+        OpenGLShader(const String& vertexSource, const String& fragmentSource, const Vector<String>& sourceMap);
         ~OpenGLShader();
 
         virtual void Bind() const override;
@@ -25,6 +25,9 @@ namespace axiom
 
         String m_vertexSource;
         String m_fragmentSource;
+        Vector<String> m_sourceMap;
         StringMap<SharedPtr<Shader>> m_variantCache;
+
+        String ResolveSourceIndices(const String& errorLog, const Vector<String>& sourceMap) const;
     };
 }
