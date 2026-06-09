@@ -43,6 +43,8 @@ namespace axiom
         inline uint32 GetInstanceCallCount() const { return m_instanceCallCount; }
         inline uint32 GetInstanceObjectCount() const { return m_instanceObjectCount; }
 
+        void ReloadShaders();
+
     protected:
         void OnInitialize() override;
         void OnShutdown() override;
@@ -69,6 +71,7 @@ namespace axiom
             Vec3 lightColor;
 
             Vec3 cameraPosition;
+            float time;
         };
 
         struct RenderCommand
@@ -83,8 +86,6 @@ namespace axiom
         RenderSceneData m_renderSceneData;
 
         StringMap<SharedPtr<Shader>> m_shaderCache;
-        UnorderedMap<Shader*, SharedPtr<Shader>> m_depthPassShaderCache;
-        UnorderedMap<Shader*, SharedPtr<Shader>> m_depthPassInstancedShaderCache;
 
         using InstanceGroupKey  = std::pair<MeshResource*, MaterialResource*>;   // for OnRender grouping
         using InstanceMaterialBufferKey = std::pair<VertexBuffer*, MaterialResource*>;   // for SubmitInstanced cache
@@ -99,10 +100,6 @@ namespace axiom
         UnorderedMap<MeshResource*, MeshBuffers> m_meshCache;
 
         MeshBuffers GetOrCreateBuffers(const SharedPtr<MeshResource>& mesh);
-        SharedPtr<Shader> CreateDepthPassShader(const String path);
-        SharedPtr<Shader> CreateDepthPassInstancedShader(const String path);
-        SharedPtr<Shader> GetOrCreateDepthPassShader(const SharedPtr<Shader>& shader);
-        SharedPtr<Shader> GetOrCreateDepthPassInstancedShader(const SharedPtr<Shader>& shader);
 
         void SubmitInstanced(const MeshBuffers& buffers, const SharedPtr<MaterialResource>& material, const Vector<Matrix4>& transforms);
         void SubmitInstanced(const MeshBuffers& buffers, const SharedPtr<Shader>& instancedShader, const Vector<Matrix4>& transforms);
@@ -112,6 +109,7 @@ namespace axiom
         SharedPtr<Shader> m_screenQuadShader;        
         
         SharedPtr<MaterialResource> m_debugDrawMaterial;
+        SharedPtr<Shader> m_errorShader;
 
         SharedPtr<VertexBuffer> m_screenQuadVB;
         SharedPtr<IndexBuffer> m_screenQuadIB;
@@ -139,8 +137,7 @@ namespace axiom
         bool m_instancingEnabled = true;
         int m_debugDrawMode = 0;
         
-
         TimePoint m_lastRenderTime;
-        float m_dt;
+        float m_elapsedTime = 0;
     };
 }

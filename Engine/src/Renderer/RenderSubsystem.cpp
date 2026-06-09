@@ -24,6 +24,24 @@ namespace axiom
     {
     }
 
+    void RenderSubsystem::ReloadShaders()
+    {
+        Log::Info("Reloading shaders...");
+        auto& resourceSubsystem = GetSubsystem<ResourceSubsystem>();
+        // path is const String&, shader is SharedPtr<Shader>&
+        for (auto& [path, shader] : m_shaderCache)
+        {
+            resourceSubsystem.Evict(path);
+            auto shaderResource = resourceSubsystem.Load<ShaderResource>(path);
+            bool result = shader->Reload(shaderResource->GetVertexSource(), shaderResource->GetFragmentSource(), shaderResource->GetSourceMap());
+            if (!result)
+            {
+                Log::Error("Failed to reload shader: {}", path);
+            }
+        }
+        Log::Info("Reloading shaders... Done!");
+    }
+
     void RenderSubsystem::OnInitialize()
     {
         auto API = GetRenderAPI();
@@ -46,6 +64,31 @@ namespace axiom
         m_screenQuadIB = m_graphicsDevice->CreateIndexBuffer(quad);
         m_screenQuadShader = GetShader("engine://Shaders/FullScreen.glsl");
         m_debugDrawMaterial = GetMaterial("engine://Shaders/DebugDraw.glsl");
+        const char* vertSrc = R"(
+        #version 330 core
+        layout(location = 0) in vec3 a_Position;
+        uniform mat4 u_ViewProjection;
+        uniform mat4 u_LocalToWorld;
+        void main()
+        {
+            gl_Position = u_ViewProjection * u_LocalToWorld * vec4(a_Position, 1.0);
+        }
+        )";
+        const char* fragSrc = R"(
+        #version 330 core
+        uniform float u_time;
+        layout(location = 0) out vec4 color;
+        void main()
+        {
+            float t = abs(sin(u_time * 3.0));
+            //color = vec4(t, 0.0, t, 1.0);
+            color = vec4(t,0,1,1.0);
+        }
+        )";
+
+        m_errorShader = GetGraphicsDevice().CreateShader(vertSrc, fragSrc, {});
+
+        m_lastRenderTime = std::chrono::steady_clock::now();
     }
 
     void RenderSubsystem::OnShutdown()
@@ -65,9 +108,9 @@ namespace axiom
     void RenderSubsystem::OnRender()
     {    
         auto now = std::chrono::steady_clock::now();
-        m_dt = std::chrono::duration<float>(now - m_lastRenderTime).count();
+        float dt = std::chrono::duration<float>(now - m_lastRenderTime).count();
+        m_elapsedTime += dt;
         m_lastRenderTime = now;
-
         
         WorldSubsystem& worldSubsystem = GetSubsystem<WorldSubsystem>();
 
@@ -117,6 +160,7 @@ namespace axiom
         Matrix4 viewMatrix = cameraTransform ? cameraTransform->GetViewMatrix() : Matrix4::Identity();
         m_renderSceneData.viewProjectionMatrix = cameraComponent->GetProjectionMatrix() * viewMatrix;
         m_renderSceneData.cameraPosition = cameraTransform->position;
+        m_renderSceneData.time = m_elapsedTime;
         
         Vector<DirectionalLightComponent*> directionalLight = scene.GetComponents<DirectionalLightComponent>();
         if(directionalLight.size() > 1)
@@ -156,7 +200,7 @@ namespace axiom
 
     void RenderSubsystem::OnGUI()
     {
-        uint8 fps = static_cast<uint8>(1.0f / m_dt);
+        uint8 fps = static_cast<uint8>(1.0f / m_elapsedTime);
 
         ImGui::SetNextWindowPos(ImVec2(0, 0));
         ImGui::SetNextWindowBgAlpha(0.0f);
@@ -191,6 +235,9 @@ namespace axiom
         m->SetUniform("u_LocalToWorld", transform);
         m->SetUniform("u_WorldToLocal", transform.Inverse());
         m->SetUniform("u_DebugMode", m_debugDrawMode);
+
+        m->SetUniform("u_time", m_renderSceneData.time);
+
         Vector<String> defines;
         if(m_renderSceneData.hasDirectionalLight)
         {
@@ -230,12 +277,6 @@ namespace axiom
             auto shader = CreateShader(path);
             m_shaderCache[path] = shader;
             it = m_shaderCache.find(path);
-
-            auto depthShader = CreateDepthPassShader(path);
-            m_depthPassShaderCache[shader.get()] = depthShader;
-
-            auto depthInstancedShader = CreateDepthPassInstancedShader(path);
-            m_depthPassInstancedShaderCache[shader.get()] = depthInstancedShader;
         }
         return it->second;
     }
@@ -243,8 +284,11 @@ namespace axiom
     SharedPtr<Shader> RenderSubsystem::CreateShader(const String path)
     {
         auto shaderResource = GetSubsystem<ResourceSubsystem>().Load<ShaderResource>(path);
-        return GetGraphicsDevice().CreateShader(*shaderResource);
+        auto shader = GetGraphicsDevice().CreateShader(*shaderResource);
+        if (!shader) return m_errorShader;
+        return shader;
     }
+
 
     RenderSubsystem::MeshBuffers RenderSubsystem::GetOrCreateBuffers(const SharedPtr<MeshResource> &mesh)
     {
@@ -256,37 +300,6 @@ namespace axiom
         buffers.ib = m_graphicsDevice->CreateIndexBuffer(*mesh);
         m_meshCache[mesh.get()] = buffers;
         return buffers;
-    }
-
-    SharedPtr<Shader> RenderSubsystem::CreateDepthPassShader(const String path)
-    {
-        auto shaderResource = GetSubsystem<ResourceSubsystem>().Load<ShaderResource>(path);
-        const String depthFrag = "#version 330 core\nvoid main() {}\n";
-        return GetGraphicsDevice().CreateShader(shaderResource->GetVertexSource(), depthFrag);
-    }
-
-    SharedPtr<Shader> RenderSubsystem::CreateDepthPassInstancedShader(const String path)
-    {
-        auto shaderResource = GetSubsystem<ResourceSubsystem>().Load<ShaderResource>(path);
-        const String& vertSrc = shaderResource->GetVertexSource();
-        size_t newline = vertSrc.find('\n', vertSrc.find("#version"));
-        String instancedVert = vertSrc.substr(0, newline + 1)
-            + "#define INSTANCED 1\n"
-            + vertSrc.substr(newline + 1);
-        const String depthFrag = "#version 330 core\nvoid main() {}\n";
-        return GetGraphicsDevice().CreateShader(instancedVert, depthFrag);
-    }
-
-    SharedPtr<Shader> RenderSubsystem::GetOrCreateDepthPassShader(const SharedPtr<Shader> &shader)
-    {
-        auto it = m_depthPassShaderCache.find(shader.get());
-        return it != m_depthPassShaderCache.end() ? it->second : nullptr;
-    }
-
-    SharedPtr<Shader> RenderSubsystem::GetOrCreateDepthPassInstancedShader(const SharedPtr<Shader> &shader)
-    {
-        auto it = m_depthPassInstancedShaderCache.find(shader.get());
-        return it != m_depthPassInstancedShaderCache.end() ? it->second : nullptr;
     }
 
     void RenderSubsystem::SubmitInstanced(const MeshBuffers& buffers, const SharedPtr<MaterialResource>& material, const Vector<Matrix4>& transforms)
@@ -450,10 +463,12 @@ namespace axiom
         {
             auto buffers = GetOrCreateBuffers(cmd.mesh);
             //TODO: wrap it around Submit later on 
-            auto shader = GetOrCreateDepthPassShader(cmd.material->GetShader());
-            shader->Bind();
-            shader->UploadUniform("u_ViewProjection", viewProjectionMatrix);
-            shader->UploadUniform("u_LocalToWorld", cmd.transform);
+            auto shader = cmd.material->GetShader();            
+            auto variant = shader->GetVariant({"DEPTH_PASS"});
+
+            variant->Bind();
+            variant->UploadUniform("u_ViewProjection", viewProjectionMatrix);
+            variant->UploadUniform("u_LocalToWorld", cmd.transform);
             m_graphicsDevice->DrawIndexed(buffers.vb, buffers.ib);
             m_callCount++;
         }
@@ -474,12 +489,19 @@ namespace axiom
             auto it = std::find_if(commands.begin(), commands.end(),
                 [meshPtr](const RenderCommand& c) { return c.mesh.get() == meshPtr; });
             auto buffers = GetOrCreateBuffers(it->mesh);
-            auto& materialShader = it->material->GetShader();
+            auto shader = it->material->GetShader();
 
             if (transforms.size() > 1)
-                SubmitInstanced(buffers, GetOrCreateDepthPassInstancedShader(materialShader), transforms);
+            {
+                auto variant = shader->GetVariant({"DEPTH_PASS", "INSTANCED"});
+                SubmitInstanced(buffers, variant, transforms);
+            }
             else
-                Submit(buffers.vb, buffers.ib, GetOrCreateDepthPassShader(materialShader), transforms[0]);
+            {
+                auto variant = shader->GetVariant({"DEPTH_PASS"});
+                Submit(buffers.vb, buffers.ib, variant, transforms[0]);
+            }
+
         }
 
         m_graphicsDevice->SetColorWriteEnabled(true);

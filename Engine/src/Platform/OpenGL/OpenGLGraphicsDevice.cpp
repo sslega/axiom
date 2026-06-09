@@ -122,7 +122,7 @@ namespace axiom
 
     SharedPtr<Shader> OpenGLGraphicsDevice::CreateShader(const String& vertexSource, const String& fragmentSource, const Vector<String>& sourceMap) const
     {
-        return MakeShared<OpenGLShader>(vertexSource, fragmentSource, sourceMap);
+        return OpenGLShader::Create(vertexSource, fragmentSource, sourceMap);
     }
 
     SharedPtr<Shader> OpenGLGraphicsDevice::CreateShader(const ShaderResource &shaderResource) const

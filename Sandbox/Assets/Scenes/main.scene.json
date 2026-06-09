@@ -70,7 +70,7 @@
         {
           "type": "MeshComponent",
           "mesh": "engine://Meshes/cube.obj",
-          "material": "engine://Materials/Lit.mat"
+          "material": "engine://Materials/Unlit.mat"
         }
       ]
     },

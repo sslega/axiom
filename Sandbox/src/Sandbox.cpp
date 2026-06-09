@@ -67,6 +67,10 @@ void Sandbox::OnRender()
     ImGui::Checkbox("Enable batching", &m_batchingEnabled);
     ImGui::Checkbox("Enable instancing", &m_instancingEnabled);
     ImGui::Combo("DebugDraw mode", &m_debugDrawMode, debugModes, IM_ARRAYSIZE(debugModes));
+    if(ImGui::Button("Reload Shaders"))
+    {
+        renderSubsystem->ReloadShaders();
+    }
     ImGui::End();
 
 

@@ -11,7 +11,8 @@ namespace axiom
 
     void MaterialResource::Bind(const Vector<String>& defines)
     {
-        Shader* target = defines.empty() ? m_shader.get() : m_shader->GetVariant(defines).get();
+        Shader* variant = defines.empty() ? nullptr : m_shader->GetVariant(defines).get();
+        Shader* target = variant ? variant : m_shader.get();
 
         target->Bind();
         for (auto& [name, value] : m_uniforms)

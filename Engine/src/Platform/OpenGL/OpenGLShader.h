@@ -6,11 +6,14 @@ namespace axiom
     class OpenGLShader : public Shader
     {
     public:
-        OpenGLShader(const String& vertexSource, const String& fragmentSource, const Vector<String>& sourceMap);
         ~OpenGLShader();
+
+        static SharedPtr<OpenGLShader> Create(const String& vertexSource, const String& fragmentSource, const Vector<String>& sourceMap);
 
         virtual void Bind() const override;
         virtual void Unbind() const override;
+        virtual bool Reload(const String& vertexSource, const String& fragmentSource, const Vector<String>& sourceMap) override;
+
 
         virtual void UploadUniform(const String& name, const int& value) override;
         virtual void UploadUniform(const String& name, const float& value) override;
@@ -21,13 +24,15 @@ namespace axiom
         virtual SharedPtr<Shader> GetVariant(const Vector<String>& defines) override;
 
     private:
-        uint32 m_rendererID;
+        OpenGLShader(const String& vertexSource, const String& fragmentSource,  const Vector<String>& sourceMap, const uint32 shaderID);
 
         String m_vertexSource;
         String m_fragmentSource;
         Vector<String> m_sourceMap;
+        uint32 m_shaderID;
         StringMap<SharedPtr<Shader>> m_variantCache;
 
-        String ResolveSourceIndices(const String& errorLog, const Vector<String>& sourceMap) const;
+        static bool Compile(const String& vertexSource, const String& fragmentSource, const Vector<String>& sourceMap, uint32& shaderID);
+        static String ResolveSourceIndices(const String& errorLog, const Vector<String>& sourceMap);
     };
 }

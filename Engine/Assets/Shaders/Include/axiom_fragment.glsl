@@ -41,10 +41,10 @@ void main()
     FragmentInput output;
     output.Color = vec3(0,0,0);
     output.Opacity = 1.0;
-
-    FragmentShader(input, output);
-    
-    color = vec4(output.Color, output.Opacity);
+    #ifndef DEPTH_PASS 
+        FragmentShader(input, output);    
+        color = vec4(output.Color, output.Opacity);
+    #endif
 }
 
 #endif

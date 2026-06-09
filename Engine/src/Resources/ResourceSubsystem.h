@@ -15,6 +15,8 @@ namespace axiom
         ~ResourceSubsystem();
 
         Path Resolve(const String& virtualPath) const;
+
+        void Evict(const String& virtualPath);
         
         template<typename T>
         SharedPtr<T> Load(const String& virtualPath)

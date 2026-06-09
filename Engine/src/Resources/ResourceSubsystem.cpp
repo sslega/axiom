@@ -45,6 +45,11 @@ namespace axiom
         return resource;
     }
 
+    void ResourceSubsystem::Evict(const String& virtualPath)
+    {
+        m_resources.erase(virtualPath);
+    }
+
     ResourceLoader* ResourceSubsystem::GetLoader(Path path)
     {
         String fileExtension = path.extension().string();
