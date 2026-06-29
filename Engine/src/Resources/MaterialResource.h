@@ -18,6 +18,7 @@ namespace axiom
         void Bind(const Vector<String>& defines = {});
         void Unbind();
         void SetTexture(const String& name, const SharedPtr<Texture2D> texture, uint32 slot);
+        bool IsValid();
         inline const SharedPtr<Shader> GetShader() const { return m_shader; }
 
         template<typename T>

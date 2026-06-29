@@ -9,5 +9,5 @@ void VertexShader(inout VertexInput input)
 
 void FragmentShader(in VertexInput input, out FragmentInput output)
 {
-    output.Color = vec3(0.8, 0.6, 0.8)
+    output.Color = vec3(0.8, 0.6, 0.8);
 }

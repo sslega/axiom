@@ -37,4 +37,9 @@ namespace axiom
     {
         m_textures[name] = {texture, slot};
     }
+    
+    bool MaterialResource::IsValid()
+    {
+        return m_shader->IsValid();
+    }
 }

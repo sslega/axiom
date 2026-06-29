@@ -12,6 +12,7 @@ namespace axiom
     , m_fragmentSource(fragmentSource)
     , m_sourceMap(sourceMap)
     , m_shaderID(shaderID)
+    , m_isValid(true)
     {
     }
 
@@ -22,75 +23,6 @@ namespace axiom
 
     SharedPtr<OpenGLShader> OpenGLShader::Create(const String& vertexSource, const String& fragmentSource, const Vector<String>& sourceMap)
     {
-        // int shaderID = -1;
-        // GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-        // const GLchar *source = (const GLchar *)vertexSource.c_str();
-        // glShaderSource(vertexShader, 1, &source, 0);
-        // glCompileShader(vertexShader);
-
-        // GLint isCompiled = 0;
-        // glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &isCompiled);
-        // if (isCompiled == GL_FALSE)
-        // {
-        //     GLint maxLength = 0;
-        //     glGetShaderiv(vertexShader, GL_INFO_LOG_LENGTH, &maxLength);
-        //     std::vector<GLchar> infoLog(maxLength);
-        //     glGetShaderInfoLog(vertexShader, maxLength, &maxLength, infoLog.data());
-        //     glDeleteShader(vertexShader);
-        //     String errorLog = String(infoLog.data());
-        //     errorLog = ResolveSourceIndices(errorLog, sourceMap);
-        //     Log::Error("Vertex shader compilation failed:\n{}", errorLog);
-        //     // Log::Error("Source:\n{}", vertexSource);
-        //     // AX_ASSERT(false, "Vertex shader compilation failed");
-        //     return nullptr;
-        // }
-
-        // GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-        // source = (const GLchar *)fragmentSource.c_str();
-        // glShaderSource(fragmentShader, 1, &source, 0);
-        // glCompileShader(fragmentShader);
-
-        // glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &isCompiled);
-        // if (isCompiled == GL_FALSE)
-        // {
-        //     GLint maxLength = 0;
-        //     glGetShaderiv(fragmentShader, GL_INFO_LOG_LENGTH, &maxLength);
-        //     std::vector<GLchar> infoLog(maxLength);
-        //     glGetShaderInfoLog(fragmentShader, maxLength, &maxLength, infoLog.data());
-        //     glDeleteShader(fragmentShader);
-        //     glDeleteShader(vertexShader);
-        //     String errorLog = String(infoLog.data());
-        //     errorLog = ResolveSourceIndices(errorLog, sourceMap);
-        //     Log::Error("Fragment shader compilation failed:\n{}", errorLog);
-        //     // Log::Error("Source:\n{}", fragmentSource);
-        //     // AX_ASSERT(false, "Fragment shader compilation failed");
-        //     return nullptr;
-        // }
-
-        // shaderID = glCreateProgram();
-        // glAttachShader(shaderID, vertexShader);
-        // glAttachShader(shaderID, fragmentShader);
-        // glLinkProgram(shaderID);
-
-        // GLint isLinked = 0;
-        // glGetProgramiv(shaderID, GL_LINK_STATUS, &isLinked);
-        // if (isLinked == GL_FALSE)
-        // {
-        //     GLint maxLength = 0;
-        //     glGetProgramiv(shaderID, GL_INFO_LOG_LENGTH, &maxLength);
-        //     std::vector<GLchar> infoLog(maxLength);
-        //     glGetProgramInfoLog(shaderID, maxLength, &maxLength, infoLog.data());
-        //     glDeleteProgram(shaderID);
-        //     glDeleteShader(vertexShader);
-        //     glDeleteShader(fragmentShader);
-
-        //     Log::Error("Shader linking failed:\n{}", infoLog.data());
-        //     // AX_ASSERT(false, "Shader linking failed");
-        //     return nullptr;
-        // }
-
-        // glDetachShader(shaderID, vertexShader);
-        // glDetachShader(shaderID, fragmentShader);
         uint32 shaderID;
         if(Compile(vertexSource, fragmentSource, sourceMap, shaderID))
         {
@@ -119,8 +51,10 @@ namespace axiom
             m_fragmentSource = fragmentSource;
             m_sourceMap = sourceMap;
             m_variantCache.clear();
+            m_isValid = true;
             return true;
         }
+        m_isValid = false;
         return false;
     }
 
@@ -183,6 +117,11 @@ namespace axiom
             m_variantCache[key] = variant;
         } 
         return variant;
+    }
+
+    bool OpenGLShader::IsValid() const
+    {
+        return m_isValid;
     }
 
     bool OpenGLShader::Compile(const String& vertexSource, const String& fragmentSource, const Vector<String>& sourceMap, uint32& shaderID)

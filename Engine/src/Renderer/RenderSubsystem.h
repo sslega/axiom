@@ -110,6 +110,7 @@ namespace axiom
         
         SharedPtr<MaterialResource> m_debugDrawMaterial;
         SharedPtr<Shader> m_errorShader;
+        SharedPtr<MaterialResource> m_errorMaterial;
 
         SharedPtr<VertexBuffer> m_screenQuadVB;
         SharedPtr<IndexBuffer> m_screenQuadIB;

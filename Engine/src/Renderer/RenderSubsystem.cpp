@@ -87,6 +87,7 @@ namespace axiom
         )";
 
         m_errorShader = GetGraphicsDevice().CreateShader(vertSrc, fragSrc, {});
+        m_errorMaterial = MakeShared<MaterialResource>(m_errorShader);
 
         m_lastRenderTime = std::chrono::steady_clock::now();
     }
@@ -229,8 +230,8 @@ namespace axiom
 
     void RenderSubsystem::Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<MaterialResource>& material, const Matrix4& transform)
     {
-
-        auto& m = m_debugDrawMode > 0 ? m_debugDrawMaterial : material;
+        const auto& effective = material->IsValid() ? material : m_errorMaterial;
+        auto& m = m_debugDrawMode > 0 ? m_debugDrawMaterial : effective;
         m->SetUniform("u_ViewProjection", m_renderSceneData.viewProjectionMatrix);
         m->SetUniform("u_LocalToWorld", transform);
         m->SetUniform("u_WorldToLocal", transform.Inverse());
@@ -251,6 +252,7 @@ namespace axiom
         }
 
         m->Bind(defines);
+
         m_graphicsDevice->DrawIndexed(vb, ib);
         m_callCount++;
     }
@@ -304,7 +306,8 @@ namespace axiom
 
     void RenderSubsystem::SubmitInstanced(const MeshBuffers& buffers, const SharedPtr<MaterialResource>& material, const Vector<Matrix4>& transforms)
     {
-        auto& m = m_debugDrawMode > 0 ? m_debugDrawMaterial : material;
+        const auto& effective = material->IsValid() ? material : m_errorMaterial;
+        auto& m = m_debugDrawMode > 0 ? m_debugDrawMaterial : effective;
 
         Vector<Matrix4> instanceData;
         instanceData.reserve(transforms.size() * 2);
@@ -340,7 +343,7 @@ namespace axiom
         // Bind the INSTANCED variant — uploads all material uniforms to the correct GL program
         m->SetUniform("u_ViewProjection", m_renderSceneData.viewProjectionMatrix);
         m->Bind({"INSTANCED"});
-        // material->GetShader()->GetVariant({"INSTANCED"})->UploadUniform("u_ViewProjection", m_renderSceneData.viewProjectionMatrix);
+
         
         m_graphicsDevice->DrawIndexedInstanced(buffers.vb, buffers.ib, instanceBuffer, static_cast<uint32>(transforms.size()));
         m_callCount++;
@@ -423,13 +426,6 @@ namespace axiom
 
         Submit(vb, ib, m, Matrix4::Identity());
 
-        // m->SetUniform("u_ViewProjection", m_renderSceneData.viewProjectionMatrix);
-        // m->Bind();
-        // m->GetShader()->UploadUniform("u_ViewProjection", m_renderSceneData.viewProjectionMatrix);
-        // m->GetShader()->UploadUniform("u_LocalToWorld", Matrix4::Identity());
-        
-        // m_graphicsDevice->DrawIndexed(m_batchVBCache[key], m_batchIBCache[key]);
-        // m_callCount++;
         m_batchCallCount++;
         m_batchObjectCount += commands.size();
     }
