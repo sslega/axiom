@@ -2,6 +2,7 @@
 #include "Serialization/Archive.h"
 #include "Serialization/ClassRegistry.h"
 #include "Math/Math.h"
+#include "Core/Reflection.h"
 
 namespace axiom
 {

@@ -10,6 +10,7 @@ namespace axiom
     public:
         enum class ProjectionType { Perspective, Orthographic };
         
+        Camera();
         Camera(float fovYRadians, float aspectRatio, float near, float far);
         Camera(float left, float right, float bottom, float top, float near, float far);
 
@@ -19,10 +20,21 @@ namespace axiom
         void SetOrthographic(float left, float right, float bottom, float top, float near = -1.0f, float far = 1.0f);
         void SetPerspective(float fovYRadians, float aspectRatio, float near = 0.1f, float far = 1000.0f);
         void SetAspectRatio(float aspectRatio);
+
+        void SetView(const Vec3 position, const Matrix4& viewMatrix);
+        void SetView(const Vec3 position, float yaw, float pitch);
+
+        inline const Vec3& GetPosition() const { return m_position; }
+        inline const Matrix4& GetViewMatrix() const { return m_viewMatrix; }
+        inline const Matrix4& GetProjectionMatrix() const { return m_projectionMatrix; };
+        inline const Matrix4& GetViewProjectionMatrix() const { return m_viewProjectionMatrix; }
         
         void SetFoV(float fovYRadians);
         inline float GetFoV() const { return m_fovY; };
+
+        void SetNear(float perspNear);
         inline float GetNear() const { return m_perspNear; }
+        void SetFar(float perspFar);
         inline float GetFar() const { return m_perspFar; }
 
         void SetOrthoSize(float halfHeight);
@@ -33,8 +45,6 @@ namespace axiom
         inline float GetOrthoRight() const { return m_orthoRight; }
         inline float GetOrthoTop() const { return m_orthoTop; }
         inline float GetOrthoBottom() const { return m_orthoBottom; }
-        
-        inline const Matrix4& GetProjectionMatrix() const { return m_projectionMatrix; };
 
     private:
         ProjectionType m_projectionType = ProjectionType::Perspective;
@@ -49,9 +59,13 @@ namespace axiom
         float m_perspNear   = 0.1f;
         float m_perspFar    = 1000.0f;
 
+        Vec3 m_position;
+        Matrix4 m_viewMatrix;
         Matrix4 m_projectionMatrix;
+        Matrix4 m_viewProjectionMatrix;
 
         void RecalculateProjection();
+        inline void RecalculateViewProjection();
     };
 
 }

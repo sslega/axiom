@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Core/Reflection.h"
 #include "Scene/Component.h"
 #include "Renderer/Camera.h"
 
@@ -31,4 +32,7 @@ namespace axiom
         friend class SceneLoader;
         Camera m_camera;
     };
+
+    AX_REFLECT(CameraComponent)
+    AX_REFLECT_END()
 }

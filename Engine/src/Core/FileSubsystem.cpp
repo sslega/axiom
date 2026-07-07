@@ -43,8 +43,8 @@ namespace axiom
 
     void FileSubsystem::OnInitialize()
     {
-        AX_ASSERT(MountExists("engine"), "Engine folder not mount.");
-        AX_ASSERT(MountExists("project"), "Project folder not mount.");
+        AX_ASSERT(MountExists(MountPoints::Engine), "Engine folder not mount.");
+        AX_ASSERT(MountExists(MountPoints::Project), "Project folder not mount.");
     }
 
     String FileSubsystem::ToLower(const String& str) const

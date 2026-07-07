@@ -5,6 +5,13 @@
 
 namespace axiom
 {
+    namespace MountPoints
+    {
+        constexpr const char* Engine  = "engine";
+        constexpr const char* Project = "project";
+        constexpr const char* Editor  = "editor";  // Editor target only
+    }
+
     class FileSubsystem : public ApplicationSubsystem
     {
     public:

@@ -1,23 +1,20 @@
 #pragma once
 #include "Math/Matrix4.h"
+#include "Math/Vector.h"
 
 namespace axiom
 {
     class Scene;
     class FrameBuffer;
 
-    enum class PassType 
-    {
-        DepthOnly,
-        Full
-    };
-
     struct View
     {
-        Scene* scene {nullptr};
         Matrix4 viewProjection;
+        Vec3 cameraPosition;
         SharedPtr<FrameBuffer> renderTarget;
-        PassType passType {PassType::Full};
         String debugName;
+        uint32 width {0};
+        uint32 height {0};
+        Vec4 clearColor {0, 0, 0, 1};
     };
 }

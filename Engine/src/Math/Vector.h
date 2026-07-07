@@ -14,6 +14,8 @@ namespace axiom
         Vec2& operator+=(const Vec2& o) { x += o.x; y += o.y; return *this; }
         Vec2& operator-=(const Vec2& o) { x -= o.x; y -= o.y; return *this; }
         Vec2& operator*=(float s)       { x *= s;   y *= s;   return *this; }
+        bool operator==(const Vec2& o) const { return x == o.x && y == o.y; }
+        bool operator!=(const Vec2& o) const { return !(*this == o); }
     };
 
     struct Vec3
@@ -32,6 +34,8 @@ namespace axiom
         Vec3& operator-=(const Vec3& o) { x -= o.x; y -= o.y; z -= o.z; return *this; }
         Vec3& operator*=(float s)       { x *= s;   y *= s;   z *= s;   return *this; }
         Vec3& operator/=(float s)       { x /= s;   y /= s;   z /= s;   return *this; }
+        bool operator==(const Vec3& o) const { return x == o.x && y == o.y && z == o.z; }
+        bool operator!=(const Vec3& o) const { return !(*this == o); }
         Vec2 xy() const { return Vec2(x, y); }
     };
 
@@ -45,6 +49,8 @@ namespace axiom
         Vec4& operator-=(const Vec4& o) { x -= o.x; y -= o.y; z -= o.z; w -= o.w; return *this; }
         Vec4& operator*=(float s)       { x *= s;   y *= s;   z *= s;   w *= s;   return *this; }
         Vec4& operator/=(float s)       { x /= s;   y /= s;   z /= s;   w /= s;   return *this; }
+        bool operator==(const Vec4& o) const { return x == o.x && y == o.y && z == o.z && w == o.w; }
+        bool operator!=(const Vec4& o) const { return !(*this == o); }
         Vec3 xyz() const { return Vec3(x, y, z); }
     };
 

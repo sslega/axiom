@@ -1,6 +1,7 @@
 #pragma once
 #include "Scene/Component.h"
 #include "Core/Types.h"
+#include "Core/Reflection.h"
 
 namespace axiom
 {
@@ -26,4 +27,7 @@ namespace axiom
         SharedPtr<MaterialResource> m_material;
         bool m_isVisible = true;
     };
+
+    AX_REFLECT(MeshComponent)
+    AX_REFLECT_END()
 }

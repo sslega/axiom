@@ -1,9 +1,15 @@
 #include "Renderer/Camera.h"
 #include "Core/Assert.h"
 #include "Camera.h"
+#include "Math/Math.h"
 
 namespace axiom
 {
+    Camera::Camera()
+    : Camera(ToRadians(60.0f), 16.0f / 9.0f, 0.01f, 50.0f)
+    {
+    }
+
     //TODO: aspecrt artion should not be in the constructor
     Camera::Camera(float fovYRadians, float aspectRatio, float near, float far)
     {
@@ -53,6 +59,18 @@ namespace axiom
         RecalculateProjection();
     }
 
+    void Camera::SetNear(float perspNear)
+    {
+        m_perspNear = perspNear;
+        RecalculateProjection();
+    }
+
+    void Camera::SetFar(float perspFar)
+    {
+        m_perspFar = perspFar;
+        RecalculateProjection();
+    }
+
     void Camera::RecalculateProjection()
     {
         if (m_projectionType == ProjectionType::Orthographic)
@@ -63,8 +81,13 @@ namespace axiom
         {
             m_projectionMatrix = Matrix4::Perspective(m_fovY, m_aspectRatio, m_perspNear, m_perspFar);
         }
+        RecalculateViewProjection();
     }
 
+    void Camera::RecalculateViewProjection()
+    {
+        m_viewProjectionMatrix = m_projectionMatrix * m_viewMatrix;
+    }
 
     void Camera::SetAspectRatio(float aspectRatio)
     {
@@ -77,5 +100,19 @@ namespace axiom
             m_orthoTop    =  m_orthoSize;
         }
         RecalculateProjection();
+    }
+
+    void Camera::SetView(const Vec3 position, const Matrix4& viewMatrix)
+    {
+        m_position = position;
+        m_viewMatrix = viewMatrix;
+        RecalculateViewProjection();
+    }
+
+    void Camera::SetView(const Vec3 position, float yaw, float pitch)
+    {
+        m_position = position;
+        m_viewMatrix = Matrix4::GetViewMatrix(position, Vec3(pitch, yaw, 0.0f));
+        RecalculateViewProjection();
     }
 }

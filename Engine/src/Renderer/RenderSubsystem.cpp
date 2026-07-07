@@ -8,11 +8,11 @@
 #include "Renderer/CameraComponent.h"
 #include "Renderer/MeshComponent.h"
 #include "Renderer/LightComponent.h"
+#include "Renderer/FrameBuffer.h"
 #include "Scene/TransformComponent.h"
 #include "Core/Log.h"
 #include "Core/Types.h"
 #include "Resources/MaterialResource.h"
-#include "FrameBuffer.h"
 #include <imgui.h>
 #include "Geometry/Quad.h"
 #include <algorithm>
@@ -48,10 +48,10 @@ namespace axiom
         auto& window = GetApp().GetApplicationWindow();
         m_graphicsDevice = GraphicsDevice::Create(API, window);
 
-        FramebufferSpec fbSpec;
-        fbSpec.width = window.GetWidth();
-        fbSpec.height = window.GetHeight();
-        m_frameBuffer = m_graphicsDevice->CreateFrameBuffer(fbSpec);
+        // FramebufferSpec fbSpec;
+        // fbSpec.width = window.GetWidth();
+        // fbSpec.height = window.GetHeight();
+        // m_frameBuffer = m_graphicsDevice->CreateFrameBuffer(fbSpec);
 
         FramebufferSpec fbShadowSpec;
         fbShadowSpec.width = 2048;
@@ -109,13 +109,46 @@ namespace axiom
     void RenderSubsystem::OnRender()
     {    
         auto now = std::chrono::steady_clock::now();
-        float dt = std::chrono::duration<float>(now - m_lastRenderTime).count();
-        m_elapsedTime += dt;
+        m_dt = std::chrono::duration<float>(now - m_lastRenderTime).count();
+        m_elapsedTime += m_dt;
         m_lastRenderTime = now;
         
         WorldSubsystem& worldSubsystem = GetSubsystem<WorldSubsystem>();
 
         Scene& scene = worldSubsystem.GetActiveScene();
+        // Directional Light
+        Vector<DirectionalLightComponent*> directionalLight = scene.GetComponents<DirectionalLightComponent>();
+        if(directionalLight.size() > 1)
+        {
+            Log::Error("More than one DirectionalLightComponent present!");
+        }
+
+        if(!directionalLight.empty() && !m_views.empty())
+        {
+            DirectionalLightComponent* light = directionalLight[0];
+            TransformComponent* lightTransform = light->GetEntity().GetComponent<TransformComponent>();
+            AX_ASSERT(lightTransform, "No TransformComponent present with DirectionalLightComponent!");
+            m_renderSceneData.hasDirectionalLight = true;
+            m_renderSceneData.lightColor = light->color * light->intensity;
+            m_renderSceneData.lightDirection = lightTransform->Forward();
+            Vec3 eye = m_renderSceneData.lightDirection;
+            Matrix4 lightViewMatrix = Matrix4::LookAt(eye, Vec3(0,0,0), Vec3(0,1,0));
+            //TODO: this probably should calculate for each view
+            Matrix4 lightProjection = ComputeShadowProjection(lightViewMatrix, m_views[0].viewProjection);
+            m_renderSceneData.lightViewProjectionMatrix = lightProjection * lightViewMatrix;
+
+        }
+        else
+        {
+            m_renderSceneData.hasDirectionalLight = false;
+            m_renderSceneData.lightColor = Vec3(0);
+            m_renderSceneData.lightDirection = Vec3(1,0,0);
+            
+            m_renderSceneData.lightViewProjectionMatrix = Matrix4::Identity();
+        }
+
+
+        // Mesh Components
         auto meshComponents = scene.GetComponents<MeshComponent>();
 
         Vector<RenderCommand> renderCommands;
@@ -127,14 +160,32 @@ namespace axiom
             renderCommands.push_back({ meshComponent->GetMesh(), meshComponent->GetMaterial(), tc ? tc->GetTransform() : Matrix4::Identity() });
         }
 
-        Vector<View> views = BuildViews(scene);
-        for(auto& view : views)
+        // Shadow Pass
+        if(m_renderSceneData.hasDirectionalLight)
+        {
+            m_graphicsDevice->SetColorWriteEnabled(true);
+            m_graphicsDevice->SetDepthWriteEnabled(true);
+            m_graphicsDevice->SetDepthFunction(DepthFunction::Less);
+            m_shadowMapFrameBuffer->Bind();
+            m_graphicsDevice->SetViewport(0, 0, m_shadowMapFrameBuffer->GetWidth(), m_shadowMapFrameBuffer->GetHeight());
+            m_graphicsDevice->Clear();
+            RenderShadowPass(m_renderSceneData.lightViewProjectionMatrix, renderCommands);
+        }
+
+        // Build views
+        
+
+        // View Pass
+        for(const auto& view : m_views)
         {
             ExecuteView(view, renderCommands);
         }
 
+        m_graphicsDevice->BindDefaultFrameBuffer();
+        m_graphicsDevice->SetClearColor(Vec4(0,0,0,1));
+        m_graphicsDevice->Clear();
+
         OnGUI();
-        RenderToScreen();
     }
 
     void RenderSubsystem::OnEndFrame()
@@ -149,49 +200,9 @@ namespace axiom
 
     void RenderSubsystem::BeginScene()
     {
-        WorldSubsystem& worldSubsystem = GetSubsystem<WorldSubsystem>();
-
-        Scene& scene = worldSubsystem.GetActiveScene();
-
-        Vector<CameraComponent*> cameras = scene.GetComponents<CameraComponent>();
-        AX_ASSERT(!cameras.empty(), "No active Camera!");
-        CameraComponent* cameraComponent = cameras[0];
-        TransformComponent* cameraTransform = cameraComponent->GetEntity().GetComponent<TransformComponent>();
-        cameraComponent->SetAspectRatio(GetApp().GetApplicationWindow().GetAspectRatio());
-        Matrix4 viewMatrix = cameraTransform ? cameraTransform->GetViewMatrix() : Matrix4::Identity();
-        m_renderSceneData.viewProjectionMatrix = cameraComponent->GetProjectionMatrix() * viewMatrix;
-        m_renderSceneData.cameraPosition = cameraTransform->position;
-        m_renderSceneData.time = m_elapsedTime;
+        m_views.clear();
         
-        Vector<DirectionalLightComponent*> directionalLight = scene.GetComponents<DirectionalLightComponent>();
-        if(directionalLight.size() > 1)
-        {
-            Log::Error("More than one DirectionalLightComponent present!");
-        }
-
-        if(!directionalLight.empty())
-        {
-            DirectionalLightComponent* light = directionalLight[0];
-            TransformComponent* lightTransform = light->GetEntity().GetComponent<TransformComponent>();
-            AX_ASSERT(lightTransform, "No TransformComponent present with DirectionalLightComponent!");
-            m_renderSceneData.hasDirectionalLight = true;
-            m_renderSceneData.lightColor = light->color * light->intensity;
-            m_renderSceneData.lightDirection = lightTransform->Forward();
-            Vec3 eye = m_renderSceneData.lightDirection;
-            Vec3 center = Vec3(0,0,0);
-            Matrix4 lightViewMatrix = Matrix4::LookAt(eye, center, Vec3(0, 1, 0));
-            
-            Matrix4 lightProjectionMatrix = ComputeShadowProjection(lightViewMatrix, m_renderSceneData.viewProjectionMatrix);
-            m_renderSceneData.lightViewProjectionMatrix = lightProjectionMatrix * lightViewMatrix;
-        }
-        else
-        {
-            m_renderSceneData.hasDirectionalLight = false;
-            m_renderSceneData.lightColor = Vec3(0);
-            m_renderSceneData.lightDirection = Vec3(1,0,0);
-            
-            m_renderSceneData.lightViewProjectionMatrix = Matrix4::Identity();
-        }
+        m_renderSceneData.time = m_elapsedTime;
     }
 
     void RenderSubsystem::EndScene()
@@ -201,7 +212,7 @@ namespace axiom
 
     void RenderSubsystem::OnGUI()
     {
-        uint8 fps = static_cast<uint8>(1.0f / m_elapsedTime);
+        uint8 fps = static_cast<uint8>(1.0f / m_dt);
 
         ImGui::SetNextWindowPos(ImVec2(0, 0));
         ImGui::SetNextWindowBgAlpha(0.0f);
@@ -228,11 +239,11 @@ namespace axiom
         }
     }
 
-    void RenderSubsystem::Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<MaterialResource>& material, const Matrix4& transform)
+    void RenderSubsystem::Submit(const RenderViewData& viewData, const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<MaterialResource>& material, const Matrix4& transform)
     {
         const auto& effective = material->IsValid() ? material : m_errorMaterial;
         auto& m = m_debugDrawMode > 0 ? m_debugDrawMaterial : effective;
-        m->SetUniform("u_ViewProjection", m_renderSceneData.viewProjectionMatrix);
+        m->SetUniform("u_ViewProjection", viewData.viewProjectionMatrix);
         m->SetUniform("u_LocalToWorld", transform);
         m->SetUniform("u_WorldToLocal", transform.Inverse());
         m->SetUniform("u_DebugMode", m_debugDrawMode);
@@ -244,7 +255,7 @@ namespace axiom
         {
             m->SetUniform("u_LightDir", m_renderSceneData.lightDirection);
             m->SetUniform("u_LightColor", m_renderSceneData.lightColor);
-            m->SetUniform("u_CameraPos", m_renderSceneData.cameraPosition);
+            m->SetUniform("u_CameraPos", viewData.cameraPosition);
             m->SetUniform("u_LightViewProjection", m_renderSceneData.lightViewProjectionMatrix);
             m->SetUniform("u_ShadowMap", 1);  // texture slot 1
             m_graphicsDevice->BindFrameBufferTexture(*m_shadowMapFrameBuffer, 1);
@@ -257,14 +268,19 @@ namespace axiom
         m_callCount++;
     }
 
-    void RenderSubsystem::Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Shader>& shader, const Matrix4& transform)
+    void RenderSubsystem::Submit(const RenderViewData& viewData, const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Shader>& shader, const Matrix4& transform)
     {
         shader->Bind();
-        shader->UploadUniform("u_ViewProjection", m_renderSceneData.viewProjectionMatrix);
+        shader->UploadUniform("u_ViewProjection", viewData.viewProjectionMatrix);
         shader->UploadUniform("u_LocalToWorld", transform);
         m_graphicsDevice->DrawIndexed(vb, ib);
         m_callCount++;
-}
+    }
+
+    void RenderSubsystem::SubmitView(const View &view)
+    {
+        m_views.push_back(view);
+    }
 
     SharedPtr<MaterialResource> RenderSubsystem::GetMaterial(const String path)
     {
@@ -304,7 +320,7 @@ namespace axiom
         return buffers;
     }
 
-    void RenderSubsystem::SubmitInstanced(const MeshBuffers& buffers, const SharedPtr<MaterialResource>& material, const Vector<Matrix4>& transforms)
+    void RenderSubsystem::SubmitInstanced(const RenderViewData& viewData, const MeshBuffers& buffers, const SharedPtr<MaterialResource>& material, const Vector<Matrix4>& transforms)
     {
         const auto& effective = material->IsValid() ? material : m_errorMaterial;
         auto& m = m_debugDrawMode > 0 ? m_debugDrawMaterial : effective;
@@ -341,7 +357,7 @@ namespace axiom
         instanceBuffer->SetData(instanceData.data(), byteSize);
 
         // Bind the INSTANCED variant — uploads all material uniforms to the correct GL program
-        m->SetUniform("u_ViewProjection", m_renderSceneData.viewProjectionMatrix);
+        m->SetUniform("u_ViewProjection", viewData.viewProjectionMatrix);
         m->Bind({"INSTANCED"});
 
         
@@ -351,7 +367,7 @@ namespace axiom
         m_instanceObjectCount += transforms.size();
     }
 
-    void RenderSubsystem::SubmitInstanced(const MeshBuffers& buffers, const SharedPtr<Shader>& instancedShader, const Vector<Matrix4>& transforms)
+    void RenderSubsystem::SubmitInstanced(const RenderViewData& viewData, const MeshBuffers& buffers, const SharedPtr<Shader>& instancedShader, const Vector<Matrix4>& transforms)
     {
         uint32 byteSize = static_cast<uint32>(transforms.size() * sizeof(Matrix4));
         auto cacheKey = std::make_pair(buffers.vb.get(), instancedShader.get());
@@ -371,14 +387,14 @@ namespace axiom
         SharedPtr<VertexBuffer>& instanceBuffer = it->second;
         instanceBuffer->SetData(transforms.data(), byteSize);
         instancedShader->Bind();
-        instancedShader->UploadUniform("u_ViewProjection", m_renderSceneData.viewProjectionMatrix);
+        instancedShader->UploadUniform("u_ViewProjection", viewData.viewProjectionMatrix);
         m_graphicsDevice->DrawIndexedInstanced(buffers.vb, buffers.ib, instanceBuffer, static_cast<uint32>(transforms.size()));
         m_callCount++;
         m_instanceCallCount++;
         m_instanceObjectCount += transforms.size();
     }
 
-    void RenderSubsystem::SubmitBatched(const SharedPtr<MaterialResource>& material, const Vector<RenderCommand>& commands)
+    void RenderSubsystem::SubmitBatched(const RenderViewData& viewData, const SharedPtr<MaterialResource>& material, const Vector<RenderCommand>& commands)
     {
         Vector<Vertex> vertices;
         Vector<uint32> indices;
@@ -424,7 +440,7 @@ namespace axiom
         auto& vb = m_batchVBCache[key];
         auto& ib = m_batchIBCache[key];
 
-        Submit(vb, ib, m, Matrix4::Identity());
+        Submit(viewData, vb, ib, m, Matrix4::Identity());
 
         m_batchCallCount++;
         m_batchObjectCount += commands.size();
@@ -437,19 +453,6 @@ namespace axiom
         m_instanceObjectCount = 0;
         m_batchCallCount = 0;
         m_batchObjectCount = 0;
-    }
-
-    void RenderSubsystem::RenderToScreen()
-    {
-        m_frameBuffer->Unbind();
-        m_graphicsDevice->SetDepthTestEnabled(false);
-        m_graphicsDevice->SetClearColor(Vec4(0.0f, 0.0f, 0.0f, 1.0f));
-        m_graphicsDevice->Clear();
-        m_screenQuadShader->Bind();
-        m_screenQuadShader->UploadUniform("u_ScreenTexture", 0);
-        m_graphicsDevice->BindFrameBufferTexture(*m_frameBuffer, 0);
-        m_graphicsDevice->DrawIndexed(m_screenQuadVB, m_screenQuadIB);
-        m_graphicsDevice->SetDepthTestEnabled(true);
     }
 
     void RenderSubsystem::RenderShadowPass(const Matrix4& viewProjectionMatrix, const Vector<RenderCommand>& commands)
@@ -470,7 +473,7 @@ namespace axiom
         }
     }
 
-    void RenderSubsystem::RenderScenePass(const Matrix4& viewProjectionMatrix, const Vector<RenderCommand>& commands)
+    void RenderSubsystem::RenderScenePass(const RenderSceneData& sceneData, const RenderViewData& viewData, const Vector<RenderCommand>& commands)
     {
         // 2. Depth Pre-Pass
         m_graphicsDevice->SetColorWriteEnabled(false);
@@ -490,12 +493,12 @@ namespace axiom
             if (transforms.size() > 1)
             {
                 auto variant = shader->GetVariant({"DEPTH_PASS", "INSTANCED"});
-                SubmitInstanced(buffers, variant, transforms);
+                SubmitInstanced(viewData, buffers, variant, transforms);
             }
             else
             {
                 auto variant = shader->GetVariant({"DEPTH_PASS"});
-                Submit(buffers.vb, buffers.ib, variant, transforms[0]);
+                Submit(viewData, buffers.vb, buffers.ib, variant, transforms[0]);
             }
 
         }
@@ -524,7 +527,7 @@ namespace axiom
             auto buffers = GetOrCreateBuffers(it->mesh);
             if (transforms.size() > 1 && m_instancingEnabled)
             {
-                SubmitInstanced(buffers, it->material, transforms);
+                SubmitInstanced(viewData, buffers, it->material, transforms);
             }
             else
             {
@@ -539,13 +542,13 @@ namespace axiom
         for (auto& [matPtr, cmds] : batchCandidates)
         {
             if (cmds.size() > 1 && m_batchingEnabled)
-                SubmitBatched(cmds[0].material, cmds);
+                SubmitBatched(viewData, cmds[0].material, cmds);
             else
             {
                 for(auto& c : cmds)
                 {
                     auto buffers = GetOrCreateBuffers(c.mesh);
-                    Submit(buffers.vb, buffers.ib, c.material, c.transform);
+                    Submit(viewData, buffers.vb, buffers.ib, c.material, c.transform);
                 }
             }
         }
@@ -566,9 +569,9 @@ namespace axiom
         return corners;
     }
 
-    Matrix4 RenderSubsystem::ComputeShadowProjection(const Matrix4 &lightViewMatrix, const Matrix4 &cameraViewProjection)
+    Matrix4 RenderSubsystem::ComputeShadowProjection(const Matrix4& lightViewMatrix, const Matrix4& cameraViewMatrix)
     {
-        Vector<Vec3> frustumCorners = GetFrustumCornersWorldSpace(m_renderSceneData.viewProjectionMatrix.Inverse());
+        Vector<Vec3> frustumCorners = GetFrustumCornersWorldSpace(cameraViewMatrix.Inverse());
         Vec3 frustumCenter = 0;
         float frustumRadius = 0;
         float minZ = FLT_MAX;
@@ -607,52 +610,25 @@ namespace axiom
         return lightProjectionMatrix;
     }
 
-    Vector<View> RenderSubsystem::BuildViews(Scene &scene)
-    {
-        Vector<View> views;
-        // Directional Shadowmap
-        if(m_renderSceneData.hasDirectionalLight)
-        {
-            View view = View();
-            view.debugName = "ShadowPass";
-            view.passType = PassType::DepthOnly;
-            view.renderTarget = m_shadowMapFrameBuffer;
-            view.viewProjection = m_renderSceneData.lightViewProjectionMatrix;
-            views.push_back(view);
-        }
-        // SceneColor
-        {
-            View view = View();
-            view.debugName = "SceneColor";
-            view.passType = PassType::Full;
-            view.renderTarget = m_frameBuffer;
-            view.viewProjection = m_renderSceneData.viewProjectionMatrix;
-            views.push_back(view);
-        }
-
-        return views;
-    }
-
     void RenderSubsystem::ExecuteView(const View& view, const Vector<RenderCommand>& commands)
     {
-        if(!view.renderTarget) return;
+        AX_ASSERT(view.renderTarget, "View has no render target!");
+        AX_ASSERT(view.width != 0, "Invalid view render target dimension!");
+        AX_ASSERT(view.height != 0, "Invalid view render target dimension!");
         
         m_graphicsDevice->SetColorWriteEnabled(true);
         m_graphicsDevice->SetDepthWriteEnabled(true);
         m_graphicsDevice->SetDepthFunction(DepthFunction::Less);
         view.renderTarget->Bind();
-        m_graphicsDevice->SetViewport(0, 0, view.renderTarget->GetWidth(), view.renderTarget->GetHeight());
+        m_graphicsDevice->SetViewport(0, 0, view.width, view.height);
+        m_graphicsDevice->SetClearColor(view.clearColor);
         m_graphicsDevice->Clear();
 
-        switch (view.passType)
-        {
-        case PassType::DepthOnly:
-            RenderShadowPass(view.viewProjection, commands);
-            break;
-        case PassType::Full:
-            RenderScenePass(view.viewProjection, commands);
-            break;
-        }
+        RenderViewData renderViewData;
+        renderViewData.cameraPosition = view.cameraPosition;
+        renderViewData.viewProjectionMatrix = view.viewProjection;
+
+        RenderScenePass(m_renderSceneData, renderViewData, commands);
     }
 
     GraphicsDevice::API RenderSubsystem::GetRenderAPI() const

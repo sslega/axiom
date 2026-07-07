@@ -71,6 +71,20 @@ namespace axiom
     
     void OpenGLFrameBuffer::Resize(uint32 width, uint32 height)
     {
-        AX_ASSERT(false, "Not yet implemented");
+        m_width = width;
+        m_height = height;
+
+        if(IsDepthOnly())
+        {
+            glBindTexture(GL_TEXTURE_2D, m_textureDepthBuffer);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_width, m_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+            glBindTexture(GL_TEXTURE_2D, 0);
+        }
+        else
+        {
+            glBindTexture(GL_TEXTURE_2D, m_textureColorBuffer);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+            glBindTexture(GL_TEXTURE_2D, 0);
+        }
     }
 }

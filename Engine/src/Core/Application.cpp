@@ -1,25 +1,29 @@
-#include "Core/Application.h"
+#include "Application.h"
+#include "FileSubsystem.h"
+#include "ReflectionSubsystem.h"
+#include "Log.h"
+#include "Global.h"
+
 #include "Platform/ApplicationWindow.h"
+
 #include "Renderer/RenderSubsystem.h"
+#include "Renderer/CameraComponent.h"
+#include "Renderer/CameraController.h"
+#include "Renderer/MeshComponent.h"
+#include "Renderer/LightComponent.h"
+
 #include "Resources/ResourceSubsystem.h"
 #include "Resources/GLShaderLoader.h"
 #include "Resources/Texture2DLoader.h"
 #include "Resources/OBJLoader.h"
 #include "Resources/MaterialLoader.h"
-#include "Core/FileSubsystem.h"
-#include "Scene/WorldSubsystem.h"
-#include "ImGui/ImGuiSubsystem.h"
-#include "Input/Input.h"
-#include "Core/Log.h"
-#include <imgui.h>
-#include "Application.h"
-#include "Global.h"
 
 #include "Scene/TransformComponent.h"
-#include "Renderer/CameraComponent.h"
-#include "Renderer/CameraController.h"
-#include "Renderer/MeshComponent.h"
-#include "Renderer/LightComponent.h"
+#include "Scene/WorldSubsystem.h"
+
+#include "ImGui/ImGuiSubsystem.h"
+#include "Input/Input.h"
+#include <imgui.h>
 
 namespace axiom
 {
@@ -135,6 +139,7 @@ namespace axiom
     void Application::RegisterSubsystems()
     {
         fileSubsystem = RegisterSubsystem<FileSubsystem>();
+        fileSubsystem->Mount(MountPoints::Engine, AX_ENGINE_DIR);
         
         resourceSubsystem = RegisterSubsystem<ResourceSubsystem>();
         resourceSubsystem->RegisterLoader<GLShaderLoader>(".glsl");
@@ -146,6 +151,8 @@ namespace axiom
         renderSubsystem = RegisterSubsystem<RenderSubsystem>();
         resourceSubsystem->RegisterLoader<MaterialLoader>(".mat", *renderSubsystem);
         imGuiSubsystem = RegisterSubsystem<ImGuiSubsystem>();
+
+        reflectionSubsystem = RegisterSubsystem<ReflectionSubsystem>();
     }
 
     void Application::InitializeSubsystems()

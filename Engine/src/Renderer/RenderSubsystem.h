@@ -8,6 +8,7 @@
 #include "Renderer/GraphicsDevice.h"
 #include "Renderer/Camera.h"
 #include "Renderer/View.h"
+#include "Renderer./FrameBuffer.h"
 #include "Core/Timestep.h"
 
 namespace axiom
@@ -18,14 +19,32 @@ namespace axiom
     class MaterialResource;
     class RenderResourceFactory;
     class FrameBuffer;
+    
+    struct RenderSceneData
+    {
+        bool hasDirectionalLight = false;
+        Vec3 lightDirection;
+        Vec3 lightColor;
+        Matrix4 lightViewProjectionMatrix;
+
+        float time;
+    };
+
+    struct RenderViewData
+    {
+        Vec3 cameraPosition;
+        Matrix4 viewProjectionMatrix;
+    };
 
     class RenderSubsystem : public ApplicationSubsystem
     {
     public:
         RenderSubsystem(Application& engine);
 
-        void Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<MaterialResource>& material, const Matrix4& transform);
-        void Submit(const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Shader>& shader, const Matrix4& transform);
+        void Submit(const RenderViewData& viewData, const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<MaterialResource>& material, const Matrix4& transform);
+        void Submit(const RenderViewData& viewData, const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Shader>& shader, const Matrix4& transform);
+
+        void SubmitView(const View& view);
 
         SharedPtr<MaterialResource> GetMaterial(const String path);
         SharedPtr<Shader> GetShader(const String path);
@@ -45,6 +64,7 @@ namespace axiom
 
         void ReloadShaders();
 
+
     protected:
         void OnInitialize() override;
         void OnShutdown() override;
@@ -61,18 +81,6 @@ namespace axiom
         SharedPtr<Shader> CreateShader(const String path);
 
     private:
-        struct RenderSceneData
-        {
-            Matrix4 viewProjectionMatrix;
-            Matrix4 lightViewProjectionMatrix;
-            
-            bool hasDirectionalLight = false;
-            Vec3 lightDirection;
-            Vec3 lightColor;
-
-            Vec3 cameraPosition;
-            float time;
-        };
 
         struct RenderCommand
         {
@@ -101,9 +109,9 @@ namespace axiom
 
         MeshBuffers GetOrCreateBuffers(const SharedPtr<MeshResource>& mesh);
 
-        void SubmitInstanced(const MeshBuffers& buffers, const SharedPtr<MaterialResource>& material, const Vector<Matrix4>& transforms);
-        void SubmitInstanced(const MeshBuffers& buffers, const SharedPtr<Shader>& instancedShader, const Vector<Matrix4>& transforms);
-        void SubmitBatched(const SharedPtr<MaterialResource>& material, const Vector<RenderCommand>& commands);
+        void SubmitInstanced(const RenderViewData& viewData, const MeshBuffers& buffers, const SharedPtr<MaterialResource>& material, const Vector<Matrix4>& transforms);
+        void SubmitInstanced(const RenderViewData& viewData, const MeshBuffers& buffers, const SharedPtr<Shader>& instancedShader, const Vector<Matrix4>& transforms);
+        void SubmitBatched(const RenderViewData& viewData, const SharedPtr<MaterialResource>& material, const Vector<RenderCommand>& commands);
         void ResetDebugDrawCounters();
 
         SharedPtr<Shader> m_screenQuadShader;        
@@ -114,19 +122,18 @@ namespace axiom
 
         SharedPtr<VertexBuffer> m_screenQuadVB;
         SharedPtr<IndexBuffer> m_screenQuadIB;
-        void RenderToScreen();
 
         void RenderShadowPass(const Matrix4& lightProjectionMatrix, const Vector<RenderCommand>& commands);
-        void RenderScenePass(const Matrix4& viewProjectionMatrix, const Vector<RenderCommand>& commands);
+        void RenderScenePass(const RenderSceneData& sceneData, const RenderViewData& viewData, const Vector<RenderCommand>& commands);
 
         Vector<Vec3> GetFrustumCornersWorldSpace(const Matrix4& invViewProj);
-        Matrix4 ComputeShadowProjection(const Matrix4& lightViewMatrix, const Matrix4& cameraViewProjection);
+        Matrix4 ComputeShadowProjection(const Matrix4& lightViewMatrix, const Matrix4& cameraViewMatrix);
 
-        Vector<View> BuildViews(Scene& scene);
         void ExecuteView(const View& view, const Vector<RenderCommand>& commands);
 
-        SharedPtr<FrameBuffer> m_frameBuffer;
         SharedPtr<FrameBuffer> m_shadowMapFrameBuffer;
+
+        float m_shadowDistance = 10.0f;
 
         uint32 m_callCount = 0;
         uint32 m_instanceCallCount = 0;
@@ -140,5 +147,8 @@ namespace axiom
         
         TimePoint m_lastRenderTime;
         float m_elapsedTime = 0;
+        float m_dt = 0;
+
+        Vector<View> m_views;
     };
 }

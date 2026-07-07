@@ -42,8 +42,7 @@ Sandbox::Sandbox(AppConfig appConfig)
 void Sandbox::OnRegisterModules()
 {
     FileSubsystem& fileSystemModule = GetSubsystem<FileSubsystem>();
-    fileSystemModule.Mount("Engine", AX_ENGINE_DIR);
-    fileSystemModule.Mount("Project", AX_PROJECT_DIR);
+    fileSystemModule.Mount(MountPoints::Project, AX_PROJECT_DIR);
 }
 
 void Sandbox::OnApplicationRun()

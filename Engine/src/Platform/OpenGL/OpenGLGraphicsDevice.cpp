@@ -186,6 +186,11 @@ namespace axiom
         glBindTexture(GL_TEXTURE_2D, textureId);
     }
 
+    void OpenGLGraphicsDevice::BindDefaultFrameBuffer()
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
     void OpenGLGraphicsDevice::SetViewport(uint32 x, uint32 y, uint32 width, uint32 height)
     {
         glViewport(0, 0, width, height);

@@ -1,17 +1,17 @@
 #pragma once
 
-#include "Core/Types.h"
-#include "Core/Assert.h"
-#include "Application.h"
+#include "Types.h"
+#include "Assert.h"
+#include "Timestep.h"
+#include "Log.h"
 #include "ApplicationSubsystem.h"
+
 #include "Platform/ApplicationWindow.h"
+
 #include "Renderer/RenderTypes.h"
 #include "Renderer/GraphicsDevice.h"
+
 #include "Event/Event.h"
-#include "Log.h"
-
-#include "Core/Timestep.h"
-
 #include <unordered_map>
 #include <typeindex>
 
@@ -24,6 +24,7 @@ namespace axiom
     class WorldSubsystem;
     class RenderSubsystem;
     class ImGuiSubsystem;
+    class ReflectionSubsystem;
 
 
     struct AppConfig
@@ -83,6 +84,7 @@ namespace axiom
         WorldSubsystem* worldSubsystem = nullptr;
         RenderSubsystem* renderSubsystem = nullptr;
         ImGuiSubsystem* imGuiSubsystem = nullptr;
+        ReflectionSubsystem* reflectionSubsystem = nullptr;
 
         // User override hooks — override these in your Application subclass
         virtual void OnApplicationRun() {}
