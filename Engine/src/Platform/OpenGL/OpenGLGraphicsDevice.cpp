@@ -140,7 +140,7 @@ namespace axiom
         return MakeShared<OpenGLTexture2D>(resource);
     }
 
-    SharedPtr<FrameBuffer> OpenGLGraphicsDevice::CreateFrameBuffer(const FramebufferSpec &spec) const
+    SharedPtr<FrameBuffer> OpenGLGraphicsDevice::CreateFrameBuffer(const FramebufferSpec& spec) const
     {
         return MakeShared<OpenGLFrameBuffer>(spec);
     }

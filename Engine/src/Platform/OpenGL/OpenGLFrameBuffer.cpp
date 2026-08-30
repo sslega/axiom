@@ -74,17 +74,16 @@ namespace axiom
         m_width = width;
         m_height = height;
 
-        if(IsDepthOnly())
-        {
-            glBindTexture(GL_TEXTURE_2D, m_textureDepthBuffer);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_width, m_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-            glBindTexture(GL_TEXTURE_2D, 0);
-        }
-        else
+        if(!IsDepthOnly())
         {
             glBindTexture(GL_TEXTURE_2D, m_textureColorBuffer);
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
             glBindTexture(GL_TEXTURE_2D, 0);
         }
+
+        glBindTexture(GL_TEXTURE_2D, m_textureDepthBuffer);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_width, m_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
     }
 }

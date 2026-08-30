@@ -12,7 +12,7 @@ namespace axiom
         Matrix4 viewProjection;
         Vec3 cameraPosition;
         SharedPtr<FrameBuffer> renderTarget;
-        String debugName;
+        String name;
         uint32 width {0};
         uint32 height {0};
         Vec4 clearColor {0, 0, 0, 1};

@@ -1,17 +1,13 @@
 #pragma once
 
 #include "AxiomEngine.h"
-#include "EditorCamera.h"
+#include "UI/EditorUI.h"
 
 using namespace axiom;
 
 namespace axiom
 {
-    class Shader;
     class WindowResizeEvent;
-    class KeyboardEvent;
-    class Texture2D;
-    class CameraComponent;
 
     class Editor : public Application
     {
@@ -28,15 +24,7 @@ namespace axiom
         virtual void OnUpdate(float deltaTime) override;
     
     private:
-        EditorCamera m_viewportCamera;
-        SharedPtr<FrameBuffer> m_viewportFrameBuffer;
-        Vec2 m_lastViewportSize {0, 0};
-        bool m_viewportFocused {false};
-
-        EditorCamera m_viewportCamera2;
-        SharedPtr<FrameBuffer> m_viewportFrameBuffer2;
-        Vec2 m_lastViewportSize2 {0, 0};
-        bool m_viewport2Focused {false};
+        UniquePtr<EditorUI> m_editorUI;
     };
 
 }
