@@ -24,9 +24,9 @@ namespace axiom
     {
         bool hasDirectionalLight = false;
         Vec3 lightDirection;
+        Matrix4 lightViewMatrix;
         Vec3 lightColor;
-        Matrix4 lightViewProjectionMatrix;
-
+    
         float time;
     };
 
@@ -34,6 +34,7 @@ namespace axiom
     {
         Vec3 cameraPosition;
         Matrix4 viewProjectionMatrix;
+        Matrix4 lightViewProjectionMatrix;
     };
 
     class RenderSubsystem : public ApplicationSubsystem
@@ -124,6 +125,7 @@ namespace axiom
         SharedPtr<IndexBuffer> m_screenQuadIB;
 
         void RenderShadowPass(const Matrix4& lightProjectionMatrix, const Vector<RenderCommand>& commands);
+        void RenderShadowMap(const Matrix4& lightViewProjection, const Vector<RenderCommand>& commands);
         void RenderScenePass(const RenderSceneData& sceneData, const RenderViewData& viewData, const Vector<RenderCommand>& commands);
 
         Vector<Vec3> GetFrustumCornersWorldSpace(const Matrix4& invViewProj);

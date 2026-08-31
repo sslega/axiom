@@ -123,7 +123,7 @@ namespace axiom
             Log::Error("More than one DirectionalLightComponent present!");
         }
 
-        if(!directionalLight.empty() && !m_views.empty())
+        if(!directionalLight.empty())
         {
             DirectionalLightComponent* light = directionalLight[0];
             TransformComponent* lightTransform = light->GetEntity().GetComponent<TransformComponent>();
@@ -132,11 +132,7 @@ namespace axiom
             m_renderSceneData.lightColor = light->color * light->intensity;
             m_renderSceneData.lightDirection = lightTransform->Forward();
             Vec3 eye = m_renderSceneData.lightDirection;
-            Matrix4 lightViewMatrix = Matrix4::LookAt(eye, Vec3(0,0,0), Vec3(0,1,0));
-            //TODO: this probably should calculate for each view
-            Matrix4 lightProjection = ComputeShadowProjection(lightViewMatrix, m_views[0].viewProjection);
-            m_renderSceneData.lightViewProjectionMatrix = lightProjection * lightViewMatrix;
-
+            m_renderSceneData.lightViewMatrix = Matrix4::LookAt(eye, Vec3(0,0,0), Vec3(0,1,0));
         }
         else
         {
@@ -144,7 +140,7 @@ namespace axiom
             m_renderSceneData.lightColor = Vec3(0);
             m_renderSceneData.lightDirection = Vec3(1,0,0);
             
-            m_renderSceneData.lightViewProjectionMatrix = Matrix4::Identity();
+            m_renderSceneData.lightViewMatrix = Matrix4::Identity();
         }
 
 
@@ -159,21 +155,6 @@ namespace axiom
             TransformComponent* tc = meshComponent->GetEntity().GetComponent<TransformComponent>();
             renderCommands.push_back({ meshComponent->GetMesh(), meshComponent->GetMaterial(), tc ? tc->GetTransform() : Matrix4::Identity() });
         }
-
-        // Shadow Pass
-        if(m_renderSceneData.hasDirectionalLight)
-        {
-            m_graphicsDevice->SetColorWriteEnabled(true);
-            m_graphicsDevice->SetDepthWriteEnabled(true);
-            m_graphicsDevice->SetDepthFunction(DepthFunction::Less);
-            m_shadowMapFrameBuffer->Bind();
-            m_graphicsDevice->SetViewport(0, 0, m_shadowMapFrameBuffer->GetWidth(), m_shadowMapFrameBuffer->GetHeight());
-            m_graphicsDevice->Clear();
-            RenderShadowPass(m_renderSceneData.lightViewProjectionMatrix, renderCommands);
-        }
-
-        // Build views
-        
 
         // View Pass
         for(const auto& view : m_views)
@@ -256,7 +237,7 @@ namespace axiom
             m->SetUniform("u_LightDir", m_renderSceneData.lightDirection);
             m->SetUniform("u_LightColor", m_renderSceneData.lightColor);
             m->SetUniform("u_CameraPos", viewData.cameraPosition);
-            m->SetUniform("u_LightViewProjection", m_renderSceneData.lightViewProjectionMatrix);
+            m->SetUniform("u_LightViewProjection", viewData.lightViewProjectionMatrix);
             m->SetUniform("u_ShadowMap", 1);  // texture slot 1
             m_graphicsDevice->BindFrameBufferTexture(*m_shadowMapFrameBuffer, 1);
             defines.push_back("HAS_DIRECTIONAL_LIGHT");
@@ -473,6 +454,17 @@ namespace axiom
         }
     }
 
+    void RenderSubsystem::RenderShadowMap(const Matrix4& lightViewProjection, const Vector<RenderCommand>& commands)
+    {
+         m_graphicsDevice->SetColorWriteEnabled(true);
+        m_graphicsDevice->SetDepthWriteEnabled(true);
+        m_graphicsDevice->SetDepthFunction(DepthFunction::Less);
+        m_shadowMapFrameBuffer->Bind();
+        m_graphicsDevice->SetViewport(0, 0, m_shadowMapFrameBuffer->GetWidth(), m_shadowMapFrameBuffer->GetHeight());
+        m_graphicsDevice->Clear();
+        RenderShadowPass(lightViewProjection, commands);
+    }
+
     void RenderSubsystem::RenderScenePass(const RenderSceneData& sceneData, const RenderViewData& viewData, const Vector<RenderCommand>& commands)
     {
         // 2. Depth Pre-Pass
@@ -615,6 +607,18 @@ namespace axiom
         AX_ASSERT(view.renderTarget, "View has no render target!");
         AX_ASSERT(view.width != 0, "Invalid view render target dimension!");
         AX_ASSERT(view.height != 0, "Invalid view render target dimension!");
+
+        RenderViewData renderViewData;
+        renderViewData.cameraPosition = view.cameraPosition;
+        renderViewData.viewProjectionMatrix = view.viewProjection;
+
+        if(m_renderSceneData.hasDirectionalLight)
+        {
+            Matrix4 lightProj = ComputeShadowProjection(m_renderSceneData.lightViewMatrix, view.viewProjection);
+            renderViewData.lightViewProjectionMatrix = lightProj * m_renderSceneData.lightViewMatrix;
+            
+            RenderShadowMap(renderViewData.lightViewProjectionMatrix, commands);
+        }
         
         m_graphicsDevice->SetColorWriteEnabled(true);
         m_graphicsDevice->SetDepthWriteEnabled(true);
@@ -623,10 +627,6 @@ namespace axiom
         m_graphicsDevice->SetViewport(0, 0, view.width, view.height);
         m_graphicsDevice->SetClearColor(view.clearColor);
         m_graphicsDevice->Clear();
-
-        RenderViewData renderViewData;
-        renderViewData.cameraPosition = view.cameraPosition;
-        renderViewData.viewProjectionMatrix = view.viewProjection;
 
         RenderScenePass(m_renderSceneData, renderViewData, commands);
     }
