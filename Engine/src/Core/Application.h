@@ -130,7 +130,6 @@ namespace axiom
         void RegisterSubsystems();
         void InitializeSubsystems();
         void ShutdownSubsystems();
-        virtual void RegisterComponentFactories();
 
         static Application* s_current;
         TimePoint m_lastUpdateTime;

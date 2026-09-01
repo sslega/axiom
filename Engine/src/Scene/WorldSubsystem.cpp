@@ -11,14 +11,16 @@
 #include "Renderer/CameraController.h"
 #include "Renderer/MeshComponent.h"
 #include "Serialization/Archive.h"
+#include "Reflection/ReflectionSubsystem.h"
 
 namespace axiom
 {
-    SceneLoader::SceneLoader(Scene& scene, ResourceSubsystem& resourceModule, RenderSubsystem& renderModule, FileSubsystem& fileSystemModule)
+    SceneLoader::SceneLoader(Scene& scene, ResourceSubsystem& resourceModule, RenderSubsystem& renderModule, FileSubsystem& fileSystemModule,  ReflectionSubsystem& reflectionSubsystem)
     : m_scene(scene)
     , m_resourceModule(resourceModule)
     , m_renderModule(renderModule)
     , m_fileSystemModule(fileSystemModule)
+    , m_reflectionSubsystem(reflectionSubsystem)
     {
     }
 
@@ -38,7 +40,12 @@ namespace axiom
             for (auto& componentJson : entityJson["components"])
             {
                 String type = componentJson["type"].get<String>();
-                UniquePtr<Component> component = ClassRegistry::Get().Create(type);
+                UniquePtr<Component> component = m_reflectionSubsystem.GetTypeRegistry().Create(type);
+                if(component == nullptr)
+                {
+                    Log::Error("Unknown reflection type: {}", type);
+                    continue;
+                }
                 Archive ar(componentJson, handles);
                 component->Deserialize(ar);
                 entity->AddComponent(std::move(component));
@@ -73,8 +80,9 @@ namespace axiom
         ResourceSubsystem& resources = GetSubsystem<ResourceSubsystem>();
         RenderSubsystem& render = GetSubsystem<RenderSubsystem>();
         FileSubsystem& fileSystemModule = GetSubsystem<FileSubsystem>();
+        ReflectionSubsystem& reflection = GetSubsystem<ReflectionSubsystem>();
 
-        m_sceneLoader = MakeUnique<SceneLoader>(*m_activeScene, resources, render, fileSystemModule);
+        m_sceneLoader = MakeUnique<SceneLoader>(*m_activeScene, resources, render, fileSystemModule, reflection);
 
         m_activeScene->Initialize();
     }

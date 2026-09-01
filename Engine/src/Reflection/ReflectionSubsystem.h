@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ApplicationSubsystem.h"
-#include "Reflection.h"
+#include "Core/ApplicationSubsystem.h"
+#include "Reflection/Reflection.h"
 
 namespace axiom
 {

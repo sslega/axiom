@@ -3,7 +3,7 @@
 #include "Scene/Component.h"
 #include "Math/Vector.h"
 #include "Math/Matrix4.h"
-#include "Core/Reflection.h"
+#include "Reflection/Reflection.h"
 
 namespace axiom
 {
@@ -48,10 +48,4 @@ namespace axiom
         Vec3 Right()   const { return LocalToWorld({ 1,  0,  0}); }
         Vec3 Up()      const { return LocalToWorld({ 0,  1,  0}); }
     };
-
-    AX_REFLECT(TransformComponent)
-        AX_FIELD(position)
-        AX_FIELD(rotation)
-        AX_FIELD(scale)
-    AX_REFLECT_END()
 }

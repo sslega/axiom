@@ -10,30 +10,20 @@ namespace axiom
 {
     class ResourceSubsystem;
     class RenderSubsystem;
-
-    // using ComponentFactory = std::function<void(Entity&, const nlohmann::json&)>;
+    class ReflectionSubsystem;
 
     class SceneLoader
     {
     public:
-        SceneLoader(Scene& scene, ResourceSubsystem& resourceModule, RenderSubsystem& renderModule, FileSubsystem& fileSystemModule);
+        SceneLoader(Scene& scene, ResourceSubsystem& resourceModule, RenderSubsystem& renderModule, FileSubsystem& fileSystemModule, ReflectionSubsystem& reflectionSubsystem);
 
         void Load(const String& path);
-
-        // template<typename T>
-        // void Register(const String& key)
-        // {
-        //     m_factories[key] = [](Entity& e, const nlohmann::json& j) {
-        //         e.CreateComponent<T>().Load(j);
-        //     };
-        // }
-
     private:
         Scene& m_scene;
         ResourceSubsystem& m_resourceModule;
         RenderSubsystem& m_renderModule;
         FileSubsystem& m_fileSystemModule;
-        // StringMap<ComponentFactory> m_factories;
+        ReflectionSubsystem& m_reflectionSubsystem;
     };
 
     class WorldSubsystem : public ApplicationSubsystem

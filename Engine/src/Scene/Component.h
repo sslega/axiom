@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Serialization/ClassRegistry.h"
 #include "Core/Object.h"
 
 namespace axiom

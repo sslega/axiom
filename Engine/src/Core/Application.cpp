@@ -1,6 +1,6 @@
 #include "Application.h"
 #include "FileSubsystem.h"
-#include "ReflectionSubsystem.h"
+#include "Reflection/ReflectionSubsystem.h"
 #include "Log.h"
 #include "Global.h"
 
@@ -66,7 +66,6 @@ namespace axiom
     {
         Log::Info("Starting Axiom Application...");
 
-        RegisterComponentFactories();
         RegisterSubsystems();
         OnRegisterModules();
         InitializeSubsystems();
@@ -140,6 +139,8 @@ namespace axiom
     {
         fileSubsystem = RegisterSubsystem<FileSubsystem>();
         fileSubsystem->Mount(MountPoints::Engine, AX_ENGINE_DIR);
+
+        reflectionSubsystem = RegisterSubsystem<ReflectionSubsystem>();
         
         resourceSubsystem = RegisterSubsystem<ResourceSubsystem>();
         resourceSubsystem->RegisterLoader<GLShaderLoader>(".glsl");
@@ -152,7 +153,7 @@ namespace axiom
         resourceSubsystem->RegisterLoader<MaterialLoader>(".mat", *renderSubsystem);
         imGuiSubsystem = RegisterSubsystem<ImGuiSubsystem>();
 
-        reflectionSubsystem = RegisterSubsystem<ReflectionSubsystem>();
+        
     }
 
     void Application::InitializeSubsystems()
@@ -173,15 +174,6 @@ namespace axiom
             Log::Info("Shutting down module: {}", it->name());
             m_applicationSubsystems[*it]->Shutdown();
         }
-    }
-
-    void Application::RegisterComponentFactories()
-    {
-        ClassRegistry::Get().Register("TransformComponent", [] { return MakeUnique<TransformComponent>(); });
-        ClassRegistry::Get().Register("CameraComponent", [] { return MakeUnique<CameraComponent>(); });
-        ClassRegistry::Get().Register("CameraController", [] { return MakeUnique<CameraController>(); });
-        ClassRegistry::Get().Register("MeshComponent", [] { return MakeUnique<MeshComponent>(); });
-        ClassRegistry::Get().Register("DirectionalLightComponent", [] { return MakeUnique<DirectionalLightComponent>(); });
     }
 
     const GraphicsDevice::API Application::GetRenderAPI() const

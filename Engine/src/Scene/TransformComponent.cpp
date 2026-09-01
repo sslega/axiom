@@ -1,8 +1,7 @@
 #include "TransformComponent.h"
 #include "Serialization/Archive.h"
-#include "Serialization/ClassRegistry.h"
 #include "Math/Math.h"
-#include "Core/Reflection.h"
+#include "Reflection/Reflection.h"
 
 namespace axiom
 {

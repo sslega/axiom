@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Types.h"
-#include "Core/Reflection.h"
+#include "Reflection/Reflection.h"
 #include "Math/Vector.h"
 #include "Scene/Component.h"
 
@@ -18,9 +18,4 @@ namespace axiom
         virtual void Serialize(Archive& ar) override;
         virtual void Deserialize(Archive& ar) override;
     };
-
-    AX_REFLECT(DirectionalLightComponent)
-        AX_FIELD(color)
-        AX_FIELD(intensity)
-    AX_REFLECT_END()
 }
