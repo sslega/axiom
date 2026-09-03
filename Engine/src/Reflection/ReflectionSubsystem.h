@@ -13,6 +13,7 @@ namespace axiom
 
         protected:
             virtual void OnInitialize() override;
+            virtual void OnShutdown() override;
         
         private:
             TypeRegistry m_typeRegistry;

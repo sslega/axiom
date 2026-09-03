@@ -14,6 +14,8 @@ namespace axiom
 
         Entity& GetEntity() const;
         
+        void Deserialize(Archive& ar) override;
+        void Serialize(Archive& ar) override;
 
     protected:
         virtual void OnRegister()   {}

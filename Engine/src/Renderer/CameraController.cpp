@@ -51,18 +51,6 @@ namespace axiom
             m_transformComponent->position.y -= speed;
     }
 
-    void CameraController::Deserialize(Archive &ar)
-    {
-        ar.Read("moveSpeed", moveSpeed);
-        ar.Read("lookSensitivity", lookSensitivity);
-    }
-
-    void CameraController::Serialize(Archive &ar)
-    {
-        ar.Write("moveSpeed", moveSpeed);
-        ar.Write("lookSensitivity", lookSensitivity);
-    }
-
     void CameraController::OnInitialize()
     {
         m_transformComponent = GetEntity().GetComponent<TransformComponent>();

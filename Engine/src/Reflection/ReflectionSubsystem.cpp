@@ -11,5 +11,11 @@ namespace axiom
     void ReflectionSubsystem::OnInitialize()
     {
         RegisterEngineReflection(m_typeRegistry);
+        Reflection::SetInstance(&m_typeRegistry);
+    }
+    
+    void ReflectionSubsystem::OnShutdown()
+    {
+        Reflection::SetInstance(nullptr);
     }
 }

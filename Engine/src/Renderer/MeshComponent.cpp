@@ -42,15 +42,15 @@ namespace axiom
 
     void MeshComponent::Deserialize(Archive& ar)
     {
+        Component::Deserialize(ar);
         ar.Read("material", m_material);
-        ar.Read("visible", m_isVisible);
         ar.Read("mesh", m_mesh);
     }
 
     void MeshComponent::Serialize(Archive& ar)
     {
+        Component::Serialize(ar);
         ar.Write("material", m_material);
-        ar.Write("visible", m_isVisible);
         ar.Write("mesh", m_mesh);
     }
 }

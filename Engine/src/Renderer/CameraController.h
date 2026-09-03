@@ -13,9 +13,6 @@ namespace axiom
         float lookSensitivity = 0.002f;
         
         virtual void OnUpdate(float deltaTime) override;
-
-        virtual void Deserialize(Archive& ar) override;
-        virtual void Serialize(Archive& ar) override;
         
     protected:
         TransformComponent* m_transformComponent;

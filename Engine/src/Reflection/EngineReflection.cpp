@@ -6,7 +6,6 @@
 #include "Renderer/CameraComponent.h"
 #include "Renderer/LightComponent.h"
 #include "Renderer/CameraController.h"
-#include <cstddef>   // offsetof
 
 namespace axiom
 {
@@ -17,9 +16,10 @@ namespace axiom
             desc.name = "TransformComponent";
             desc.type = typeid(TransformComponent);
             desc.factory = []() -> UniquePtr<Component> { return MakeUnique<TransformComponent>(); };
-            desc.fields.push_back({ "position", MapFieldType<Vec3>(), offsetof(TransformComponent, position) });
-            desc.fields.push_back({ "rotation", MapFieldType<Vec3>(), offsetof(TransformComponent, rotation) });
-            desc.fields.push_back({ "scale",    MapFieldType<Vec3>(), offsetof(TransformComponent, scale) });
+            desc.fields.push_back(MakeField("position", &TransformComponent::position));
+            desc.fields.push_back(MakeField("rotation", &TransformComponent::rotation));
+            desc.fields.push_back(MakeField("scale", &TransformComponent::scale));
+            
             registry.Register(std::move(desc));
         }
     
@@ -36,8 +36,8 @@ namespace axiom
             desc.name = "CameraController";
             desc.type = typeid(CameraController);
             desc.factory = []() -> UniquePtr<Component> { return MakeUnique<CameraController>(); };
-            desc.fields.push_back({ "moveSpeed", MapFieldType<float>(), offsetof(CameraController, moveSpeed) });
-            desc.fields.push_back({ "lookSensitivity", MapFieldType<float>(), offsetof(CameraController, lookSensitivity) });
+            desc.fields.push_back(MakeField("moveSpeed", &CameraController::moveSpeed));
+            desc.fields.push_back(MakeField("lookSensitivity", &CameraController::lookSensitivity));
             registry.Register(std::move(desc));
         }
 
@@ -46,16 +46,17 @@ namespace axiom
             desc.name = "DirectionalLightComponent";
             desc.type = typeid(DirectionalLightComponent);
             desc.factory = []() -> UniquePtr<Component> { return MakeUnique<DirectionalLightComponent>(); };
-            desc.fields.push_back({ "color", MapFieldType<Vec3>(), offsetof(DirectionalLightComponent, color) });
-            desc.fields.push_back({ "intensity", MapFieldType<float>(), offsetof(DirectionalLightComponent, intensity) });
+            desc.fields.push_back(MakeField("color", &DirectionalLightComponent::color));
+            desc.fields.push_back(MakeField("intensity", &DirectionalLightComponent::intensity));
             registry.Register(std::move(desc));
         }
 
-         {
+        {
             TypeDescriptor desc;
             desc.name = "MeshComponent";
             desc.type = typeid(MeshComponent);
             desc.factory = []() -> UniquePtr<Component> { return MakeUnique<MeshComponent>(); };
+            desc.fields.push_back(MakeField("visible", &MeshComponent::IsVisible, &MeshComponent::SetVisible));
             registry.Register(std::move(desc));
         }
     }

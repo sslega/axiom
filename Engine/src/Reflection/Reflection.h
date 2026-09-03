@@ -1,7 +1,8 @@
 #pragma once
 #include "Core/Types.h"
-#include "Scene/Component.h"
+#include "Core/Assert.h"
 #include "Assert.h"
+#include "Scene/Component.h"
 #include "Math/Vector.h"
 #include <variant>
 #include <functional>
@@ -13,11 +14,14 @@ namespace axiom
 
     enum class FieldType { Float, Int, Bool, Vec3, String };
     
+
     struct FieldDescriptor
     {
         const char* name;
         FieldType type;
-        size_t offset;
+        std::function<FieldValue(const void*)> get;
+        std::function<void(void*, const FieldValue&)> set;
+
     };
 
     struct TypeDescriptor
@@ -80,4 +84,36 @@ namespace axiom
     { 
         return FieldTypeTag(static_cast<U*>(nullptr)); 
     }
+
+    template<class T, class U>
+    FieldDescriptor MakeField(const char* name, U T::* m)
+    {
+        FieldDescriptor f;
+        f.name = name;
+        f.type = MapFieldType<U>();
+        f.get  = [m](const void* o)                     { return FieldValue(static_cast<const T*>(o)->*m); };
+        f.set  = [m](void* o, const FieldValue& v)      { static_cast<T*>(o)->*m = std::get<U>(v); };
+        return f;
+    }
+
+    template<class T, class U>
+    FieldDescriptor MakeField(const char* name, U (T::*getter)() const, void (T::*setter)(U))
+    {
+        FieldDescriptor f;
+        f.name = name;
+        f.type = MapFieldType<U>();
+        f.get = [getter](const void* o)                { return FieldValue((static_cast<const T*>(o)->*getter)()); };
+        f.set = [setter](void* o, const FieldValue& v) { (static_cast<T*>(o)->*setter)(std::get<U>(v)); };
+        return f;
+    }
+
+    class Reflection
+    {
+    public:
+        inline static const TypeRegistry& Get() { AX_ASSERT(s_instance, "No Reflection instance set."); return *s_instance;};
+    private:
+        inline static void SetInstance(TypeRegistry* instance) { s_instance = instance; }
+        inline static TypeRegistry* s_instance = nullptr;
+        friend class ReflectionSubsystem;
+    };
 }
