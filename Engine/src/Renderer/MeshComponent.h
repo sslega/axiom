@@ -1,7 +1,6 @@
 #pragma once
 #include "Scene/Component.h"
 #include "Core/Types.h"
-#include "Reflection/Reflection.h"
 
 namespace axiom
 {
@@ -12,19 +11,15 @@ namespace axiom
     {
     public:
         MeshComponent();
-        void SetMesh(const SharedPtr<MeshResource>& mesh);
-        const SharedPtr<MeshResource> GetMesh() const;
-        void SetMaterial(const SharedPtr<MaterialResource>& material);
-        const SharedPtr<MaterialResource> GetMaterial() const;
+
         bool IsVisible() const;
         void SetVisible(bool visible);
 
-        virtual void Deserialize(Archive& ar) override;
-        virtual void Serialize(Archive& ar) override;
+        SharedPtr<MeshResource> mesh;
+        SharedPtr<MaterialResource> material;
 
     protected:
-        SharedPtr<MeshResource> m_mesh;
-        SharedPtr<MaterialResource> m_material;
+
         bool m_isVisible = true;
     };
 }

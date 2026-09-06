@@ -1,11 +1,13 @@
 #include "Reflection/EngineReflection.h"
-#include "Reflection/Reflection.h"
+#include "Reflection/ReflectionField.h"
 #include "Scene/Component.h"
 #include "Scene/TransformComponent.h"
 #include "Renderer/MeshComponent.h"
 #include "Renderer/CameraComponent.h"
 #include "Renderer/LightComponent.h"
 #include "Renderer/CameraController.h"
+#include "Resources/MeshResource.h"
+#include "Resources/MaterialResource.h"
 
 namespace axiom
 {
@@ -18,8 +20,7 @@ namespace axiom
             desc.factory = []() -> UniquePtr<Component> { return MakeUnique<TransformComponent>(); };
             desc.fields.push_back(MakeField("position", &TransformComponent::position));
             desc.fields.push_back(MakeField("rotation", &TransformComponent::rotation));
-            desc.fields.push_back(MakeField("scale", &TransformComponent::scale));
-            
+            desc.fields.push_back(MakeField("scale", &TransformComponent::scale));            
             registry.Register(std::move(desc));
         }
     
@@ -57,6 +58,8 @@ namespace axiom
             desc.type = typeid(MeshComponent);
             desc.factory = []() -> UniquePtr<Component> { return MakeUnique<MeshComponent>(); };
             desc.fields.push_back(MakeField("visible", &MeshComponent::IsVisible, &MeshComponent::SetVisible));
+            desc.fields.push_back(MakeResourceField("mesh",     &MeshComponent::mesh));
+            desc.fields.push_back(MakeResourceField("material", &MeshComponent::material));
             registry.Register(std::move(desc));
         }
     }

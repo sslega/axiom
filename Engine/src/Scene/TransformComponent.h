@@ -3,7 +3,6 @@
 #include "Scene/Component.h"
 #include "Math/Vector.h"
 #include "Math/Matrix4.h"
-#include "Reflection/Reflection.h"
 
 namespace axiom
 {

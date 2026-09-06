@@ -15,7 +15,7 @@ namespace axiom
         Archive(nlohmann::json& node, Vector<UniquePtr<IResolvable>>& handles);
 
         template<typename T>
-        void Write(const String& key, T& value)
+        void Write(const String& key, const T& value)
         {
             Serializer<T>::Write(*this, key, value);
         }
