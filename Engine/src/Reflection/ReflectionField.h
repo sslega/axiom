@@ -2,6 +2,7 @@
 
 #include "Reflection/Reflection.h"
 #include "Serialization/Archive.h"
+#include "Resources/ResourceRef.h"
 
 namespace axiom
 {
@@ -18,6 +19,10 @@ namespace axiom
     constexpr FieldType FieldTypeTag(Vec3*)  { return FieldType::Vec3;  }
     constexpr FieldType FieldTypeTag(String*){ return FieldType::String;}
 
+    template<class>   struct IsResourceRef                  : std::false_type {};
+    template<class R> struct IsResourceRef<ResourceRef<R>>  : std::true_type  {};
+
+
     template<class U> 
     constexpr FieldType MapFieldType() 
     { 
@@ -29,11 +34,21 @@ namespace axiom
     {
         FieldDescriptor f;
         f.name = name;
-        f.type = MapFieldType<U>();
-        f.get  = [m](const void* o)                             { return FieldValue(static_cast<const T*>(o)->*m); };
-        f.set  = [m](void* o, const FieldValue& v)              { static_cast<T*>(o)->*m = std::get<U>(v); };
-        f.serialize = [name, m](Archive& ar, const void* o)     { ar.Write(name, static_cast<const T*>(o)->*m); };
+
+        if constexpr (IsResourceRef<U>::value)
+        {            
+            f.type = FieldType::Resource;
+        }
+        else
+        {
+            f.type = MapFieldType<U>();
+            f.get  = [m](const void* o)                 { return FieldValue(static_cast<const T*>(o)->*m); };
+            f.set  = [m](void* o, const FieldValue& v)  { static_cast<T*>(o)->*m = std::get<U>(v); };
+        }
+
+        f.serialize =   [name, m](Archive& ar, const void* o)   { ar.Write(name, static_cast<const T*>(o)->*m); };
         f.deserialize = [name, m](Archive& ar, void* o)         { ar.Read(name, static_cast<T*>(o)->*m); };
+
         return f;
     }
 
@@ -56,15 +71,4 @@ namespace axiom
 
         return f;
     }
-
-    template<class T, class R>
-    FieldDescriptor MakeResourceField(const char* name, SharedPtr<R> T::* m)
-    {
-        FieldDescriptor f;
-        f.name = name;
-        f.serialize   = [name, m](Archive& ar, const void* o) { ar.Write(name, static_cast<const T*>(o)->*m); };
-        f.deserialize = [name, m](Archive& ar, void* o)       { ar.Read (name, static_cast<T*>(o)->*m);       };
-        return f;
-    }
-
 }

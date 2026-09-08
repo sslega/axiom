@@ -20,9 +20,9 @@ namespace axiom
         void Load(const String& path);
     private:
         Scene& m_scene;
-        ResourceSubsystem& m_resourceModule;
-        RenderSubsystem& m_renderModule;
-        FileSubsystem& m_fileSystemModule;
+        ResourceSubsystem& m_resourceSubsystem;
+        RenderSubsystem& m_renderSubsystem;
+        FileSubsystem& m_fileSubsystem;
         ReflectionSubsystem& m_reflectionSubsystem;
     };
 

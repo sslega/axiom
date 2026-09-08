@@ -1,6 +1,7 @@
 #pragma once
 #include "Scene/Component.h"
 #include "Core/Types.h"
+#include "Resources/ResourceRef.h"
 
 namespace axiom
 {
@@ -15,8 +16,8 @@ namespace axiom
         bool IsVisible() const;
         void SetVisible(bool visible);
 
-        SharedPtr<MeshResource> mesh;
-        SharedPtr<MaterialResource> material;
+        ResourceRef<MeshResource> mesh;
+        ResourceRef<MaterialResource> material;
 
     protected:
 

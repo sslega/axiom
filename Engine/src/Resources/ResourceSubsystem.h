@@ -3,6 +3,7 @@
 #include "Core/Types.h"
 #include "Core/ApplicationSubsystem.h"
 #include "Resources/ResourceLoader.h"
+#include "Resources/ResourceRef.h"
 
 namespace axiom
 {
@@ -31,6 +32,16 @@ namespace axiom
             static_assert(std::is_base_of_v<ResourceLoader, T>, "T must derive from ResourceLoader");
             m_loaders[fileExtension] = MakeUnique<T>(*this, std::forward<Args>(args)...);
         }
+
+        template<typename T>
+        void ResolveRef(ResourceRef<T>& ref)
+        {
+            if(!ref.m_path.empty() && !ref.IsResolved())
+            {
+                ref.m_resource = Load<T>(ref.m_path);
+            }
+        }
+
 
     protected:
         void OnInitialize() override;

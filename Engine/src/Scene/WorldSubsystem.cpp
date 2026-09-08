@@ -15,27 +15,25 @@
 
 namespace axiom
 {
-    SceneLoader::SceneLoader(Scene& scene, ResourceSubsystem& resourceModule, RenderSubsystem& renderModule, FileSubsystem& fileSystemModule,  ReflectionSubsystem& reflectionSubsystem)
+    SceneLoader::SceneLoader(Scene& scene, ResourceSubsystem& resourceSubsystem, RenderSubsystem& renderSubsystem, FileSubsystem& fileSystemModule,  ReflectionSubsystem& reflectionSubsystem)
     : m_scene(scene)
-    , m_resourceModule(resourceModule)
-    , m_renderModule(renderModule)
-    , m_fileSystemModule(fileSystemModule)
+    , m_resourceSubsystem(resourceSubsystem)
+    , m_renderSubsystem(renderSubsystem)
+    , m_fileSubsystem(fileSystemModule)
     , m_reflectionSubsystem(reflectionSubsystem)
     {
     }
 
     void SceneLoader::Load(const String& path)
     {
-        Vector<UniquePtr<IResolvable>> handles;
-
-        Path absolutePath = m_fileSystemModule.Resolve(path);
+        Path absolutePath = m_fileSubsystem.Resolve(path);
         std::ifstream fstream(absolutePath);
         nlohmann::json jsonData = nlohmann::json::parse(fstream);
 
         for (auto& entityJson : jsonData["entities"])
         {
             SharedPtr<Entity> entity = m_scene.CreateEntity();
-            Archive ar(entityJson, handles);
+            Archive ar(entityJson, m_resourceSubsystem);
             entity->Deserialize(ar);
             for (auto& componentJson : entityJson["components"])
             {
@@ -46,15 +44,10 @@ namespace axiom
                     Log::Error("Unknown reflection type: {}", type);
                     continue;
                 }
-                Archive ar(componentJson, handles);
+                Archive ar(componentJson, m_resourceSubsystem);
                 component->Deserialize(ar);
                 entity->AddComponent(std::move(component));
             }
-        }
-
-        for (auto& handle : handles)
-        {
-            handle->Resolve(m_resourceModule);
         }
     }
 

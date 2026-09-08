@@ -2,17 +2,19 @@
 
 #include "Core/Types.h"
 #include "nlohmann/json.hpp"
-#include "Resources/ResourceHandle.h"
+#include "Resources/ResourceSubsystem.h"
 #include "Math/Vector.h"
 
 namespace axiom
 {
-    class ResourceSubsystem;
-
     class Archive
     {
     public:
-        Archive(nlohmann::json& node, Vector<UniquePtr<IResolvable>>& handles);
+        Archive(nlohmann::json& node, ResourceSubsystem& resourceSubsystem)
+        : m_node(node)
+        , m_resourceSubsystem(resourceSubsystem)
+        {
+        }
 
         template<typename T>
         void Write(const String& key, const T& value)
@@ -29,13 +31,16 @@ namespace axiom
             }
         }
 
-        void RegisterHandle(UniquePtr<IResolvable> handle);
-        void MergeHandlesInto(Archive& other);
+        template<typename T>
+        void ResolveRef(ResourceRef<T>& ref)
+        {
+            m_resourceSubsystem.ResolveRef(ref);
+        }
 
         template<typename T> friend struct Serializer;
     private:
         nlohmann::json& m_node;
-        Vector<UniquePtr<IResolvable>>& m_handles;
+        ResourceSubsystem& m_resourceSubsystem;
     };
 
     template<typename T>
@@ -70,19 +75,20 @@ namespace axiom
     };
 
     template<typename T>
-    struct Serializer<SharedPtr<T>>
+    struct Serializer<ResourceRef<T>>
     {
-        static void Write(Archive& ar, const String& key, const SharedPtr<T>& value)
+        static void Write(Archive& ar, const String& key, const ResourceRef<T>& value)
         {
-            ar.m_node[key] = value->GetPath();
+            ar.m_node[key] = value.GetPath();
         }
 
-        static void Read(Archive& ar, const String& key, SharedPtr<T>& value)
+        static void Read(Archive& ar, const String& key, ResourceRef<T>& value)
         {
-            String path = ar.m_node[key].get<String>();
-            ar.RegisterHandle(MakeUnique<ResourceHandle<T>>(path, value));
+            value = ResourceRef<T>(ar.m_node[key].get<String>());
+            ar.ResolveRef(value);
         }
     };
+
 
     template<>
     struct Serializer<Vec2>
@@ -125,5 +131,4 @@ namespace axiom
             value = { arr[0].get<float>(), arr[1].get<float>(), arr[2].get<float>(), arr[3].get<float>() };
         }
     };
-
 } // namespace axiom

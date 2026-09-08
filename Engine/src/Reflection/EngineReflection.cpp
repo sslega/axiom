@@ -58,8 +58,8 @@ namespace axiom
             desc.type = typeid(MeshComponent);
             desc.factory = []() -> UniquePtr<Component> { return MakeUnique<MeshComponent>(); };
             desc.fields.push_back(MakeField("visible", &MeshComponent::IsVisible, &MeshComponent::SetVisible));
-            desc.fields.push_back(MakeResourceField("mesh",     &MeshComponent::mesh));
-            desc.fields.push_back(MakeResourceField("material", &MeshComponent::material));
+            desc.fields.push_back(MakeField("mesh",     &MeshComponent::mesh));
+            desc.fields.push_back(MakeField("material", &MeshComponent::material));
             registry.Register(std::move(desc));
         }
     }

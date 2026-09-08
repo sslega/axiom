@@ -14,7 +14,7 @@ namespace axiom
 
     using FieldValue = std::variant<float, int, bool, Vec3, String>;
 
-    enum class FieldType { Float, Int, Bool, Vec3, String, Opaque };
+    enum class FieldType { Float, Int, Bool, Vec3, String, Resource, Opaque };
 
     struct FieldDescriptor
     {

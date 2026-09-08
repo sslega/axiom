@@ -153,7 +153,7 @@ namespace axiom
             if (!meshComponent->IsVisible()) continue;
             if (!meshComponent->material || !meshComponent->mesh) continue;
             TransformComponent* tc = meshComponent->GetEntity().GetComponent<TransformComponent>();
-            renderCommands.push_back({ meshComponent->mesh, meshComponent->material, tc ? tc->GetTransform() : Matrix4::Identity() });
+            renderCommands.push_back({ meshComponent->mesh.GetResource(), meshComponent->material.GetResource(), tc ? tc->GetTransform() : Matrix4::Identity() });
         }
 
         // View Pass
