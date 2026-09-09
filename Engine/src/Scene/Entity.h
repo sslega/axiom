@@ -65,6 +65,10 @@ namespace axiom
             auto it = m_components.find(TypeID<T>());
             return it != m_components.end();
         }
+
+        Vector<Component*> GetComponents() const;
+        void GetComponents(Vector<Component*>& outComponents) const;
+
         
     protected:
         TypeMap<UniquePtr<Component>> m_components;

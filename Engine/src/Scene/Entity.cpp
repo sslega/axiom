@@ -14,6 +14,21 @@ namespace axiom
         ptr->Initialize();
     }
 
+    Vector<Component *> Entity::GetComponents() const
+    {
+        Vector<Component*> results;
+        GetComponents(results);
+        return results;
+    }
+
+    void Entity::GetComponents(Vector<Component *> &outComponents) const
+    {
+        for (auto& [type, component] : m_components)
+        {
+            outComponents.push_back(component.get());
+        }         
+    }
+
     void Entity::OnUnregister()
     {
         for (auto& [id, component] : m_components)

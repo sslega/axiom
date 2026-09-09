@@ -40,7 +40,7 @@ namespace axiom
 
     void Editor::OnInitializeModules()
     {
-        m_editorUI = MakeUnique<EditorUI>(GetSubsystem<RenderSubsystem>());
+        m_editorUI = MakeUnique<EditorUI>(GetSubsystem<RenderSubsystem>(), GetSubsystem<WorldSubsystem>());
         m_editorUI->OnInitialize();
     }
 

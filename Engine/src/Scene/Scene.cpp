@@ -34,6 +34,21 @@ namespace axiom
         return m_name;
     }
 
+    Vector<Entity *> Scene::GetEntities() const
+    {
+        Vector<Entity*> results;
+        GetEntities(results);
+        return results;
+    }
+
+    void Scene::GetEntities(Vector<Entity *> &outEntities) const
+    {
+        for(auto& [id, entity] : m_entities)
+        {
+            outEntities.push_back(entity.get());
+        }
+    }
+
     void Scene::OnUpdate(float deltaTime)
     {
         for (auto& [id, entity] : m_entities)

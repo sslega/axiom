@@ -35,6 +35,10 @@ namespace axiom
                 }
             }
         }
+
+        Vector<Entity*> GetEntities() const;
+        void GetEntities(Vector<Entity*>& outEntities) const;
+
     protected:
         virtual void OnRegister()   {}
         virtual void OnUnregister() {}

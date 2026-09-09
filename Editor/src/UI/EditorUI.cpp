@@ -1,11 +1,13 @@
 #include "EditorUI.h"
 #include "Panels/ViewportPanel.h"
+#include "Panels/OutlinerPanel.h"
 #include <imgui.h>
 
 namespace axiom
 {
-    EditorUI::EditorUI(RenderSubsystem &renderSubsystem)
-    :m_renderSubsystem (renderSubsystem)
+    EditorUI::EditorUI(RenderSubsystem& renderSubsystem, WorldSubsystem& worldSubsystem)
+    : m_renderSubsystem(renderSubsystem)
+    , m_worldSubsystem(worldSubsystem)
     {
     }
 
@@ -13,6 +15,7 @@ namespace axiom
     {
         AddViewportPanel("ViewportA");
         AddViewportPanel("ViewportB");
+        AddOutlinerPanel();
     }
 
     void EditorUI::OnUpdate(float dt)
@@ -46,5 +49,10 @@ namespace axiom
     void EditorUI::AddViewportPanel(const String& name)
     {
         m_panels.push_back(MakeUnique<ViewportPanel>(name, m_renderSubsystem));
+    }
+    
+    void EditorUI::AddOutlinerPanel()
+    {
+        m_panels.push_back(MakeUnique<OutlinerPanel>(m_worldSubsystem, m_selection));
     }
 }

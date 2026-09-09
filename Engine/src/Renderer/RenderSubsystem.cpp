@@ -193,6 +193,7 @@ namespace axiom
 
     void RenderSubsystem::OnGUI()
     {
+        return;
         uint8 fps = static_cast<uint8>(1.0f / m_dt);
 
         ImGui::SetNextWindowPos(ImVec2(0, 0));

@@ -10,8 +10,7 @@ namespace axiom
     }
 
     ViewportPanel::ViewportPanel(const String &name, uint32 width, uint32 height, RenderSubsystem &renderSubsystem)
-    : m_renderSubsystem(renderSubsystem)
-    , m_name(name)
+    : EditorPanel(name), m_renderSubsystem(renderSubsystem)
     {
         axiom::FramebufferSpec frameBufferSpec;
         frameBufferSpec.width = width;
