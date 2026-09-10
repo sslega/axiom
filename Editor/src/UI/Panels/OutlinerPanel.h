@@ -9,8 +9,8 @@ namespace axiom
     class OutlinerPanel : public EditorPanel
     {
     public:
-        OutlinerPanel(WorldSubsystem& world, Selection& selection)
-        : EditorPanel("Outliner"), m_world(world), m_selection(selection) {}
+        OutlinerPanel(WorldSubsystem& world, Selection& selection): 
+        EditorPanel("Outliner"), m_world(world), m_selection(selection) {}
 
         virtual void OnRender() override;
     

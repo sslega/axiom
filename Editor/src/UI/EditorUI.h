@@ -30,5 +30,6 @@ namespace axiom
         
         void AddViewportPanel(const String& name);
         void AddOutlinerPanel();
+        void AddInspectorPanel();
     };
 }

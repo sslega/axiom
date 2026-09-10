@@ -7,7 +7,7 @@ namespace axiom
 {
     void OutlinerPanel::OnRender()
     {
-        ImGui::Begin("Outliner");
+        ImGui::Begin(GetName().c_str());
         
         for(Entity* e : m_world.GetActiveScene().GetEntities())
         {
