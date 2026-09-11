@@ -54,6 +54,13 @@ namespace axiom
         Vec3 xyz() const { return Vec3(x, y, z); }
     };
 
+    struct Color : Vec3
+    {
+        Color() : Vec3() {};
+        Color(float xyz) : Vec3(xyz) {};
+        Color(float x, float y, float z) : Vec3(x, y, z) {};
+    };
+
     inline float Dot(Vec3 a, Vec3 b)
     {
         return a.x * b.x + a.y * b.y + a.z * b.z;

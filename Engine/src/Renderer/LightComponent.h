@@ -11,7 +11,7 @@ namespace axiom
     class DirectionalLightComponent : public Component
     {
     public:
-        Vec3 color {1.0, 0.95, 0.85};
+        Color color {1.0, 0.95, 0.85};
         float intensity {1.0f};
     };
 }

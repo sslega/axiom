@@ -12,14 +12,14 @@ namespace axiom
 
     class Archive;
 
-    using FieldValue = std::variant<float, int, bool, Vec3, String>;
+    using FieldValue = std::variant<float, int, bool, Vec3, String, Color>;
 
-    enum class FieldType { Float, Int, Bool, Vec3, String, Resource, Opaque };
+    enum class FieldType { Float, Int, Bool, Vec3, String, Color, Resource };
 
     struct FieldDescriptor
     {
         const char* name;
-        FieldType type = FieldType::Opaque;
+        FieldType type;
         std::function<FieldValue(const void*)> get;
         std::function<void(void*, const FieldValue&)> set;
 

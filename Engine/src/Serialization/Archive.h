@@ -131,4 +131,19 @@ namespace axiom
             value = { arr[0].get<float>(), arr[1].get<float>(), arr[2].get<float>(), arr[3].get<float>() };
         }
     };
+
+    template<>
+    struct Serializer<Color>
+    {
+        static void Write(Archive& ar, const String& key, const Color& value)
+        {
+            ar.m_node[key] = { value.x, value.y, value.z };
+        }
+        static void Read(Archive& ar, const String& key, Color& value)
+        {
+            auto& arr = ar.m_node[key];
+            value = { arr[0].get<float>(), arr[1].get<float>(), arr[2].get<float>() };
+        }
+    };
+    
 } // namespace axiom

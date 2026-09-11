@@ -13,11 +13,12 @@ namespace axiom
         return {};
     }    
 
-    constexpr FieldType FieldTypeTag(float*) { return FieldType::Float; }
-    constexpr FieldType FieldTypeTag(int*)   { return FieldType::Int;   }
-    constexpr FieldType FieldTypeTag(bool*)  { return FieldType::Bool;  }
-    constexpr FieldType FieldTypeTag(Vec3*)  { return FieldType::Vec3;  }
-    constexpr FieldType FieldTypeTag(String*){ return FieldType::String;}
+    constexpr FieldType FieldTypeTag(float*)    { return FieldType::Float;  }
+    constexpr FieldType FieldTypeTag(int*)      { return FieldType::Int;    }
+    constexpr FieldType FieldTypeTag(bool*)     { return FieldType::Bool;   }
+    constexpr FieldType FieldTypeTag(Vec3*)     { return FieldType::Vec3;   }
+    constexpr FieldType FieldTypeTag(Color*)    { return FieldType::Color;  }
+    constexpr FieldType FieldTypeTag(String*)   { return FieldType::String; }
 
     template<class>   struct IsResourceRef                  : std::false_type {};
     template<class R> struct IsResourceRef<ResourceRef<R>>  : std::true_type  {};
