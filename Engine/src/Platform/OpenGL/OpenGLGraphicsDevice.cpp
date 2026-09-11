@@ -179,6 +179,19 @@ namespace axiom
         }
     }
 
+    void OpenGLGraphicsDevice::SetPolygonOffset(bool enabled, float factor, float units)
+    {
+        if (enabled)
+        {
+            glEnable(GL_POLYGON_OFFSET_FILL);
+            glPolygonOffset(factor, units);
+        }
+        else
+        {
+            glDisable(GL_POLYGON_OFFSET_FILL);
+        }
+    }
+
     void OpenGLGraphicsDevice::BindFrameBufferTexture(FrameBuffer& frameBuffer, uint32 slot)
     {
         glActiveTexture(GL_TEXTURE0 + slot);

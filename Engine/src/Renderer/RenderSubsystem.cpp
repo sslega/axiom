@@ -471,6 +471,9 @@ namespace axiom
         // 2. Depth Pre-Pass
         m_graphicsDevice->SetColorWriteEnabled(false);
         m_graphicsDevice->SetDepthWriteEnabled(true);
+        float factor = 1.0f;
+        float units = 1.0f;
+        m_graphicsDevice->SetPolygonOffset(true, factor, units);
 
         UnorderedMap<MeshResource*, Vector<Matrix4>> depthGroups;
         for (const auto& cmd : commands)
@@ -499,6 +502,7 @@ namespace axiom
         m_graphicsDevice->SetColorWriteEnabled(true);
         m_graphicsDevice->SetDepthWriteEnabled(false);
         m_graphicsDevice->SetDepthFunction(DepthFunction::LessEqual);
+        m_graphicsDevice->SetPolygonOffset(false, 0, 0);
 
         //TODO: Clean up instancing/batching toggle flags
         // 3. Group by (mesh, material)

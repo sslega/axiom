@@ -47,6 +47,7 @@ namespace axiom
         virtual void SetColorWriteEnabled(bool enabled) override;
         virtual void SetDepthWriteEnabled(bool enabled) override;
         virtual void SetDepthFunction(DepthFunction func) override;
+        virtual void SetPolygonOffset(bool enabled, float factor, float units) override;
 
     private:
         PairMap<std::pair<VertexBuffer*, VertexBuffer*>, uint32> m_vaoCache;

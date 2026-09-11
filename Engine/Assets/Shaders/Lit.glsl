@@ -32,7 +32,8 @@ float CalculateShadow(ShadowInput shadowInput)
         return 0;
 
     float shadowBias = 0.002;
-    float slopeScaleBias = shadowBias;//max(shadowBias * (1.0 - shadowInput.NdotL), shadowBias * 0.1);
+    // float slopeScaleBias = max(shadowBias * (1.0 - shadowInput.NdotL), shadowBias * 0.1);
+    float slopeScaleBias = shadowBias;
 
     vec3 lightSpaceNDC = (u_LightViewProjection * vec4(shadowInput.worldPosition, 1.0)).xyz;
     vec3 texCoords = (lightSpaceNDC * 0.5 + 0.5);

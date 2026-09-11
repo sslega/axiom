@@ -60,6 +60,7 @@ namespace axiom
         virtual void SetDepthTestEnabled(bool enabled) = 0;
         virtual void SetColorWriteEnabled(bool enabled) = 0;
         virtual void SetDepthWriteEnabled(bool enabled) = 0;
+        virtual void SetPolygonOffset(bool enabled, float factor, float units) = 0;
 
         virtual void SetDepthFunction(DepthFunction func) = 0;
 
