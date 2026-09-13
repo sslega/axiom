@@ -37,14 +37,34 @@ namespace axiom
             if (ImGui::BeginMenu("File"))
             {
                 ImGui::EndMenu();
-            } 
+            }
+            if (ImGui::BeginMenu("Edit"))
+            {
+                if(ImGui::MenuItem("Undo", "Ctrl+Z", false, m_undoStack.CanUndo()))
+                {
+                    m_undoStack.Undo();
+                }
+                if(ImGui::MenuItem("Redo", "Ctrl+Y", false, m_undoStack.CanRedo()))
+                {
+                    m_undoStack.Redo();
+                }
+                ImGui::EndMenu();
+            }  
             ImGui::EndMainMenuBar();
         }
         
-
         for(auto& panel : m_panels)
         {
             panel->OnRender();
+        }
+
+        if (!ImGui::GetIO().WantTextInput && ImGui::IsKeyDown(ImGuiMod_Ctrl) && ImGui::IsKeyPressed(ImGuiKey_Z))
+        {
+            m_undoStack.Undo();
+        }
+        if (!ImGui::GetIO().WantTextInput && ImGui::IsKeyDown(ImGuiMod_Ctrl) && ImGui::IsKeyPressed(ImGuiKey_Y))
+        {
+            m_undoStack.Redo();
         }
     }
     
@@ -60,6 +80,6 @@ namespace axiom
     
     void EditorUI::AddInspectorPanel()
     {
-        m_panels.push_back(MakeUnique<InspectorPanel>(m_selection));
+        m_panels.push_back(MakeUnique<InspectorPanel>(m_selection, m_undoStack));
     }
 }

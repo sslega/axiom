@@ -1,5 +1,7 @@
 #include "InspectorPanel.h"
 #include "UI/Selection.h"
+#include "UI/Commands/UndoStack.h"
+#include "UI/Commands/PropertyEditCommand.h"
 #include "Scene/Entity.h"
 #include "Reflection/Reflection.h"
 
@@ -83,6 +85,14 @@ namespace axiom
                         {
                             field.set(component, FieldValue(local));
                         }
+                        if(ImGui::IsItemActivated())
+                        {
+                            m_pendingOldValue = value;
+                        }
+                        if(ImGui::IsItemDeactivatedAfterEdit())
+                        {
+                            m_undoStack.Execute(MakeUnique<PropertyEditCommand>(component, &field, m_pendingOldValue, FieldValue(local)));
+                        }
                         break;
                     }  
                     case FieldType::Int:
@@ -91,6 +101,14 @@ namespace axiom
                         if(ImGui::DragInt(label.c_str(), &local, 0.1f))
                         {
                             field.set(component, FieldValue(local));
+                        }
+                        if(ImGui::IsItemActivated())
+                        {
+                            m_pendingOldValue = value;
+                        }
+                        if(ImGui::IsItemDeactivatedAfterEdit())
+                        {
+                            m_undoStack.Execute(MakeUnique<PropertyEditCommand>(component, &field, m_pendingOldValue, FieldValue(local)));
                         }
                         break;
                     }
@@ -101,13 +119,25 @@ namespace axiom
                         {
                             field.set(component, FieldValue(local));
                         }
+                        if(ImGui::IsItemActivated())
+                        {
+                            m_pendingOldValue = value;
+                        }
+                        if(ImGui::IsItemDeactivatedAfterEdit())
+                        {
+                            m_undoStack.Execute(MakeUnique<PropertyEditCommand>(component, &field, m_pendingOldValue, FieldValue(local)));
+                        }
                         break;
                     }   
                     case FieldType::Vec3:
                     {
                         Vec3 local = std::get<Vec3>(value);
-
-                        auto drawAxis = [&](const char* axisName, float* axisValue, Vec3 axisColor) -> bool
+                        
+                        bool activated = false;
+                        bool changed = false;
+                        bool deactivatedAfterEdit = false;
+                        
+                        auto drawAxis = [&](const char* axisName, float* axisValue, Vec3 axisColor) -> void
                         {
                             String axisLabel = axisName + label;
                             String axisId = label + "_" + axisName;
@@ -115,25 +145,43 @@ namespace axiom
 
                             ImVec2 p = ImGui::GetCursorScreenPos();
                             ImGui::SetNextItemWidth(-FLT_MIN);
-                            bool modified = ImGui::DragFloat(axisId.c_str(), axisValue, 0.1f);
+                            changed |= ImGui::DragFloat(axisId.c_str(), axisValue, 0.1f);
 
                             float stripWidth = 3.0f;
                             ImGui::GetWindowDrawList()->AddRectFilled(p, ImVec2(p.x + stripWidth, p.y + ImGui::GetFrameHeight()), IM_COL32(255 * axisColor.x, 255 * axisColor.y, 255 * axisColor.z, 255));
-                            return modified;
+                            
+                            if(ImGui::IsItemActivated())
+                            {
+                                activated |= true;
+                            }
+                            if(ImGui::IsItemDeactivatedAfterEdit())
+                            {
+                                deactivatedAfterEdit |= true;
+                            }
                         };
 
-                        bool changed = false;
+                        
                         ImGui::BeginTable("VecFields", 3);
                         ImGui::TableNextColumn();
-                        changed |= drawAxis("X", &local.x, Vec3(1,0,0));
+                        drawAxis("X", &local.x, Vec3(1,0,0));
                         ImGui::TableNextColumn();
-                        changed |= drawAxis("Y", &local.y, Vec3(0,1,0));
+                        drawAxis("Y", &local.y, Vec3(0,1,0));
                         ImGui::TableNextColumn();
-                        changed |= drawAxis("Z", &local.z, Vec3(0,0,1));
+                        drawAxis("Z", &local.z, Vec3(0,0,1));
                         ImGui::EndTable();
 
                         if (changed)
-                        field.set(component, FieldValue(local));
+                        {
+                            field.set(component, FieldValue(local));
+                        }
+                        if(activated)
+                        {
+                            m_pendingOldValue = value;
+                        }
+                        if(deactivatedAfterEdit)
+                        {
+                            m_undoStack.Execute(MakeUnique<PropertyEditCommand>(component, &field, m_pendingOldValue, FieldValue(local)));
+                        }
                         break;
                     }
                     case FieldType::Color:
@@ -142,6 +190,14 @@ namespace axiom
                         if(ImGui::ColorEdit3(label.c_str(), reinterpret_cast<float*>(&local)))
                         {
                             field.set(component, FieldValue(local));
+                        }
+                        if(ImGui::IsItemActivated())
+                        {
+                            m_pendingOldValue = value;
+                        }
+                        if(ImGui::IsItemDeactivatedAfterEdit())
+                        {
+                            m_undoStack.Execute(MakeUnique<PropertyEditCommand>(component, &field, m_pendingOldValue, FieldValue(local)));
                         }
                         break;
                     }
@@ -153,6 +209,14 @@ namespace axiom
                         if(ImGui::InputText(label.c_str(), buffer, sizeof(buffer)))
                         {
                             field.set(component, FieldValue(String(buffer)));
+                        }
+                        if(ImGui::IsItemActivated())
+                        {
+                            m_pendingOldValue = buffer;
+                        }
+                        if(ImGui::IsItemDeactivatedAfterEdit())
+                        {
+                            m_undoStack.Execute(MakeUnique<PropertyEditCommand>(component, &field, m_pendingOldValue, FieldValue(buffer)));
                         }
                         break;
                     }

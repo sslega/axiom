@@ -3,6 +3,7 @@
 #include "AxiomEngine.h"
 #include "UI/EditorPanel.h"
 #include "UI/Selection.h"
+#include "UI/Commands/UndoStack.h"
 
 using namespace axiom;
 
@@ -25,6 +26,7 @@ namespace axiom
         WorldSubsystem& m_worldSubsystem;
 
         Selection m_selection;
+        UndoStack m_undoStack;
 
         Vector<UniquePtr<EditorPanel>> m_panels;
         
