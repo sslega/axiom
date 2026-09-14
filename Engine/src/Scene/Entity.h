@@ -32,21 +32,9 @@ namespace axiom
             componentPtr->Initialize();
             return *componentPtr;
         }
-        
-        //TODO: think about AddComponent vs CreateComponent<T>
-        void AddComponent(UniquePtr<Component> component);
 
-        template <IsComponent T>
-        void DestroyComponent()
-        {
-            auto it = m_components.find(TypeID<T>());
-            if (it != m_components.end())
-            {
-                it->second->Shutdown();
-                it->second->Unregister();
-                m_components.erase(it);
-            }
-        }
+        void AddComponent(UniquePtr<Component> component);
+        UniquePtr<Component> RemoveComponent(std::type_index type);
 
         template <IsComponent T>
         T* GetComponent()
@@ -60,11 +48,12 @@ namespace axiom
         }
 
         template <IsComponent T>
-        bool HasComponent()
+        bool HasComponent() const
         {
-            auto it = m_components.find(TypeID<T>());
-            return it != m_components.end();
+            return HasComponent(TypeID<T>());
         }
+
+        bool HasComponent(std::type_index type) const;
 
         Vector<Component*> GetComponents() const;
         void GetComponents(Vector<Component*>& outComponents) const;

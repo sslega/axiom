@@ -14,6 +14,26 @@ namespace axiom
         ptr->Initialize();
     }
 
+    UniquePtr<Component> Entity::RemoveComponent(std::type_index type)
+    {
+        auto it = m_components.find(type);
+        if (it != m_components.end())
+        {
+            it->second->Shutdown();
+            it->second->Unregister();
+            UniquePtr<Component> base = std::move(it->second);
+            m_components.erase(it);
+            return UniquePtr<Component>(base.release());
+        }
+        return nullptr;
+    }
+
+    bool Entity::HasComponent(std::type_index type) const
+    {
+        auto it = m_components.find(type);
+        return it != m_components.end();
+    }
+
     Vector<Component *> Entity::GetComponents() const
     {
         Vector<Component*> results;

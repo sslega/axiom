@@ -65,6 +65,8 @@ namespace axiom
                 }
                 return nullptr;
             }
+
+            Vector<const TypeDescriptor*> GetAllTypes() const;
         private:
             TypeMap<TypeDescriptor> m_descriptors;
     };

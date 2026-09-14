@@ -2,6 +2,7 @@
 #include "UI/Selection.h"
 #include "UI/Commands/UndoStack.h"
 #include "UI/Commands/PropertyEditCommand.h"
+#include "UI/Commands/AddComponentCommand.h"
 #include "Scene/Entity.h"
 #include "Reflection/Reflection.h"
 
@@ -165,6 +166,26 @@ namespace axiom
             }
             ImGui::PopID();
             ImGui::Spacing();
+        }
+
+        if (ImGui::Button("Add Component", ImVec2(-FLT_MIN, 0.0f)))
+
+        {
+            ImGui::OpenPopup("AddComponentPopup");
+        }
+
+        if (ImGui::BeginPopup("AddComponentPopup"))
+        {
+            for (const TypeDescriptor* typeDescriptor : Reflection::Get().GetAllTypes())
+            {
+                if(entity->HasComponent(typeDescriptor->type)) continue;
+
+                if(ImGui::MenuItem(typeDescriptor->name))
+                {
+                    m_undoStack.Execute(MakeUnique<AddComponentCommand>(*entity, *typeDescriptor));
+                }
+            }
+            ImGui::EndPopup();
         }
 
         ImGui::End();

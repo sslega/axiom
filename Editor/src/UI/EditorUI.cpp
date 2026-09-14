@@ -75,7 +75,7 @@ namespace axiom
     
     void EditorUI::AddOutlinerPanel()
     {
-        m_panels.push_back(MakeUnique<OutlinerPanel>(m_worldSubsystem, m_selection));
+        m_panels.push_back(MakeUnique<OutlinerPanel>(m_worldSubsystem, m_selection, m_undoStack));
     }
     
     void EditorUI::AddInspectorPanel()

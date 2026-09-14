@@ -12,21 +12,30 @@ namespace axiom
     SharedPtr<Entity> Scene::CreateEntity()
     {
         SharedPtr<Entity> entity = std::make_unique<Entity>();
-        m_entities[entity->GetID()] = entity;
-        entity->Register();
-        entity->Initialize();
+        AddEntity(entity);
+
         return entity;
     }
 
-    void Scene::DestroyEntity(Entity& entity)
+    void Scene::AddEntity(SharedPtr<Entity> entity)
+    {
+        m_entities[entity->GetID()] = entity;
+        entity->Register();
+        entity->Initialize();
+    }
+
+    SharedPtr<Entity> Scene::RemoveEntity(Entity& entity)
     {
         auto it = m_entities.find(entity.GetID());
         if (it != m_entities.end())
         {
             it->second->Shutdown();
             it->second->Unregister();
+            SharedPtr<Entity> removed = it->second;
             m_entities.erase(it);
+            return removed;
         }
+        return nullptr;
     }
 
     const String& Scene::GetName() const

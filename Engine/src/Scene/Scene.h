@@ -6,12 +6,15 @@ namespace axiom
 {
     class Scene
     {
+        friend class WorldSubsystem;
+
     public:
         Scene(const String& name);
         ~Scene() = default;
 
         SharedPtr<Entity> CreateEntity();
-        void DestroyEntity(Entity& entity);
+        void AddEntity(SharedPtr<Entity> entity);
+        SharedPtr<Entity> RemoveEntity(Entity& entity);
 
         const String& GetName() const;
 
@@ -50,7 +53,6 @@ namespace axiom
         virtual void OnEndFrame();
 
     private:
-        friend class WorldSubsystem;
         void Register()              { OnRegister(); }
         void Unregister()            { OnUnregister(); }
         void Initialize()            { FileSubsystem(); }
