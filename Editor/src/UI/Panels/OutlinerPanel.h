@@ -6,6 +6,7 @@ namespace axiom
     class WorldSubsystem;
     class Selection;
     class UndoStack;
+    class Entity;
 
     class OutlinerPanel : public EditorPanel
     {
@@ -18,5 +19,8 @@ namespace axiom
         WorldSubsystem& m_world;
         Selection& m_selection;
         UndoStack& m_undoStack;
+
+        Entity* m_renamingEntity = nullptr;
+        char m_renameBuffer[256] = {};
     };
 }

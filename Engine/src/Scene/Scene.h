@@ -41,6 +41,7 @@ namespace axiom
 
         Vector<Entity*> GetEntities() const;
         void GetEntities(Vector<Entity*>& outEntities) const;
+        String GetUniqueName(const String& baseName);
 
     protected:
         virtual void OnRegister()   {}
@@ -64,5 +65,6 @@ namespace axiom
 
         String m_name;
         StringMap<SharedPtr<Entity>> m_entities;
+        StringMap<int> m_nameCounters;
     };
 }

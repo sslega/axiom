@@ -58,6 +58,12 @@ namespace axiom
         }
     }
 
+    String Scene::GetUniqueName(const String& baseName)
+    {
+        int n = ++m_nameCounters[baseName];
+        return n == 1 ? baseName : baseName + " " + std::to_string(n);
+    }
+
     void Scene::OnUpdate(float deltaTime)
     {
         for (auto& [id, entity] : m_entities)

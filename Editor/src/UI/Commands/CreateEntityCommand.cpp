@@ -8,6 +8,7 @@ namespace axiom
     : m_scene(scene)
     , m_entity(MakeShared<Entity>())
     {
+        m_entity->SetName(m_scene.GetUniqueName("Entity"));
     }
     
     void CreateEntityCommand::Execute()

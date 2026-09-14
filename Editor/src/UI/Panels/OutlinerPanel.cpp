@@ -4,6 +4,7 @@
 #include "UI/Selection.h"
 #include "UI/Commands/UndoStack.h"
 #include "UI/Commands/CreateEntityCommand.h"
+#include "UI/Commands/RenameEntityCommand.h"
 
 namespace axiom
 {
@@ -24,10 +25,32 @@ namespace axiom
             {
                 label = "<unnamed>";
             }
-            ImGui::PushID(e->GetID().c_str()); 
-            if(ImGui::Selectable(label.c_str(), isSelected))
+            ImGui::PushID(e->GetID().c_str());
+            if(m_renamingEntity == e)
             {
-                m_selection.Set(e);
+                ImGui::SetNextItemWidth(-FLT_MIN);
+                ImGui::InputText("", m_renameBuffer, sizeof(m_renameBuffer));
+                if (ImGui::IsItemDeactivatedAfterEdit())
+                {
+                    m_undoStack.Execute(MakeUnique<RenameEntityCommand>(*e, e->GetName(), m_renameBuffer));
+                    m_renamingEntity = nullptr;
+                }
+                else if (ImGui::IsItemDeactivated())
+                {
+                    m_renamingEntity = nullptr;
+                }
+            }
+            else
+            {
+                if(ImGui::Selectable(label.c_str(), isSelected))
+                {
+                    m_selection.Set(e);
+                }
+            }
+            if(ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+            {
+                m_renamingEntity = e;
+                strncpy_s(m_renameBuffer, sizeof(m_renameBuffer), e->GetName().c_str(), _TRUNCATE);
             }
             ImGui::PopID();
         }
