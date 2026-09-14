@@ -81,54 +81,24 @@ namespace axiom
                     case FieldType::Float:
                     {
                         float local = std::get<float>(value);
-                        if(ImGui::DragFloat(label.c_str(), &local, 0.1f))
-                        {
-                            field.set(component, FieldValue(local));
-                        }
-                        if(ImGui::IsItemActivated())
-                        {
-                            m_pendingOldValue = value;
-                        }
-                        if(ImGui::IsItemDeactivatedAfterEdit())
-                        {
-                            m_undoStack.Execute(MakeUnique<PropertyEditCommand>(component, &field, m_pendingOldValue, FieldValue(local)));
-                        }
+                        bool changed = ImGui::DragFloat(label.c_str(), &local, 0.1f);
+                        CommitField(component, field, value, ImGui::IsItemActivated(), changed, ImGui::IsItemDeactivatedAfterEdit(), local);
                         break;
-                    }  
+                    }
                     case FieldType::Int:
                     {
                         int local = std::get<int>(value);
-                        if(ImGui::DragInt(label.c_str(), &local, 0.1f))
-                        {
-                            field.set(component, FieldValue(local));
-                        }
-                        if(ImGui::IsItemActivated())
-                        {
-                            m_pendingOldValue = value;
-                        }
-                        if(ImGui::IsItemDeactivatedAfterEdit())
-                        {
-                            m_undoStack.Execute(MakeUnique<PropertyEditCommand>(component, &field, m_pendingOldValue, FieldValue(local)));
-                        }
+                        bool changed = ImGui::DragInt(label.c_str(), &local, 0.1f);
+                        CommitField(component, field, value, ImGui::IsItemActivated(), changed, ImGui::IsItemDeactivatedAfterEdit(), local);
                         break;
                     }
                     case FieldType::Bool:
                     {
                         bool local = std::get<bool>(value);
-                        if(ImGui::Checkbox(label.c_str(), &local))
-                        {
-                            field.set(component, FieldValue(local));
-                        }
-                        if(ImGui::IsItemActivated())
-                        {
-                            m_pendingOldValue = value;
-                        }
-                        if(ImGui::IsItemDeactivatedAfterEdit())
-                        {
-                            m_undoStack.Execute(MakeUnique<PropertyEditCommand>(component, &field, m_pendingOldValue, FieldValue(local)));
-                        }
+                        bool changed = ImGui::Checkbox(label.c_str(), &local);
+                        CommitField(component, field, value, ImGui::IsItemActivated(), changed, ImGui::IsItemDeactivatedAfterEdit(), local);
                         break;
-                    }   
+                    }
                     case FieldType::Vec3:
                     {
                         Vec3 local = std::get<Vec3>(value);
@@ -160,7 +130,6 @@ namespace axiom
                             }
                         };
 
-                        
                         ImGui::BeginTable("VecFields", 3);
                         ImGui::TableNextColumn();
                         drawAxis("X", &local.x, Vec3(1,0,0));
@@ -170,35 +139,14 @@ namespace axiom
                         drawAxis("Z", &local.z, Vec3(0,0,1));
                         ImGui::EndTable();
 
-                        if (changed)
-                        {
-                            field.set(component, FieldValue(local));
-                        }
-                        if(activated)
-                        {
-                            m_pendingOldValue = value;
-                        }
-                        if(deactivatedAfterEdit)
-                        {
-                            m_undoStack.Execute(MakeUnique<PropertyEditCommand>(component, &field, m_pendingOldValue, FieldValue(local)));
-                        }
+                        CommitField(component, field, value, activated, changed, deactivatedAfterEdit, local);
                         break;
                     }
                     case FieldType::Color:
                     {
                         Color local = std::get<Color>(value);
-                        if(ImGui::ColorEdit3(label.c_str(), reinterpret_cast<float*>(&local)))
-                        {
-                            field.set(component, FieldValue(local));
-                        }
-                        if(ImGui::IsItemActivated())
-                        {
-                            m_pendingOldValue = value;
-                        }
-                        if(ImGui::IsItemDeactivatedAfterEdit())
-                        {
-                            m_undoStack.Execute(MakeUnique<PropertyEditCommand>(component, &field, m_pendingOldValue, FieldValue(local)));
-                        }
+                        bool changed = ImGui::ColorEdit3(label.c_str(), reinterpret_cast<float*>(&local));
+                        CommitField(component, field, value, ImGui::IsItemActivated(), changed, ImGui::IsItemDeactivatedAfterEdit(), local);
                         break;
                     }
                     case FieldType::String:
@@ -206,18 +154,8 @@ namespace axiom
                         char buffer[256];
                         String local = std::get<String>(value);
                         strncpy_s(buffer, sizeof(buffer), local.c_str(), _TRUNCATE);
-                        if(ImGui::InputText(label.c_str(), buffer, sizeof(buffer)))
-                        {
-                            field.set(component, FieldValue(String(buffer)));
-                        }
-                        if(ImGui::IsItemActivated())
-                        {
-                            m_pendingOldValue = buffer;
-                        }
-                        if(ImGui::IsItemDeactivatedAfterEdit())
-                        {
-                            m_undoStack.Execute(MakeUnique<PropertyEditCommand>(component, &field, m_pendingOldValue, FieldValue(buffer)));
-                        }
+                        bool changed = ImGui::InputText(label.c_str(), buffer, sizeof(buffer));
+                        CommitField(component, field, value, ImGui::IsItemActivated(), changed, ImGui::IsItemDeactivatedAfterEdit(), String(buffer));
                         break;
                     }
                     default: break;
