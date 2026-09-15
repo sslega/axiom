@@ -5,6 +5,7 @@
 #include "UI/Commands/UndoStack.h"
 #include "UI/Commands/CreateEntityCommand.h"
 #include "UI/Commands/RenameEntityCommand.h"
+#include "UI/Commands/DeleteEntityCommand.h"
 
 namespace axiom
 {
@@ -72,7 +73,19 @@ namespace axiom
             }
             ImGui::EndPopup();
         }
-
+        if(ImGui::IsWindowFocused() && m_renamingEntity == nullptr)
+        {
+            if(ImGui::IsKeyPressed(ImGuiKey_Delete))
+            {
+                Scene& scene = m_world.GetActiveScene();
+                Entity* entity = m_selection.Get();
+                if(entity)
+                {
+                    m_undoStack.Execute(MakeUnique<DeleteEntityCommand>(scene, *entity));
+                    m_selection.Clear();
+                }
+            }
+        }
         ImGui::End();
     }
 }
