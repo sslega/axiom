@@ -10,7 +10,7 @@ namespace axiom
     
     void ReflectionSubsystem::OnInitialize()
     {
-        RegisterEngineReflection(m_typeRegistry);
+        EngineReflection::Register(m_typeRegistry);
         Reflection::SetInstance(&m_typeRegistry);
     }
     

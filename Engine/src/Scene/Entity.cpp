@@ -1,5 +1,6 @@
 #include "Scene/Entity.h"
 #include "Entity.h"
+#include "Serialization/Archive.h"
 
 namespace axiom
 {
@@ -47,6 +48,16 @@ namespace axiom
         {
             outComponents.push_back(component.get());
         }         
+    }
+
+    void Entity::Deserialize(Archive &ar)
+    {
+        ar.Read("name", m_name);
+    }
+
+    void Entity::Serialize(Archive &ar)
+    {
+        ar.Write("name", m_name);
     }
 
     void Entity::OnUnregister()

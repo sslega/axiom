@@ -4,7 +4,7 @@
 #include "UI/Selection.h"
 #include "UI/Commands/UndoStack.h"
 #include "UI/Commands/CreateEntityCommand.h"
-#include "UI/Commands/RenameEntityCommand.h"
+#include "UI/Commands/PropertyEditCommand.h"
 #include "UI/Commands/DeleteEntityCommand.h"
 
 namespace axiom
@@ -33,8 +33,16 @@ namespace axiom
                 ImGui::InputText("", m_renameBuffer, sizeof(m_renameBuffer));
                 if (ImGui::IsItemDeactivatedAfterEdit())
                 {
-                    m_undoStack.Execute(MakeUnique<RenameEntityCommand>(*e, e->GetName(), m_renameBuffer));
-                    m_renamingEntity = nullptr;
+                    if(const TypeDescriptor* typeDescriptor = Reflection::Get().Find(typeid(*e)))
+                    {
+                        if(const FieldDescriptor* fieldDescriptor = typeDescriptor->FindField("name"))
+                        {
+                            FieldValue oldValue = fieldDescriptor->get(e);
+                            FieldValue newValue = FieldValue(String(m_renameBuffer));
+                            m_undoStack.Execute(MakeUnique<PropertyEditCommand>(e, fieldDescriptor, oldValue, newValue));
+                            m_renamingEntity = nullptr;
+                        }
+                    }
                 }
                 else if (ImGui::IsItemDeactivated())
                 {

@@ -1,11 +1,11 @@
 #include "PropertyEditCommand.h"
-#include "Scene/Component.h"
+#include "Core/Object.h"
 #include "Reflection/ReflectionField.h"
 
 namespace axiom
 {
-    PropertyEditCommand::PropertyEditCommand(Component *component, const FieldDescriptor* fieldDescriptor, FieldValue oldValue, FieldValue newValue)
-    : m_component(component)
+    PropertyEditCommand::PropertyEditCommand(Object *object, const FieldDescriptor* fieldDescriptor, FieldValue oldValue, FieldValue newValue)
+    : m_target(object)
     , m_fieldDescriptor(fieldDescriptor)
     , m_oldValue(oldValue)
     , m_newValue(newValue)
@@ -14,11 +14,11 @@ namespace axiom
 
     void PropertyEditCommand::Execute()
     {
-        m_fieldDescriptor->set(m_component, m_newValue);
+        m_fieldDescriptor->set(m_target, m_newValue);
     }
 
     void PropertyEditCommand::Undo()
     {
-        m_fieldDescriptor->set(m_component, m_oldValue);
+        m_fieldDescriptor->set(m_target, m_oldValue);
     }
 }

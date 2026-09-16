@@ -176,13 +176,13 @@ namespace axiom
 
         if (ImGui::BeginPopup("AddComponentPopup"))
         {
-            for (const TypeDescriptor* typeDescriptor : Reflection::Get().GetAllTypes())
+            for (const TypeDescriptor* componentTypeDescriptor : Reflection::Get().GetAllTypes<Component>())
             {
-                if(entity->HasComponent(typeDescriptor->type)) continue;
+                if(entity->HasComponent(componentTypeDescriptor->type)) continue;
 
-                if(ImGui::MenuItem(typeDescriptor->name))
+                if(ImGui::MenuItem(componentTypeDescriptor->name))
                 {
-                    m_undoStack.Execute(MakeUnique<AddComponentCommand>(*entity, *typeDescriptor));
+                    m_undoStack.Execute(MakeUnique<AddComponentCommand>(*entity, *componentTypeDescriptor));
                 }
             }
             ImGui::EndPopup();

@@ -33,40 +33,30 @@ namespace axiom
         std::type_index type = typeid(void);
         Vector<FieldDescriptor> fields;
         std::function<UniquePtr<Component>()> factory;
+        std::type_index baseType = typeid(void);
+
+        const FieldDescriptor* FindField(const char* fieldName) const;
     };
 
 
     class TypeRegistry 
     {
         public:
-            void Register(TypeDescriptor desc)
+            template<class T>
+            Vector<const TypeDescriptor*> GetAllTypes() const
             {
-                m_descriptors.insert_or_assign(desc.type, std::move(desc));
-            }
-
-
-            const TypeDescriptor* Find(std::type_index id) const
-            {
-                auto it = m_descriptors.find(id);
-                if (it != m_descriptors.end())
-                    return &it->second;
-                else
-                    return nullptr;
-            }
-
-            UniquePtr<Component> Create(const String& name) const
-            {
-                for(auto& [key, typeDescriptor] : m_descriptors)
+                Vector<const TypeDescriptor*> result;
+                for(auto& [key, desc] : m_descriptors)
                 {
-                    if(typeDescriptor.name == name)
-                    {
-                        return typeDescriptor.factory();
-                    }
+                    if (IsA(desc.type, typeid(T))) result.push_back(&desc);
                 }
-                return nullptr;
+                return result;
             }
+            void Register(TypeDescriptor desc);
+            const TypeDescriptor* Find(std::type_index id) const;
+            UniquePtr<Component> Create(const String& name) const;
+            bool IsA(std::type_index derived, std::type_index base) const;
 
-            Vector<const TypeDescriptor*> GetAllTypes() const;
         private:
             TypeMap<TypeDescriptor> m_descriptors;
     };

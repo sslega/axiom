@@ -11,13 +11,11 @@ namespace axiom
     void Object::Deserialize(Archive &ar)
     {
         ar.Read("id", m_id);
-        ar.Read("name", m_name);
     }
 
     void Object::Serialize(Archive &ar)
     {   
         ar.Write("id", m_id);
-        ar.Write("name", m_name);
     }
 
     String Object::GenerateUUID()

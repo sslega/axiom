@@ -2,5 +2,9 @@
 namespace axiom
 {
     class TypeRegistry;
-    void RegisterEngineReflection(TypeRegistry& registry);
+    class EngineReflection
+    {
+    public:
+        static void Register(TypeRegistry& registry);
+    };
 }

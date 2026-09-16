@@ -1,5 +1,7 @@
 #include "Reflection/EngineReflection.h"
 #include "Reflection/ReflectionField.h"
+#include "Core/Object.h"
+#include "Scene/Entity.h"
 #include "Scene/Component.h"
 #include "Scene/TransformComponent.h"
 #include "Renderer/MeshComponent.h"
@@ -11,10 +13,37 @@
 
 namespace axiom
 {
-    void RegisterEngineReflection(TypeRegistry& registry)
+    void EngineReflection::Register(TypeRegistry &registry)
     {
         {
             TypeDescriptor desc;
+            desc.name = "Object";
+            desc.type = typeid(Object);
+            desc.fields.push_back(MakeField("id", &Object::m_id));
+            registry.Register(std::move(desc));
+
+        }
+
+        {
+            TypeDescriptor desc;
+            desc.name = "Entity";
+            desc.type = typeid(Entity);
+            desc.baseType = typeid(Object);
+            desc.fields.push_back(MakeField("name", &Entity::m_name));
+            registry.Register(std::move(desc));
+        }
+
+        {
+            TypeDescriptor desc;
+            desc.name = "Component";
+            desc.type = typeid(Component);
+            desc.baseType = typeid(Object);
+            registry.Register(std::move(desc));
+        }
+
+        {
+            TypeDescriptor desc;
+            desc.baseType = typeid(Component);
             desc.name = "TransformComponent";
             desc.type = typeid(TransformComponent);
             desc.factory = []() -> UniquePtr<Component> { return MakeUnique<TransformComponent>(); };
@@ -26,6 +55,7 @@ namespace axiom
     
         {
             TypeDescriptor desc;
+            desc.baseType = typeid(Component);
             desc.name = "CameraComponent";
             desc.type = typeid(CameraComponent);
             desc.factory = []() -> UniquePtr<Component> { return MakeUnique<CameraComponent>(); };
@@ -34,6 +64,7 @@ namespace axiom
 
         {
             TypeDescriptor desc;
+            desc.baseType = typeid(Component);
             desc.name = "CameraController";
             desc.type = typeid(CameraController);
             desc.factory = []() -> UniquePtr<Component> { return MakeUnique<CameraController>(); };
@@ -44,6 +75,7 @@ namespace axiom
 
         {
             TypeDescriptor desc;
+            desc.baseType = typeid(Component);
             desc.name = "DirectionalLightComponent";
             desc.type = typeid(DirectionalLightComponent);
             desc.factory = []() -> UniquePtr<Component> { return MakeUnique<DirectionalLightComponent>(); };
@@ -54,6 +86,7 @@ namespace axiom
 
         {
             TypeDescriptor desc;
+            desc.baseType = typeid(Component);
             desc.name = "MeshComponent";
             desc.type = typeid(MeshComponent);
             desc.factory = []() -> UniquePtr<Component> { return MakeUnique<MeshComponent>(); };

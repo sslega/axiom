@@ -8,11 +8,11 @@ namespace axiom
 
     class Object
     {
+        friend class EngineReflection;
+
     public:
         Object();
         const String& GetID() const { return m_id; }
-        const String& GetName() const { return m_name; }
-        void SetName(const String& name) { m_name = name; }
 
         virtual void Deserialize(Archive& ar);
         virtual void Serialize(Archive& ar);
@@ -20,7 +20,6 @@ namespace axiom
     protected:
         friend class SceneLoader;
         String m_id;
-        String m_name;
         String GenerateUUID();
     };    
 } // namespace axiom

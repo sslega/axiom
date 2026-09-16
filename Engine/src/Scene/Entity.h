@@ -12,6 +12,7 @@ namespace axiom
 
     class Entity : public Object
     {
+        friend class EngineReflection;
     public:
         ~Entity() = default;
 
@@ -57,6 +58,11 @@ namespace axiom
 
         Vector<Component*> GetComponents() const;
         void GetComponents(Vector<Component*>& outComponents) const;
+        const String& GetName() const { return m_name; }
+        void SetName(const String& name) { m_name = name; }
+
+        void Deserialize(Archive& ar) override;
+        void Serialize(Archive& ar) override;
 
         
     protected:
@@ -70,6 +76,8 @@ namespace axiom
         virtual void OnBeginFrame();
         virtual void OnRender();
         virtual void OnEndFrame();
+
+        String m_name;
 
     private:
         friend class Scene;
