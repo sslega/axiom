@@ -9,6 +9,7 @@
 #include "Renderer/MeshComponent.h"
 #include "Renderer/LightComponent.h"
 #include "Renderer/FrameBuffer.h"
+#include "Renderer/PostProcessBase.h"
 #include "Scene/TransformComponent.h"
 #include "Core/Log.h"
 #include "Core/Types.h"
@@ -48,15 +49,10 @@ namespace axiom
         auto& window = GetApp().GetApplicationWindow();
         m_graphicsDevice = GraphicsDevice::Create(API, window);
 
-        // FramebufferSpec fbSpec;
-        // fbSpec.width = window.GetWidth();
-        // fbSpec.height = window.GetHeight();
-        // m_frameBuffer = m_graphicsDevice->CreateFrameBuffer(fbSpec);
-
         FramebufferSpec fbShadowSpec;
         fbShadowSpec.width = 2048;
         fbShadowSpec.height = 2048;
-        fbShadowSpec.depthOnly = true;
+        fbShadowSpec.frameBufferFormat = FramebufferFormat::Depth;
         m_shadowMapFrameBuffer = m_graphicsDevice->CreateFrameBuffer(fbShadowSpec);
 
         Quad quad;
@@ -102,6 +98,8 @@ namespace axiom
 
     void RenderSubsystem::OnBeginFrame()
     {
+        m_frameIndex++;
+        ReleaseUnusedTemporaryFrameBuffers();
         ResetDebugDrawCounters();
         BeginScene();
     }
@@ -437,6 +435,14 @@ namespace axiom
         m_batchObjectCount = 0;
     }
 
+    void RenderSubsystem::ReleaseUnusedTemporaryFrameBuffers()
+    {
+        std::erase_if(m_frameBufferPool, [this](const PooledFrameBuffer& pooled)
+        {
+            return !pooled.inUse && m_frameIndex - pooled.lastUsedFrame > PooledFrameBuffer::NUM_MAX_FRAMES_KEEP;
+        });
+    }
+
     void RenderSubsystem::RenderShadowPass(const Matrix4& viewProjectionMatrix, const Vector<RenderCommand>& commands)
     {
         //TODO: Add batching/instancing
@@ -457,8 +463,9 @@ namespace axiom
 
     void RenderSubsystem::RenderShadowMap(const Matrix4& lightViewProjection, const Vector<RenderCommand>& commands)
     {
-         m_graphicsDevice->SetColorWriteEnabled(true);
+        m_graphicsDevice->SetColorWriteEnabled(true);
         m_graphicsDevice->SetDepthWriteEnabled(true);
+        m_graphicsDevice->SetDepthTestEnabled(true);
         m_graphicsDevice->SetDepthFunction(DepthFunction::Less);
         m_shadowMapFrameBuffer->Bind();
         m_graphicsDevice->SetViewport(0, 0, m_shadowMapFrameBuffer->GetWidth(), m_shadowMapFrameBuffer->GetHeight());
@@ -551,6 +558,49 @@ namespace axiom
         }
     }
 
+    void RenderSubsystem::RenderFullScreenPass(axiom::FrameBuffer& targetFrameBuffer)
+    {
+        targetFrameBuffer.Bind();
+
+        m_graphicsDevice->SetColorWriteEnabled(true);
+        m_graphicsDevice->SetDepthWriteEnabled(false);
+        m_graphicsDevice->SetDepthTestEnabled(false);        
+        m_graphicsDevice->SetViewport(0, 0, targetFrameBuffer.GetWidth(), targetFrameBuffer.GetHeight());
+      
+        m_graphicsDevice->DrawIndexed(m_screenQuadVB, m_screenQuadIB);
+    }
+
+    FrameBuffer& RenderSubsystem::AcquireTemporaryFrameBuffer(const FramebufferSpec& spec)
+    {
+        for(auto& pooledFrameBuffer : m_frameBufferPool)
+        {
+            if(!pooledFrameBuffer.inUse && pooledFrameBuffer.frameBuffer->Matches(spec))
+            {
+                pooledFrameBuffer.inUse = true;
+                pooledFrameBuffer.lastUsedFrame = m_frameIndex;
+                return *pooledFrameBuffer.frameBuffer;
+            }
+        }
+        
+        PooledFrameBuffer pooledFrameBuffer;
+        pooledFrameBuffer.inUse = true;
+        pooledFrameBuffer.frameBuffer = m_graphicsDevice->CreateFrameBuffer(spec);
+        m_frameBufferPool.push_back(pooledFrameBuffer);
+        return *pooledFrameBuffer.frameBuffer;
+    }
+
+    void RenderSubsystem::ReleaseTemporaryFrameBuffer(FrameBuffer& frameBuffer)
+    {
+        for(auto& pooledFrameBuffer : m_frameBufferPool)
+        {
+            if(*pooledFrameBuffer.frameBuffer.get() == frameBuffer)
+            {
+                pooledFrameBuffer.inUse = false;
+                pooledFrameBuffer.lastUsedFrame = m_frameIndex;
+            }
+        }
+    }
+
     Vector<Vec3> RenderSubsystem::GetFrustumCornersWorldSpace(const Matrix4& invViewProj)
     {
         Vector<Vec3> corners = {
@@ -627,6 +677,7 @@ namespace axiom
         
         m_graphicsDevice->SetColorWriteEnabled(true);
         m_graphicsDevice->SetDepthWriteEnabled(true);
+        m_graphicsDevice->SetDepthTestEnabled(true);
         m_graphicsDevice->SetDepthFunction(DepthFunction::Less);
         view.renderTarget->Bind();
         m_graphicsDevice->SetViewport(0, 0, view.width, view.height);
@@ -634,6 +685,22 @@ namespace axiom
         m_graphicsDevice->Clear();
 
         RenderScenePass(m_renderSceneData, renderViewData, commands);
+        if(!view.postProcesses.empty())
+        {
+            FramebufferSpec postProcessFramebufferSpec;
+            postProcessFramebufferSpec.frameBufferFormat = view.renderTarget->GetFramebufferFormat();
+            postProcessFramebufferSpec.width = view.renderTarget->GetWidth();
+            postProcessFramebufferSpec.height = view.renderTarget->GetHeight();        
+
+            FrameBuffer& postprocessSource = *view.renderTarget;
+            FrameBuffer& postprocessTarget = AcquireTemporaryFrameBuffer(postProcessFramebufferSpec);
+            for(PostProcessBase* postProcess : view.postProcesses)
+            {
+                postProcess->Execute(*this, postprocessSource, postprocessTarget);
+                m_graphicsDevice->CopyFrameBuffer(postprocessTarget, postprocessSource);
+            }
+            ReleaseTemporaryFrameBuffer(postprocessTarget);
+        }
     }
 
     GraphicsDevice::API RenderSubsystem::GetRenderAPI() const

@@ -145,6 +145,14 @@ namespace axiom
         return MakeShared<OpenGLFrameBuffer>(spec);
     }
 
+    void OpenGLGraphicsDevice::CopyFrameBuffer(FrameBuffer& source, FrameBuffer& target) const
+    {
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, source.GetNativeHandle());
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, target.GetNativeHandle());
+        glBlitFramebuffer(0, 0, source.GetWidth(), source.GetHeight(), 0, 0, target.GetWidth(), target.GetHeight(), GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
     void OpenGLGraphicsDevice::SetDepthTestEnabled(bool enabled)
     {
         if(enabled)

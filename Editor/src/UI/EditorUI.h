@@ -9,6 +9,7 @@ using namespace axiom;
 
 namespace axiom
 {
+    class ViewportPanel;
     
     class EditorUI
     {
@@ -30,7 +31,7 @@ namespace axiom
 
         Vector<UniquePtr<EditorPanel>> m_panels;
         
-        void AddViewportPanel(const String& name);
+        ViewportPanel* AddViewportPanel(const String& name);
         void AddOutlinerPanel();
         void AddInspectorPanel();
     };

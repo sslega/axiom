@@ -65,6 +65,10 @@ namespace axiom
 
         void ReloadShaders();
 
+        void RenderFullScreenPass(FrameBuffer& targetFrameBuffer);
+
+        FrameBuffer& AcquireTemporaryFrameBuffer(const FramebufferSpec& spec);
+        void ReleaseTemporaryFrameBuffer(FrameBuffer& frameBuffer);
 
     protected:
         void OnInitialize() override;
@@ -90,6 +94,17 @@ namespace axiom
             Matrix4 transform;
         };
 
+        struct PooledFrameBuffer
+        {
+            static constexpr uint64 NUM_MAX_FRAMES_KEEP = 5;
+            SharedPtr<FrameBuffer> frameBuffer;
+            uint64 lastUsedFrame {0};
+            bool inUse {false};
+        };
+
+        Vector<PooledFrameBuffer> m_frameBufferPool;
+        uint64 m_frameIndex {0};
+
         UniquePtr<GraphicsDevice> m_graphicsDevice;
         
         RenderSceneData m_renderSceneData;
@@ -114,6 +129,7 @@ namespace axiom
         void SubmitInstanced(const RenderViewData& viewData, const MeshBuffers& buffers, const SharedPtr<Shader>& instancedShader, const Vector<Matrix4>& transforms);
         void SubmitBatched(const RenderViewData& viewData, const SharedPtr<MaterialResource>& material, const Vector<RenderCommand>& commands);
         void ResetDebugDrawCounters();
+        void ReleaseUnusedTemporaryFrameBuffers();
 
         SharedPtr<Shader> m_screenQuadShader;        
         

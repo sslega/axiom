@@ -2,6 +2,8 @@
 #include "Panels/ViewportPanel.h"
 #include "Panels/OutlinerPanel.h"
 #include "Panels/InspectorPanel.h"
+#include "Viewport.h"
+#include "Renderer/PostProcessTest.h"
 #include <imgui.h>
 
 namespace axiom
@@ -14,8 +16,9 @@ namespace axiom
 
     void EditorUI::OnInitialize()
     {
-        AddViewportPanel("ViewportA");
-        AddViewportPanel("ViewportB");
+        ViewportPanel* ViewportA = AddViewportPanel("ViewportA");
+        ViewportPanel* ViewportB = AddViewportPanel("ViewportB");
+        ViewportB->GetViewport()->AddPostProcess<PostProcessTest>();
         AddOutlinerPanel();
         AddInspectorPanel();
     }
@@ -68,9 +71,12 @@ namespace axiom
         }
     }
     
-    void EditorUI::AddViewportPanel(const String& name)
+    ViewportPanel* EditorUI::AddViewportPanel(const String& name)
     {
-        m_panels.push_back(MakeUnique<ViewportPanel>(name, m_renderSubsystem));
+        auto panel = MakeUnique<ViewportPanel>(name, m_renderSubsystem);
+        ViewportPanel* raw = panel.get();
+        m_panels.push_back(std::move(panel));
+        return raw;
     }
     
     void EditorUI::AddOutlinerPanel()

@@ -6,6 +6,11 @@ namespace axiom
 {
     OpenGLFrameBuffer::OpenGLFrameBuffer(const FramebufferSpec& spec) : FrameBuffer(spec)
     {
+        int internalFormat;
+        int format;
+        int type;
+        GetFrameBufferParameters(m_frameBufferFormat, internalFormat, format, type);
+
         // Create render buffer object
         glGenFramebuffers(1, &m_frameBuffer);
         glBindFramebuffer(GL_FRAMEBUFFER, m_frameBuffer);
@@ -20,7 +25,7 @@ namespace axiom
             // Color texture attachement
             glGenTextures(1, &m_textureColorBuffer);
             glBindTexture(GL_TEXTURE_2D, m_textureColorBuffer);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+            glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, m_width, m_height, 0, format, type, NULL);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glBindTexture(GL_TEXTURE_2D, 0);
@@ -74,10 +79,15 @@ namespace axiom
         m_width = width;
         m_height = height;
 
+        int internalFormat;
+        int format;
+        int type;
+        GetFrameBufferParameters(m_frameBufferFormat, internalFormat, format, type);
+
         if(!IsDepthOnly())
         {
             glBindTexture(GL_TEXTURE_2D, m_textureColorBuffer);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+            glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, m_width, m_height, 0, format, type, NULL);
             glBindTexture(GL_TEXTURE_2D, 0);
         }
 
@@ -85,5 +95,42 @@ namespace axiom
         glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_width, m_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
         glBindTexture(GL_TEXTURE_2D, 0);
 
+    }
+    void OpenGLFrameBuffer::GetFrameBufferParameters(const FramebufferFormat& frameBufferFormat, int& internalFormat, int& format, int& type)
+    {
+            switch (frameBufferFormat)
+            {
+            case FramebufferFormat::RGB8:
+                internalFormat = GL_RGB8;
+                format = GL_RGB;
+                type = GL_UNSIGNED_BYTE;
+                break;
+            case FramebufferFormat::RGBA8:
+                internalFormat = GL_RGBA8;
+                format = GL_RGBA;
+                type = GL_UNSIGNED_BYTE;
+                break;
+            case FramebufferFormat::RG16:
+                internalFormat = GL_RG16;
+                format = GL_RG;
+                type = GL_FLOAT;
+                break;
+            case FramebufferFormat::RG16F:
+                internalFormat = GL_RG16F;
+                format = GL_RG;
+                type = GL_FLOAT;
+                break;
+            case FramebufferFormat::Depth:
+                internalFormat = 0;
+                format = 0;
+                type = 0;
+                break;
+            case  FramebufferFormat::Undefined:
+                AX_ASSERT(false, "Undefined FramebufferFormat");
+                break;
+            default:
+                AX_ASSERT(false, "No valid FramebufferFormat");
+                break;
+            }
     }
 }

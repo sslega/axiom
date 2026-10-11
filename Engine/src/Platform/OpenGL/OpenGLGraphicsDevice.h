@@ -39,6 +39,8 @@ namespace axiom
         SharedPtr<Texture2D> CreateTexture2D(const Texture2DResource& resource) const override;
 
         virtual SharedPtr<FrameBuffer> CreateFrameBuffer(const FramebufferSpec& spec) const override;
+        virtual void CopyFrameBuffer(FrameBuffer& source, FrameBuffer& target) const override;
+
         virtual void BindFrameBufferTexture(FrameBuffer& frameBuffer, uint32 slot) override;
         virtual void BindDefaultFrameBuffer() override;
         virtual void SetViewport(uint32 x, uint32 y, uint32 width, uint32 height) override;

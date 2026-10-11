@@ -16,7 +16,9 @@ namespace axiom
 
         virtual void OnRender() override;
         virtual void OnUpdate(float deltaTime) override;
-    
+
+        Viewport* GetViewport() { return m_viewport.get(); }
+
     private:
         RenderSubsystem& m_renderSubsystem;
         UniquePtr<Viewport> m_viewport;

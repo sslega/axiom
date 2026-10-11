@@ -2,11 +2,14 @@
 
 namespace axiom
 {
+    enum class FramebufferFormat { Undefined, RGB8, RGBA8, RG16, RG16F, Depth };
+
+
     struct FramebufferSpec
     {
-        uint32 width;
-        uint32 height;
-        bool depthOnly {false};
+        uint32 width {0};
+        uint32 height {0};
+        FramebufferFormat frameBufferFormat {FramebufferFormat::Undefined};
     };
 
     class FrameBuffer
@@ -22,11 +25,21 @@ namespace axiom
 
         uint32 GetWidth() const { return m_width; }
         uint32 GetHeight() const { return m_height; }
-        bool IsDepthOnly() const {return m_depthOnly; }
+        FramebufferFormat GetFramebufferFormat() const { return m_frameBufferFormat; }
+        bool IsDepthOnly() const {return m_frameBufferFormat == FramebufferFormat::Depth; }
+        bool Matches(const FramebufferSpec& spec) const
+        {
+            return m_width == spec.width
+                && m_height == spec.height
+                && m_frameBufferFormat == spec.frameBufferFormat;
+        }
+
+        bool operator==(const FrameBuffer&) const = default;
+
     protected:
         uint32 m_width;
         uint32 m_height;
-        bool m_depthOnly;
+        FramebufferFormat m_frameBufferFormat;
     };
 }
 

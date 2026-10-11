@@ -1,5 +1,6 @@
 #include "ViewportPanel.h"
 #include "Renderer/RenderSubsystem.h"
+#include "Renderer/PostProcessTest.h"
 #include "Viewport.h"
 
 namespace axiom
@@ -15,7 +16,7 @@ namespace axiom
         axiom::FramebufferSpec frameBufferSpec;
         frameBufferSpec.width = width;
         frameBufferSpec.height = height;
-        frameBufferSpec.depthOnly = false;
+        frameBufferSpec.frameBufferFormat = FramebufferFormat::RGB8;
 
         SharedPtr<FrameBuffer> frameBuffer = renderSubsystem.GetGraphicsDevice().CreateFrameBuffer(frameBufferSpec);
         

@@ -1,4 +1,5 @@
 #include "Viewport.h"
+#include "Renderer/PostProcessBase.h"
 
 namespace axiom
 {
@@ -25,6 +26,14 @@ namespace axiom
         m_view.height = m_frameBuffer->GetHeight();
         m_view.renderTarget = m_frameBuffer;
         m_view.viewProjection = m_camera.GetCamera().GetViewProjectionMatrix();
+        m_view.postProcesses.clear();
+        for(UniquePtr<PostProcessBase>& postProcess : m_postProcesses)
+        {
+            if(postProcess->enabled)
+            {
+                m_view.postProcesses.emplace_back(postProcess.get());
+            }
+        }
     }
     
     void Viewport::Resize(uint32 width, uint32 height)

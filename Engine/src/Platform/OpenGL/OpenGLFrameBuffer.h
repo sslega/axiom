@@ -21,5 +21,7 @@ namespace axiom
         uint32 m_frameBuffer;
         uint32 m_textureColorBuffer;
         uint32 m_textureDepthBuffer;
+
+        void GetFrameBufferParameters(const FramebufferFormat& frameBufferFormat, int& internalFormat, int& format, int& type);
     };
 }

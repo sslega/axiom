@@ -47,6 +47,7 @@ namespace axiom
         virtual SharedPtr<Texture2D> CreateTexture2D(const Texture2DResource& resource) const = 0;
 
         virtual SharedPtr<FrameBuffer> CreateFrameBuffer(const FramebufferSpec& spec) const = 0;
+        virtual void CopyFrameBuffer(FrameBuffer& source, FrameBuffer& target) const = 0;
 
         // Draw commands
         virtual void SetClearColor(const Vec4& color) = 0;

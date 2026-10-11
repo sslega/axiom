@@ -4,6 +4,7 @@
 #include "EditorCamera.h"
 namespace axiom
 {
+    class PostProcessBase;
     class Viewport
     {
     public:
@@ -18,6 +19,14 @@ namespace axiom
         void OnUpdate(float deltaTime);
         void OnRender();
         void Resize(uint32 width, uint32 height);
+        
+        template <typename T, typename... Args>
+        T& AddPostProcess(Args&&... args)
+        {
+            static_assert(std::is_base_of_v<PostProcessBase, T>, "T must derive from PostProcessBase");
+            auto& pp = m_postProcesses.emplace_back(MakeUnique<T>(std::forward<Args>(args)...));
+            return static_cast<T&>(*pp);
+        }
     private:
         View m_view;
         EditorCamera m_camera;
@@ -26,5 +35,6 @@ namespace axiom
         uint32 m_height {32};
         String m_name;
         bool m_isActive {false};
+        Vector<UniquePtr<PostProcessBase>> m_postProcesses;
     };
 }
