@@ -19,15 +19,16 @@ namespace axiom
     class MaterialResource;
     class RenderResourceFactory;
     class FrameBuffer;
+    class Entity;
     
     struct RenderSceneData
     {
         bool hasDirectionalLight = false;
         Vec3 lightDirection;
         Matrix4 lightViewMatrix;
-        Vec3 lightColor;
-    
+        Vec3 lightColor;    
         float time;
+        UnorderedMap<String, RenderFlags> renderFlags;
     };
 
     struct RenderViewData
@@ -46,6 +47,7 @@ namespace axiom
         void Submit(const RenderViewData& viewData, const SharedPtr<VertexBuffer>& vb, const SharedPtr<IndexBuffer>& ib, const SharedPtr<Shader>& shader, const Matrix4& transform);
 
         void SubmitView(const View& view);
+        void AddTransientRenderFlags(const Entity& entity, RenderFlags renderFlags);
 
         SharedPtr<MaterialResource> GetMaterial(const String path);
         SharedPtr<Shader> GetShader(const String path);
@@ -92,6 +94,7 @@ namespace axiom
             SharedPtr<MeshResource> mesh;
             SharedPtr<MaterialResource> material;
             Matrix4 transform;
+            RenderFlags renderFlags { RenderFlags::None };
         };
 
         struct PooledFrameBuffer
@@ -166,6 +169,7 @@ namespace axiom
         TimePoint m_lastRenderTime;
         float m_elapsedTime = 0;
         float m_dt = 0;
+        int m_customMaskDrawCount = 0;
 
         Vector<View> m_views;
     };

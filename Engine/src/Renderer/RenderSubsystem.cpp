@@ -11,6 +11,7 @@
 #include "Renderer/FrameBuffer.h"
 #include "Renderer/PostProcessBase.h"
 #include "Scene/TransformComponent.h"
+#include "Scene/Entity.h"
 #include "Core/Log.h"
 #include "Core/Types.h"
 #include "Resources/MaterialResource.h"
@@ -150,8 +151,27 @@ namespace axiom
         {
             if (!meshComponent->IsVisible()) continue;
             if (!meshComponent->material || !meshComponent->mesh) continue;
-            TransformComponent* tc = meshComponent->GetEntity().GetComponent<TransformComponent>();
-            renderCommands.push_back({ meshComponent->mesh.GetResource(), meshComponent->material.GetResource(), tc ? tc->GetTransform() : Matrix4::Identity() });
+            Entity& entity = meshComponent->GetEntity();
+            const String& id = entity.GetID();
+            
+            const auto it = m_renderSceneData.renderFlags.find(id);
+            RenderFlags renderFlags = RenderFlags::None;
+            if(it != m_renderSceneData.renderFlags.end())
+            {
+                renderFlags = it->second;
+            }
+            if (HasAnyFlag(renderFlags, RenderFlags::CustomMask))
+            {
+                m_customMaskDrawCount++;
+            }
+
+            TransformComponent* tc = entity.GetComponent<TransformComponent>();
+            renderCommands.push_back({ 
+                meshComponent->mesh.GetResource(), 
+                meshComponent->material.GetResource(), 
+                tc ? tc->GetTransform() : Matrix4::Identity(),
+                renderFlags
+            });
         }
 
         // View Pass
@@ -182,6 +202,7 @@ namespace axiom
         m_views.clear();
         
         m_renderSceneData.time = m_elapsedTime;
+        m_renderSceneData.renderFlags.clear();
     }
 
     void RenderSubsystem::EndScene()
@@ -191,7 +212,6 @@ namespace axiom
 
     void RenderSubsystem::OnGUI()
     {
-        return;
         uint8 fps = static_cast<uint8>(1.0f / m_dt);
 
         ImGui::SetNextWindowPos(ImVec2(0, 0));
@@ -208,6 +228,7 @@ namespace axiom
         ImGui::Text("Instanced objects: %d", GetInstanceObjectCount());
         ImGui::Text("Batched calls: %d", GetBatchCallCount());
         ImGui::Text("Batched objects: %d", GetBatchObjectCount());
+        ImGui::Text("Custom mask draw calls: %d", m_customMaskDrawCount);
         ImGui::End();
         
         if(m_renderSceneData.hasDirectionalLight)
@@ -260,6 +281,13 @@ namespace axiom
     void RenderSubsystem::SubmitView(const View &view)
     {
         m_views.push_back(view);
+    }
+
+    void RenderSubsystem::AddTransientRenderFlags(const Entity& entity, RenderFlags renderFlags)
+    {
+        const String& id = entity.GetID();
+        RenderFlags& sceneDataRenderFlags = m_renderSceneData.renderFlags[id];
+        sceneDataRenderFlags |= renderFlags;
     }
 
     SharedPtr<MaterialResource> RenderSubsystem::GetMaterial(const String path)
@@ -433,6 +461,7 @@ namespace axiom
         m_instanceObjectCount = 0;
         m_batchCallCount = 0;
         m_batchObjectCount = 0;
+        m_customMaskDrawCount = 0;
     }
 
     void RenderSubsystem::ReleaseUnusedTemporaryFrameBuffers()

@@ -69,6 +69,12 @@ namespace axiom
         {
             m_undoStack.Redo();
         }
+
+        // must run after RenderSubsystem::BeginScene, before RenderSubsystem::OnRender
+        if(Entity* selectedEntity = m_selection.Get())
+        {
+            m_renderSubsystem.AddTransientRenderFlags(*selectedEntity, RenderFlags::CustomMask);
+        }
     }
     
     ViewportPanel* EditorUI::AddViewportPanel(const String& name)
