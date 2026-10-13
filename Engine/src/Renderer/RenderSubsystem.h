@@ -8,7 +8,7 @@
 #include "Renderer/GraphicsDevice.h"
 #include "Renderer/Camera.h"
 #include "Renderer/View.h"
-#include "Renderer./FrameBuffer.h"
+#include "Renderer/FrameBuffer.h"
 #include "Core/Timestep.h"
 
 namespace axiom
@@ -144,8 +144,8 @@ namespace axiom
         SharedPtr<IndexBuffer> m_screenQuadIB;
 
         void RenderShadowPass(const Matrix4& lightProjectionMatrix, const Vector<RenderCommand>& commands);
-        void RenderShadowMap(const Matrix4& lightViewProjection, const Vector<RenderCommand>& commands);
         void RenderScenePass(const RenderSceneData& sceneData, const RenderViewData& viewData, const Vector<RenderCommand>& commands);
+        void RenderCustomMaskPass(const RenderViewData& viewData, const Vector<RenderCommand>& commands);
 
         Vector<Vec3> GetFrustumCornersWorldSpace(const Matrix4& invViewProj);
         Matrix4 ComputeShadowProjection(const Matrix4& lightViewMatrix, const Matrix4& cameraViewMatrix);

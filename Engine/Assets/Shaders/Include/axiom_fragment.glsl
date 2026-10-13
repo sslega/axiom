@@ -10,7 +10,7 @@ in vec4 v_Color;
 in vec3 v_LocalNormal;
 in vec3 v_WorldNormal;
 
-layout(location = 0) out vec4 color;
+layout(location = 0) out vec4 OutColor;
 
 struct VertexInput
 {
@@ -37,13 +37,15 @@ void main()
     input.Color = v_Color;
     input.LocalNormal = v_LocalNormal;
     input.WorldNormal = v_WorldNormal;
-
-    FragmentInput output;
-    output.Color = vec3(0,0,0);
-    output.Opacity = 1.0;
-    #ifndef DEPTH_PASS 
+    #if defined(CUSTOM_MASK)
+        OutColor = vec4(1);
+    #elif defined(DEPTH_PASS)
+    #else
+        FragmentInput output;
+        output.Color = vec3(0, 0, 0);
+        output.Opacity = 1.0;
         FragmentShader(input, output);    
-        color = vec4(output.Color, output.Opacity);
+        OutColor = vec4(output.Color, output.Opacity);
     #endif
 }
 

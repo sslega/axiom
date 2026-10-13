@@ -472,6 +472,24 @@ namespace axiom
         });
     }
 
+    void RenderSubsystem::RenderCustomMaskPass(const RenderViewData& viewData, const Vector<RenderCommand>& commands)
+    {
+        for (const auto& cmd : commands)
+        {
+            if(!HasAnyFlag(cmd.renderFlags, RenderFlags::CustomMask)) continue;
+
+            auto buffers = GetOrCreateBuffers(cmd.mesh);
+            auto shader = cmd.material->GetShader();            
+            auto variant = shader->GetVariant({"CUSTOM_MASK"});
+
+            variant->Bind();
+            variant->UploadUniform("u_ViewProjection", viewData.viewProjectionMatrix);
+            variant->UploadUniform("u_LocalToWorld", cmd.transform);
+            m_graphicsDevice->DrawIndexed(buffers.vb, buffers.ib);
+            m_callCount++;
+        }
+    }
+
     void RenderSubsystem::RenderShadowPass(const Matrix4& viewProjectionMatrix, const Vector<RenderCommand>& commands)
     {
         //TODO: Add batching/instancing
@@ -488,18 +506,6 @@ namespace axiom
             m_graphicsDevice->DrawIndexed(buffers.vb, buffers.ib);
             m_callCount++;
         }
-    }
-
-    void RenderSubsystem::RenderShadowMap(const Matrix4& lightViewProjection, const Vector<RenderCommand>& commands)
-    {
-        m_graphicsDevice->SetColorWriteEnabled(true);
-        m_graphicsDevice->SetDepthWriteEnabled(true);
-        m_graphicsDevice->SetDepthTestEnabled(true);
-        m_graphicsDevice->SetDepthFunction(DepthFunction::Less);
-        m_shadowMapFrameBuffer->Bind();
-        m_graphicsDevice->SetViewport(0, 0, m_shadowMapFrameBuffer->GetWidth(), m_shadowMapFrameBuffer->GetHeight());
-        m_graphicsDevice->Clear();
-        RenderShadowPass(lightViewProjection, commands);
     }
 
     void RenderSubsystem::RenderScenePass(const RenderSceneData& sceneData, const RenderViewData& viewData, const Vector<RenderCommand>& commands)
@@ -701,9 +707,19 @@ namespace axiom
             Matrix4 lightProj = ComputeShadowProjection(m_renderSceneData.lightViewMatrix, view.viewProjection);
             renderViewData.lightViewProjectionMatrix = lightProj * m_renderSceneData.lightViewMatrix;
             
-            RenderShadowMap(renderViewData.lightViewProjectionMatrix, commands);
+            //TODO: move it to RenderShadowPass
+            m_graphicsDevice->SetColorWriteEnabled(true);
+            m_graphicsDevice->SetDepthWriteEnabled(true);
+            m_graphicsDevice->SetDepthTestEnabled(true);
+            m_graphicsDevice->SetDepthFunction(DepthFunction::Less);
+            m_shadowMapFrameBuffer->Bind();
+            m_graphicsDevice->SetViewport(0, 0, m_shadowMapFrameBuffer->GetWidth(), m_shadowMapFrameBuffer->GetHeight());
+            m_graphicsDevice->Clear();
+            
+            RenderShadowPass(renderViewData.lightViewProjectionMatrix, commands);
         }
-        
+
+        // TODO: move it to RenderShadowPass
         m_graphicsDevice->SetColorWriteEnabled(true);
         m_graphicsDevice->SetDepthWriteEnabled(true);
         m_graphicsDevice->SetDepthTestEnabled(true);
@@ -714,21 +730,39 @@ namespace axiom
         m_graphicsDevice->Clear();
 
         RenderScenePass(m_renderSceneData, renderViewData, commands);
+
+        // Custom Mask pass
+        FrameBuffer* customMask = nullptr;
         if(!view.postProcesses.empty())
         {
-            FramebufferSpec postProcessFramebufferSpec;
-            postProcessFramebufferSpec.frameBufferFormat = view.renderTarget->GetFramebufferFormat();
-            postProcessFramebufferSpec.width = view.renderTarget->GetWidth();
-            postProcessFramebufferSpec.height = view.renderTarget->GetHeight();        
+            if(m_customMaskDrawCount > 0)
+            {
+                FramebufferSpec customMaskFrameBufferSpec;
+                customMaskFrameBufferSpec.frameBufferFormat = FramebufferFormat::R8;
+                customMaskFrameBufferSpec.width = view.width;
+                customMaskFrameBufferSpec.height = view.height;
+                customMask = &AcquireTemporaryFrameBuffer(customMaskFrameBufferSpec);
+                customMask->Bind();
 
-            FrameBuffer& postprocessSource = *view.renderTarget;
-            FrameBuffer& postprocessTarget = AcquireTemporaryFrameBuffer(postProcessFramebufferSpec);
+                m_graphicsDevice->SetColorWriteEnabled(true);
+                m_graphicsDevice->SetDepthWriteEnabled(false);
+                m_graphicsDevice->SetDepthTestEnabled(false);
+                m_graphicsDevice->SetViewport(0, 0, customMask->GetWidth(), customMask->GetHeight());
+                m_graphicsDevice->SetClearColor(Vec4(0, 0, 0, 0));
+                m_graphicsDevice->Clear();
+                RenderCustomMaskPass(renderViewData, commands);
+            }
+
             for(PostProcessBase* postProcess : view.postProcesses)
             {
-                postProcess->Execute(*this, postprocessSource, postprocessTarget);
-                m_graphicsDevice->CopyFrameBuffer(postprocessTarget, postprocessSource);
+                PostProcessContext context {*this, view, *view.renderTarget, customMask};
+                postProcess->Execute(context);
             }
-            ReleaseTemporaryFrameBuffer(postprocessTarget);
+
+            if(customMask)
+            {
+                ReleaseTemporaryFrameBuffer(*customMask);
+            }
         }
     }
 

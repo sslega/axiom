@@ -100,6 +100,11 @@ namespace axiom
     {
             switch (frameBufferFormat)
             {
+            case FramebufferFormat::R8:
+                internalFormat = GL_R8;
+                format = GL_RED;
+                type = GL_UNSIGNED_BYTE;
+                break; 
             case FramebufferFormat::RGB8:
                 internalFormat = GL_RGB8;
                 format = GL_RGB;
@@ -113,12 +118,12 @@ namespace axiom
             case FramebufferFormat::RG16:
                 internalFormat = GL_RG16;
                 format = GL_RG;
-                type = GL_FLOAT;
+                type = GL_UNSIGNED_SHORT;
                 break;
             case FramebufferFormat::RG16F:
                 internalFormat = GL_RG16F;
                 format = GL_RG;
-                type = GL_FLOAT;
+                type = GL_HALF_FLOAT;
                 break;
             case FramebufferFormat::Depth:
                 internalFormat = 0;

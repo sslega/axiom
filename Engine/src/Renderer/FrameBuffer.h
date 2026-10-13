@@ -2,7 +2,7 @@
 
 namespace axiom
 {
-    enum class FramebufferFormat { Undefined, RGB8, RGBA8, RG16, RG16F, Depth };
+    enum class FramebufferFormat { Undefined, R8, RGB8, RGBA8, RG16, RG16F, Depth };
 
 
     struct FramebufferSpec

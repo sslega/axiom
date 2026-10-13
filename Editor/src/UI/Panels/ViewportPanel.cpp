@@ -1,6 +1,6 @@
 #include "ViewportPanel.h"
 #include "Renderer/RenderSubsystem.h"
-#include "Renderer/PostProcessTest.h"
+#include "Renderer/OutlinePostProcess.h"
 #include "Viewport.h"
 
 namespace axiom

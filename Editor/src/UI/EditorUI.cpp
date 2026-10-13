@@ -3,7 +3,7 @@
 #include "Panels/OutlinerPanel.h"
 #include "Panels/InspectorPanel.h"
 #include "Viewport.h"
-#include "Renderer/PostProcessTest.h"
+#include "Renderer/OutlinePostProcess.h"
 #include <imgui.h>
 
 namespace axiom
@@ -18,7 +18,7 @@ namespace axiom
     {
         ViewportPanel* ViewportA = AddViewportPanel("ViewportA");
         ViewportPanel* ViewportB = AddViewportPanel("ViewportB");
-        ViewportB->GetViewport()->AddPostProcess<PostProcessTest>();
+        ViewportB->GetViewport()->AddPostProcess<OutlinePostProcess>();
         AddOutlinerPanel();
         AddInspectorPanel();
     }
@@ -51,6 +51,10 @@ namespace axiom
                 {
                     m_undoStack.Redo();
                 }
+                if(ImGui::MenuItem("Reload Shaders", "Ctrl+R", false))
+                {
+                    m_renderSubsystem.ReloadShaders();
+                }
                 ImGui::EndMenu();
             }  
             ImGui::EndMainMenuBar();
@@ -68,6 +72,10 @@ namespace axiom
         if (!ImGui::GetIO().WantTextInput && ImGui::IsKeyDown(ImGuiMod_Ctrl) && ImGui::IsKeyPressed(ImGuiKey_Y))
         {
             m_undoStack.Redo();
+        }
+        if (!ImGui::GetIO().WantTextInput && ImGui::IsKeyDown(ImGuiMod_Ctrl) && ImGui::IsKeyPressed(ImGuiKey_R))
+        {
+            m_renderSubsystem.ReloadShaders();
         }
 
         // must run after RenderSubsystem::BeginScene, before RenderSubsystem::OnRender
