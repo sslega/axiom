@@ -20,7 +20,7 @@ Currently a single-threaded OpenGL forward renderer with a component-based ECS. 
 
 ## Building
 
-Requires CMake 3.20+ and Visual Studio 2022 (MSVC). Dependencies (GLFW, ImGui, GLAD, STB, nlohmann/json) are fetched automatically via CMake FetchContent.
+Requires CMake 3.28+ and Visual Studio 2022 (MSVC). Dependencies (GLFW, ImGui, GLAD, STB, nlohmann/json) are fetched automatically via CMake FetchContent.
 
 ```bash
 cmake -B build -G "Visual Studio 17 2022"

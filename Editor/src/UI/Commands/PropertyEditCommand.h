@@ -6,7 +6,7 @@
 namespace axiom
 {
     class Object;
-    class FieldDescriptor;
+    struct FieldDescriptor;
 
     class PropertyEditCommand : public ICommand
     {

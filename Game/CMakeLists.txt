@@ -5,6 +5,8 @@ file(GLOB_RECURSE GAME_SOURCES
 
 add_executable(Game ${GAME_SOURCES})
 
+target_compile_options(Game PRIVATE /W3)
+
 target_include_directories(Game
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src

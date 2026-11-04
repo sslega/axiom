@@ -10,8 +10,6 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
-
 # =========================================================
 # Dependencies – GLFW
 # =========================================================
@@ -37,8 +35,8 @@ FetchContent_MakeAvailable(glfw)
 
 FetchContent_Declare(imgui
     GIT_REPOSITORY  https://github.com/ocornut/imgui.git
-    GIT_TAG         docking
-    GIT_SHALLOW     TRUE
+    # docking branch, pinned to a commit. A commit hash can't be used with GIT_SHALLOW.
+    GIT_TAG         1ab953d75a760d5102eb2d5c4c6c4e65df6b29f3
     GIT_PROGRESS    TRUE
     DOWNLOAD_ONLY   YES
 )
@@ -70,8 +68,6 @@ target_include_directories(imgui PUBLIC
 )
 
 target_link_libraries(imgui PUBLIC glfw OpenGL::GL)
-
-set_target_properties(imgui PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
 
 # =========================================================
 # GLAD
@@ -123,8 +119,7 @@ FetchContent_MakeAvailable(nlohmann_json)
 
 add_library(Engine STATIC)
 
-target_compile_definitions(Engine PUBLIC ENGINE_ROOT_PATH="${ENGINE_ROOT}")
-
+target_compile_options(Engine PRIVATE /W3)
 
 file(GLOB_RECURSE ENGINE_SOURCES
     CONFIGURE_DEPENDS
@@ -143,6 +138,7 @@ target_include_directories(Engine
 
 target_compile_definitions(Engine PUBLIC
     AX_ENGINE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/Assets"
+    $<$<CONFIG:Debug>:AX_DEBUG>
 )
 
 target_precompile_headers(Engine PRIVATE
@@ -157,13 +153,3 @@ target_link_libraries(Engine PUBLIC
     nlohmann_json::nlohmann_json
     OpenGL::GL
 )
-
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_compile_definitions(Axiom PRIVATE AX_DEBUG)
-elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-    target_compile_definitions(Axiom PRIVATE AX_RELEASE)
-elseif(CMAKE_BUILD_TYPE STREQUAL "Dist")
-    target_compile_definitions(Axiom PRIVATE AX_DIST)
-endif()
-
-message(STATUS "Engine include path: ${CMAKE_CURRENT_SOURCE_DIR}/include/Axiom")

@@ -5,6 +5,8 @@ file(GLOB_RECURSE EDITOR_SOURCES
 
 add_executable(Editor ${EDITOR_SOURCES})
 
+target_compile_options(Editor PRIVATE /W3)
+
 target_include_directories(Editor
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src

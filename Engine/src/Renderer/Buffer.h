@@ -85,7 +85,7 @@ namespace axiom
         BufferLayout(const std::initializer_list<BufferElement>& elements);
         inline const Vector<BufferElement>& GetElements() const { return m_elements; }
         inline const BufferElement& GetElement(int index) const { return m_elements[index]; }
-        inline const uint8 GetSize() const { return m_elements.size(); };
+        inline const uint8 GetSize() const { return static_cast<uint8>(m_elements.size()); };
         inline const uint32 GetStride() const { return m_stride; };
     private:
         Vector<BufferElement> m_elements;

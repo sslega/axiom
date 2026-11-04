@@ -61,7 +61,7 @@ namespace axiom
                     double v1 = std::stod(match[1]);
                     double v2 = std::stod(match[2]);
                     double v3 = std::stod(match[3]);
-                    positions.push_back(Vec3(v1, v2, v3));
+                    positions.push_back(Vec3(static_cast<float>(v1), static_cast<float>(v2), static_cast<float>(v3)));
                 }
             }
             else if (line.starts_with("vt "))
@@ -72,7 +72,7 @@ namespace axiom
                 {
                     double v1 = std::stod(match[1]);
                     double v2 = std::stod(match[2]);
-                    uvs.push_back(Vec2(v1, v2));
+                    uvs.push_back(Vec2(static_cast<float>(v1), static_cast<float>(v2)));
                 }
             }
             else if (line.starts_with("vn "))
@@ -84,7 +84,7 @@ namespace axiom
                     double v1 = std::stod(match[1]);
                     double v2 = std::stod(match[2]);
                     double v3 = std::stod(match[3]);
-                    normals.push_back(Vec3(v1, v2, v3));
+                    normals.push_back(Vec3(static_cast<float>(v1), static_cast<float>(v2), static_cast<float>(v3)));
                 }
             }
             else if (line.starts_with("f "))

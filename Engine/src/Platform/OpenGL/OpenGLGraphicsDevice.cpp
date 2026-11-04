@@ -245,7 +245,7 @@ namespace axiom
                 ShaderDataTypeToOpenGLBaseType(element.type),
                 element.normalized ? GL_TRUE : GL_FALSE,
                 layout.GetStride(),
-                (const void*)element.offset
+                (const void*)(uintptr_t)element.offset
             );
         }
 
@@ -265,7 +265,7 @@ namespace axiom
                     ShaderDataTypeToOpenGLBaseType(element.type),
                     element.normalized ? GL_TRUE : GL_FALSE,
                     instanceLayout.GetStride(),
-                    (const void*)element.offset
+                    (const void*)(uintptr_t)element.offset
                 );
                 glVertexAttribDivisor(index, 1);
             }

@@ -5,7 +5,7 @@
 #include "Core/Types.h"
 #include <unordered_map>
 
-class GLFWwindow;
+struct GLFWwindow;
 
 namespace axiom
 {

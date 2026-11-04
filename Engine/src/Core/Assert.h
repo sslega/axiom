@@ -1,5 +1,8 @@
 #pragma once
 
+#include <cstdio>
+#include <cstdlib>
+
 #ifdef AX_DEBUG
     #define AX_ASSERT(condition, msg) \
         do { if (!(condition)) { \

@@ -372,7 +372,7 @@ namespace axiom
         m_graphicsDevice->DrawIndexedInstanced(buffers.vb, buffers.ib, instanceBuffer, static_cast<uint32>(transforms.size()));
         m_callCount++;
         m_instanceCallCount++;
-        m_instanceObjectCount += transforms.size();
+        m_instanceObjectCount += static_cast<uint32>(transforms.size());
     }
 
     void RenderSubsystem::SubmitInstanced(const RenderViewData& viewData, const MeshBuffers& buffers, const SharedPtr<Shader>& instancedShader, const Vector<Matrix4>& transforms)
@@ -399,7 +399,7 @@ namespace axiom
         m_graphicsDevice->DrawIndexedInstanced(buffers.vb, buffers.ib, instanceBuffer, static_cast<uint32>(transforms.size()));
         m_callCount++;
         m_instanceCallCount++;
-        m_instanceObjectCount += transforms.size();
+        m_instanceObjectCount += static_cast<uint32>(transforms.size());
     }
 
     void RenderSubsystem::SubmitBatched(const RenderViewData& viewData, const SharedPtr<MaterialResource>& material, const Vector<RenderCommand>& commands)
@@ -451,7 +451,7 @@ namespace axiom
         Submit(viewData, vb, ib, m, Matrix4::Identity());
 
         m_batchCallCount++;
-        m_batchObjectCount += commands.size();
+        m_batchObjectCount += static_cast<uint32>(commands.size());
     }
 
     void RenderSubsystem::ResetDebugDrawCounters()
@@ -665,7 +665,7 @@ namespace axiom
             maxZ = std::max(maxZ, lightSpaceCorner.z);
             frustumCenter += frustumCorner;
         }
-        frustumCenter /= frustumCorners.size();
+        frustumCenter /= static_cast<float>(frustumCorners.size());
         Vec3 lightSpaceCenter = lightViewMatrix.TransformPoint(frustumCenter);
 
         for(Vec3& frustumCorner : frustumCorners)

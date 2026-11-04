@@ -35,9 +35,7 @@ namespace axiom
         uint32 desiredW = (uint32)available.x;
         uint32 desiredH = (uint32)available.y;
 
-        Vec2 windowSize = Vec2(available.x, available.y);
-        Vec2 viewportSize = Vec2(m_viewport->GetWidth(), m_viewport->GetHeight());
-        if (desiredW > 0 && 
+        if (desiredW > 0 &&
             desiredH > 0 &&
             (desiredW != m_viewport->GetWidth() || desiredH != m_viewport->GetHeight()))
         {
@@ -46,7 +44,7 @@ namespace axiom
 
         uint32 colorId = m_viewport->GetFrameBuffer()->GetColorAttachmentID();
         ImGui::Image((ImTextureID)(uintptr_t)colorId,
-            ImVec2(desiredW, desiredH),
+            ImVec2((float)desiredW, (float)desiredH),
             ImVec2(0,1), ImVec2(1,0));
         ImGui::End();
     }
