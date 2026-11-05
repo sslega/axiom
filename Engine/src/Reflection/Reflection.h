@@ -39,6 +39,16 @@ namespace axiom
     };
 
 
+    /// The database of reflected types: their names, fields and factories.
+    /// It drives scene loading and saving, the Inspector, undoable edits and Add Component.
+    ///
+    /// Read it from anywhere through Reflection::Get(). All registrations live in EngineReflection.cpp,
+    /// with base types before derived ones. An unregistered field is silently ignored.
+    ///
+    /// @code{.cpp}
+    /// const TypeDescriptor* desc = Reflection::Get().Find(typeid(MeshComponent));
+    /// UniquePtr<Component> component = Reflection::Get().Create("MeshComponent"); // null if the name is unknown
+    /// @endcode
     class TypeRegistry 
     {
         public:

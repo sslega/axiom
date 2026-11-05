@@ -4,6 +4,16 @@
 
 namespace axiom
 {
+    /// Owns entities by UUID. WorldSubsystem owns the active scene; get it with GetActiveScene().
+    ///
+    /// RemoveEntity() returns ownership instead of destroying, so an undo command can hold the entity.
+    /// Entity order is arbitrary.
+    ///
+    /// @code{.cpp}
+    /// SharedPtr<Entity> entity = scene.CreateEntity();
+    /// entity->CreateComponent<TransformComponent>();
+    /// Vector<MeshComponent*> meshes = scene.GetComponents<MeshComponent>(); // visits every entity
+    /// @endcode
     class Scene
     {
         friend class WorldSubsystem;

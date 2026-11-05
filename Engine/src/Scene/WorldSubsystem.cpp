@@ -51,6 +51,29 @@ namespace axiom
         }
     }
 
+    SceneWriter::SceneWriter(Scene &scene, ResourceSubsystem& resourceSubsystem, FileSubsystem &fileSystemModule, ReflectionSubsystem &reflectionSubsystem)
+    : m_scene(scene)
+    , m_resourceSubsystem(resourceSubsystem)
+    , m_fileSubsystem(fileSystemModule)
+    , m_reflectionSubsystem(reflectionSubsystem)
+    {
+    }
+
+    void SceneWriter::Save(const String &path)
+    {
+        Path absolutePath = m_fileSubsystem.Resolve(path);
+        std::ifstream fstream(absolutePath);
+
+        nlohmann::json root;
+        Archive archive = Archive(root, m_resourceSubsystem);
+
+        Vector<Entity*> entities = m_scene.GetEntities();
+        for(auto& entity : entities)
+        {
+            entity->Serialize(archive);
+        }
+    }
+
     WorldSubsystem::WorldSubsystem(Application& application)
     : ApplicationSubsystem(application)
     {

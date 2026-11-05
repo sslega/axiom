@@ -12,12 +12,18 @@ namespace axiom
     class RenderSubsystem;
     class ReflectionSubsystem;
 
+    /// Reads a scene JSON file into a Scene. Usually reached through WorldSubsystem::LoadScene().
+    ///
+    /// Load() takes a virtual path, and adds to whatever the scene already holds rather than replacing it.
+    ///
+    /// File shape: `{ "entities": [ { "name": "...", "components": [ { "type": "MeshComponent", ...fields } ] } ] }`
     class SceneLoader
     {
     public:
         SceneLoader(Scene& scene, ResourceSubsystem& resourceModule, RenderSubsystem& renderModule, FileSubsystem& fileSystemModule, ReflectionSubsystem& reflectionSubsystem);
 
         void Load(const String& path);
+    
     private:
         Scene& m_scene;
         ResourceSubsystem& m_resourceSubsystem;
@@ -26,6 +32,26 @@ namespace axiom
         ReflectionSubsystem& m_reflectionSubsystem;
     };
 
+    class SceneWriter
+    {
+    public:
+        SceneWriter(Scene& scene, ResourceSubsystem& resourceSubsystem, FileSubsystem& fileSystemModule, ReflectionSubsystem& reflectionSubsystem);
+
+        void Save(const String& path);
+    
+    private:
+        Scene& m_scene;
+        ResourceSubsystem& m_resourceSubsystem;
+        FileSubsystem& m_fileSubsystem;
+        ReflectionSubsystem& m_reflectionSubsystem;
+    };
+
+    /// Owns the active Scene and drives its frame hooks.
+    ///
+    /// @code{.cpp}
+    /// Scene& scene = world.GetActiveScene();
+    /// world.LoadScene("project://Scenes/main.scene.json");
+    /// @endcode
     class WorldSubsystem : public ApplicationSubsystem
     {
     public:

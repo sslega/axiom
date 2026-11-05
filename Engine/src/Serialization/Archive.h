@@ -7,6 +7,23 @@
 
 namespace axiom
 {
+    /// Reads and writes named values on one JSON node. Make one Archive per node.
+    ///
+    /// Writing the same key twice overwrites it. Read() skips a missing key and leaves the value
+    /// unchanged, so a typo in a key name fails silently.
+    ///
+    /// @code{.cpp}
+    /// nlohmann::json node;
+    /// Archive ar(node, resourceSubsystem);
+    /// ar.Write("name", name); // node["name"] = name
+    /// ar.Read("name", name);
+    /// entity->Serialize(ar);  // writes the entity's own fields into node
+    /// @endcode
+    ///
+    /// Entity and Component only handle their own fields. The caller builds the `entities` and `components`
+    /// arrays and the component `type` key; SceneLoader shows the file's shape.
+    ///
+    /// New value type: add a Serializer<T> specialization in this file.
     class Archive
     {
     public:

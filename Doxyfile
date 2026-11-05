@@ -1,0 +1,32 @@
+# Local API reference for Axiom. Run the VS Code task "Doxygen", then "Doxygen: Open"
+# (output: build/doxygen/html/index.html). Only non-default settings are listed.
+
+PROJECT_NAME           = Axiom
+OUTPUT_DIRECTORY       = build/doxygen
+
+INPUT                  = Engine/src Editor/src Game/src
+RECURSIVE              = YES
+FILE_PATTERNS          = *.h
+
+# Show #include paths the way the code writes them, e.g. "Scene/Entity.h".
+FULL_PATH_NAMES        = YES
+STRIP_FROM_PATH        = .
+STRIP_FROM_INC_PATH    = Engine/src Editor/src Game/src
+
+# List everything, documented or not. Private members stay out of the reference.
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = YES
+JAVADOC_AUTOBRIEF      = YES
+SORT_MEMBER_DOCS       = NO
+SOURCE_BROWSER         = YES
+
+GENERATE_HTML          = YES
+GENERATE_TREEVIEW      = YES
+GENERATE_LATEX         = NO
+
+# Graphs can be turned on later with Graphviz.
+HAVE_DOT               = NO
+
+QUIET                  = YES
+WARN_IF_UNDOCUMENTED   = NO

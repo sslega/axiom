@@ -4,6 +4,16 @@
 
 namespace axiom
 {
+    /// A component field that references a resource by path.
+    ///
+    /// It's saved as the path and resolved during scene load, before the component initializes.
+    /// Only ResourceSubsystem can fill in the resource; until then GetResource() is null.
+    ///
+    /// @code{.cpp}
+    /// ResourceRef<MeshResource> mesh;                                 // the field, in MeshComponent
+    /// desc.fields.push_back(MakeField("mesh", &MeshComponent::mesh)); // its registration, in EngineReflection.cpp
+    /// if (mesh) { const SharedPtr<MeshResource>& data = mesh.GetResource(); }
+    /// @endcode
     template<class T> 
     class ResourceRef
     {

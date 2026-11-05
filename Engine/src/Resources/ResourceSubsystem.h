@@ -9,6 +9,17 @@ namespace axiom
 {
     class FileSubsystem;
 
+    /// Loads assets by virtual path. Picks a loader by file extension and caches the result by path.
+    ///
+    /// Resources are CPU-side data, and the renderer creates GPU objects from them.
+    /// The exception is materials, which hold a compiled shader.
+    ///
+    /// @code{.cpp}
+    /// SharedPtr<MeshResource> mesh = resources.Load<MeshResource>("project://Meshes/house.obj");
+    /// resources.RegisterLoader<OBJLoader>(".obj"); // the extension includes the dot
+    /// @endcode
+    ///
+    /// Loading the same path again returns the cached object; Evict() forgets it.
     class ResourceSubsystem : public ApplicationSubsystem
     {
     public:

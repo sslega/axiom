@@ -7,6 +7,24 @@ namespace axiom
     class Entity;
     class Archive;
 
+    /// Base class of data and behaviour attached to an Entity.
+    ///
+    /// To add a component type:
+    /// 1. Derive from it, next to the system that consumes it, and override the `On*` hooks you need.
+    /// 2. Register the type and its fields in EngineReflection.cpp. That gives you loading, saving, the Inspector and Add Component.
+    ///
+    /// @code{.cpp}
+    /// class SpinComponent : public Component
+    /// {
+    /// public:
+    ///     float speed = 1.0f;
+    /// protected:
+    ///     void OnUpdate(float deltaTime) override
+    ///     {
+    ///         TransformComponent* transform = GetEntity().GetComponent<TransformComponent>();
+    ///     }
+    /// };
+    /// @endcode
     class Component : public Object
     {
     public:

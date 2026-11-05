@@ -5,6 +5,13 @@
 namespace axiom
 {
     class PostProcessBase;
+    /// Owns a framebuffer, an editor camera and post-process effects, and fills in a View from them each frame.
+    ///
+    /// ViewportPanel owns it and submits its View. Only an active viewport's camera takes input.
+    ///
+    /// @code{.cpp}
+    /// viewportPanel->GetViewport()->AddPostProcess<OutlinePostProcess>();
+    /// @endcode
     class Viewport
     {
     public:

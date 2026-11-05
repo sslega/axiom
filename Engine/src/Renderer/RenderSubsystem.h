@@ -38,6 +38,18 @@ namespace axiom
         Matrix4 lightViewProjectionMatrix;
     };
 
+    /// Turns submitted Views into pixels. Owns the GraphicsDevice and the GPU-side caches.
+    ///
+    /// @code{.cpp}
+    /// render.SubmitView(viewport.GetView());                           // once per view, every frame
+    /// render.AddTransientRenderFlags(entity, RenderFlags::CustomMask); // lasts one frame, so call it every frame
+    ///
+    /// FrameBuffer& temp = render.AcquireTemporaryFrameBuffer(spec);    // for effects; always release
+    /// render.ReleaseTemporaryFrameBuffer(temp);
+    /// @endcode
+    ///
+    /// Make these requests during Application::OnRender(), which runs after the subsystems' BeginFrame
+    /// and before their Render.
     class RenderSubsystem : public ApplicationSubsystem
     {
     public:

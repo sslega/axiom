@@ -33,6 +33,19 @@ namespace axiom
         AppWindowConfig windowConfig;
     };
 
+    /// Base class of each executable. Owns the window, input, log and all subsystems, and runs the main loop.
+    ///
+    /// Subclass it and override the `On*` hooks. At startup they run in this order:
+    /// - OnRegisterModules(): subsystems exist but aren't initialized. Mount paths here.
+    /// - OnInitializeModules(): subsystems are ready. Build the UI here.
+    /// - OnApplicationRun(): the last step before the loop. Load the first scene here.
+    ///
+    /// @code{.cpp}
+    /// void Editor::OnInitializeModules()
+    /// {
+    ///     m_editorUI = MakeUnique<EditorUI>(GetSubsystem<RenderSubsystem>(), GetSubsystem<WorldSubsystem>(), GetSubsystem<FileSubsystem>());
+    /// }
+    /// @endcode
     class Application : public EventDispatcher
     {
     public:

@@ -17,6 +17,14 @@ namespace axiom
         FrameBuffer* customMask;
     };
 
+    /// Base class of a full-screen effect attached to a Viewport. Implement Execute().
+    ///
+    /// The contract: an early-out leaves the image untouched, the effect writes its result back itself,
+    /// and it releases every temporary framebuffer it acquires.
+    ///
+    /// @code{.cpp}
+    /// viewport->AddPostProcess<OutlinePostProcess>();
+    /// @endcode
     class PostProcessBase
     {
     public:

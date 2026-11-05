@@ -9,13 +9,25 @@ namespace axiom
     {
     public:
 
-        template<typename... Args>
+        // A single argument is logged verbatim, so braces in it are safe.
+        static void Info(StringView message)
+        {
+            s_instance->InfoInternal(message);
+        }
+
+        // Needs at least one argument: an empty pack would win overload resolution for string literals.
+        template<typename... Args> requires (sizeof...(Args) > 0)
         static void Info(const char* fmt, Args&&... args)
         {
             s_instance->InfoInternal(std::vformat(fmt, std::make_format_args(args...)));
         }
 
-        template<typename... Args>
+        static void Error(StringView message)
+        {
+            s_instance->ErrorInternal(message);
+        }
+
+        template<typename... Args> requires (sizeof...(Args) > 0)
         static void Error(const char* fmt, Args&&... args)
         {
             s_instance->ErrorInternal(std::vformat(fmt, std::make_format_args(args...)));

@@ -10,6 +10,17 @@ namespace axiom
     template<typename T>
     concept IsComponent = std::is_base_of<Component, T>::value;
 
+    /// A thing in the world: a UUID, a name and at most one component per type.
+    ///
+    /// @code{.cpp}
+    /// auto& transform = entity.CreateComponent<TransformComponent>();  // returns the existing one if present
+    /// if (auto* mesh = entity.GetComponent<MeshComponent>()) { }       // null if missing
+    /// UniquePtr<Component> removed = entity.RemoveComponent(typeid(MeshComponent)); // ownership comes back
+    /// entity.AddComponent(std::move(removed));
+    /// @endcode
+    ///
+    /// Adding a component runs its OnInitialize() immediately, so a component that looks up
+    /// a sibling there depends on add order.
     class Entity : public Object
     {
         friend class EngineReflection;

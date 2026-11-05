@@ -5,6 +5,13 @@
 
 namespace axiom
 {
+    /// Runs commands so they can be undone. Panels change the scene only through this.
+    ///
+    /// Execute() runs the command and drops any redo history.
+    ///
+    /// @code{.cpp}
+    /// m_undoStack.Execute(MakeUnique<DeleteEntityCommand>(scene, *entity));
+    /// @endcode
     class UndoStack
     {
     public:

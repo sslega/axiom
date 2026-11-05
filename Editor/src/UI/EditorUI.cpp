@@ -4,13 +4,15 @@
 #include "Panels/InspectorPanel.h"
 #include "Viewport.h"
 #include "Renderer/OutlinePostProcess.h"
+#include "Platform/FileDialog.h"
 #include <imgui.h>
 
 namespace axiom
 {
-    EditorUI::EditorUI(RenderSubsystem& renderSubsystem, WorldSubsystem& worldSubsystem)
+    EditorUI::EditorUI(RenderSubsystem& renderSubsystem, WorldSubsystem& worldSubsystem, FileSubsystem& fileSubsystem)
     : m_renderSubsystem(renderSubsystem)
     , m_worldSubsystem(worldSubsystem)
+    , m_fileSubsystem(fileSubsystem)
     {
     }
 
@@ -39,6 +41,22 @@ namespace axiom
         {
             if (ImGui::BeginMenu("File"))
             {
+                if(ImGui::MenuItem("New Scene", "Ctrl+N", false))
+                {
+                    
+                }
+                if(ImGui::MenuItem("Open Scene", "Ctrl+O", false))
+                {
+                    Path defaultPath = m_fileSubsystem.Resolve("editor://");
+                    if(auto physicalFilePath = FileDialog::OpenFile(defaultPath))
+                    {
+                        Log::Info(physicalFilePath->string());
+                    }
+                }
+                if(ImGui::MenuItem("Save Scene", "Ctrl+S", false))
+                {
+                    
+                }
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Edit"))

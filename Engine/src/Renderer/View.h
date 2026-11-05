@@ -8,6 +8,10 @@ namespace axiom
     class FrameBuffer;
     class PostProcessBase;
 
+    /// One render request: draw the scene from this camera into this framebuffer, then run these effects.
+    ///
+    /// Built and submitted every frame through RenderSubsystem::SubmitView(). In the editor, Viewport fills it in
+    /// and ViewportPanel submits it. The effect pointers don't own anything; whoever fills in the View keeps them alive.
     struct View
     {
         Matrix4 viewProjection;
