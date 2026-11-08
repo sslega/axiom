@@ -14,6 +14,7 @@ namespace axiom
         void OnUpdate(float deltaTime);
         inline void SetAspectRatio(float aspectRatio) { m_camera.SetAspectRatio(aspectRatio); }
         inline Camera& GetCamera() { return m_camera; }
+        inline const Camera& GetCamera() const { return m_camera; }
 
     private:
         Camera m_camera;

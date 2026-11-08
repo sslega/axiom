@@ -6,6 +6,7 @@
 #include "Renderer/OutlinePostProcess.h"
 #include "Platform/FileDialog.h"
 #include <imgui.h>
+#include <ImGuizmo.h>
 
 namespace axiom
 {
@@ -35,6 +36,7 @@ namespace axiom
 
     void EditorUI::OnRender()
     {
+        ImGuizmo::BeginFrame();
         ImGui::DockSpaceOverViewport();
 
         if(ImGui::BeginMainMenuBar())
@@ -79,28 +81,32 @@ namespace axiom
             panel->OnRender();
         }
 
-        if (!ImGui::GetIO().WantTextInput && ImGui::IsKeyDown(ImGuiMod_Ctrl) && ImGui::IsKeyPressed(ImGuiKey_Z))
+        const bool textInputActive = ImGui::GetIO().WantTextInput;
+        // A gizmo drag holds pointers into the scene and an undo step in progress; these would pull both away.
+        const bool sceneShortcutsEnabled = !textInputActive && !m_gizmoState.dragging;
+
+        if (sceneShortcutsEnabled && ImGui::IsKeyDown(ImGuiMod_Ctrl) && ImGui::IsKeyPressed(ImGuiKey_Z))
         {
             m_undoStack.Undo();
         }
-        if (!ImGui::GetIO().WantTextInput && ImGui::IsKeyDown(ImGuiMod_Ctrl) && ImGui::IsKeyPressed(ImGuiKey_Y))
+        if (sceneShortcutsEnabled && ImGui::IsKeyDown(ImGuiMod_Ctrl) && ImGui::IsKeyPressed(ImGuiKey_Y))
         {
             m_undoStack.Redo();
         }
-        if (!ImGui::GetIO().WantTextInput && ImGui::IsKeyDown(ImGuiMod_Ctrl) && ImGui::IsKeyPressed(ImGuiKey_R))
+        if (!textInputActive && ImGui::IsKeyDown(ImGuiMod_Ctrl) && ImGui::IsKeyPressed(ImGuiKey_R))
         {
             m_renderSubsystem.ReloadShaders();
         }
         // No key repeat: holding Ctrl+O must not reopen the dialog.
-        if (!ImGui::GetIO().WantTextInput && ImGui::IsKeyDown(ImGuiMod_Ctrl) && ImGui::IsKeyPressed(ImGuiKey_N, false))
+        if (sceneShortcutsEnabled && ImGui::IsKeyDown(ImGuiMod_Ctrl) && ImGui::IsKeyPressed(ImGuiKey_N, false))
         {
             NewScene();
         }
-        if (!ImGui::GetIO().WantTextInput && ImGui::IsKeyDown(ImGuiMod_Ctrl) && ImGui::IsKeyPressed(ImGuiKey_O, false))
+        if (sceneShortcutsEnabled && ImGui::IsKeyDown(ImGuiMod_Ctrl) && ImGui::IsKeyPressed(ImGuiKey_O, false))
         {
             OpenScene();
         }
-        if (!ImGui::GetIO().WantTextInput && ImGui::IsKeyDown(ImGuiMod_Ctrl) && ImGui::IsKeyPressed(ImGuiKey_S, false))
+        if (sceneShortcutsEnabled && ImGui::IsKeyDown(ImGuiMod_Ctrl) && ImGui::IsKeyPressed(ImGuiKey_S, false))
         {
             SaveScene();
         }
@@ -173,7 +179,7 @@ namespace axiom
 
     ViewportPanel* EditorUI::AddViewportPanel(const String& name)
     {
-        auto panel = MakeUnique<ViewportPanel>(name, m_renderSubsystem);
+        auto panel = MakeUnique<ViewportPanel>(name, m_renderSubsystem, m_selection, m_undoStack, m_gizmoState);
         ViewportPanel* raw = panel.get();
         m_panels.push_back(std::move(panel));
         return raw;

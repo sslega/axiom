@@ -37,7 +37,8 @@ namespace axiom
         Vec3 right = { std::cos(m_yaw), 0.0f, -std::sin(m_yaw) };
         Vec3 position = m_camera.GetPosition();
 
-        if( !Input::IsKeyPressed(KeyCode::LeftControl) &&
+        if( rmbPressed &&
+            !Input::IsKeyPressed(KeyCode::LeftControl) &&
             !Input::IsKeyPressed(KeyCode::RightControl) &&
             !Input::IsKeyPressed(KeyCode::LeftShift) &&
             !Input::IsKeyPressed(KeyCode::RightShift) &&

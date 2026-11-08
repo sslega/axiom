@@ -12,7 +12,8 @@ namespace axiom
     class Editor : public Application
     {
     public:
-        Editor(AppConfig appConfig);
+        /// @param smokeFrames Run this many frames and exit, for automated checks. 0 runs normally.
+        Editor(AppConfig appConfig, int smokeFrames = 0);
         ~Editor() = default;
         void OnResize(const WindowResizeEvent& event);
 
@@ -25,6 +26,7 @@ namespace axiom
     
     private:
         UniquePtr<EditorUI> m_editorUI;
+        int m_smokeFrames = 0;
     };
 
 }

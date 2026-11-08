@@ -3,6 +3,7 @@
 #include "AxiomEngine.h"
 #include "UI/EditorPanel.h"
 #include "UI/Selection.h"
+#include "UI/GizmoState.h"
 #include "UI/Commands/UndoStack.h"
 
 using namespace axiom;
@@ -12,7 +13,7 @@ namespace axiom
     class ViewportPanel;
     
     /// Root of the editor UI: the dock space, main menu bar, keyboard shortcuts and all panels.
-    /// Owns the Selection and UndoStack, and passes them to the panels that need them.
+    /// Owns the Selection, UndoStack and GizmoState, and passes them to the panels that need them.
     ///
     /// - New menu item or shortcut: OnRender().
     /// - New panel: an `Add*Panel()` function called from OnInitialize().
@@ -26,7 +27,8 @@ namespace axiom
         EditorUI(RenderSubsystem& renderSubsystem, WorldSubsystem& worldSubsystem, FileSubsystem& m_fileSubsystem);
 
         inline Scene& GetActiveScene() { return m_worldSubsystem.GetActiveScene(); };
-        
+        inline Selection& GetSelection() { return m_selection; }
+
         void OnInitialize();
         void OnUpdate(float dt);
         void OnRender();
@@ -38,6 +40,7 @@ namespace axiom
 
         Selection m_selection;
         UndoStack m_undoStack;
+        GizmoState m_gizmoState;
 
         Vector<UniquePtr<EditorPanel>> m_panels;
         
