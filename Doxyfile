@@ -25,12 +25,13 @@ GENERATE_HTML          = YES
 GENERATE_LATEX         = NO
 
 # Theme: doxygen-awesome-css, sidebar-only layout. It follows the system's light/dark setting.
+# Kept outside the repo, next to doxygen.exe.
 # LIGHT is required by the theme on Doxygen 1.9.5 and newer; it doesn't mean light mode.
 GENERATE_TREEVIEW      = YES
 DISABLE_INDEX          = NO
 FULL_SIDEBAR           = NO
 HTML_COLORSTYLE        = LIGHT
-HTML_EXTRA_STYLESHEET  = Tools/doxygen-awesome/doxygen-awesome.css Tools/doxygen-awesome/doxygen-awesome-sidebar-only.css
+HTML_EXTRA_STYLESHEET  = Z:/Tools/doxygen-awesome/doxygen-awesome.css Z:/Tools/doxygen-awesome/doxygen-awesome-sidebar-only.css
 
 # Graphs can be turned on later with Graphviz.
 HAVE_DOT               = NO
