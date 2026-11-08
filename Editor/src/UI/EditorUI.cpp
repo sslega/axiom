@@ -43,19 +43,15 @@ namespace axiom
             {
                 if(ImGui::MenuItem("New Scene", "Ctrl+N", false))
                 {
-                    
+                    NewScene();
                 }
                 if(ImGui::MenuItem("Open Scene", "Ctrl+O", false))
                 {
-                    Path defaultPath = m_fileSubsystem.Resolve("editor://");
-                    if(auto physicalFilePath = FileDialog::OpenFile(defaultPath))
-                    {
-                        Log::Info(physicalFilePath->string());
-                    }
+                    OpenScene();
                 }
                 if(ImGui::MenuItem("Save Scene", "Ctrl+S", false))
                 {
-                    
+                    SaveScene();
                 }
                 ImGui::EndMenu();
             }
@@ -95,6 +91,19 @@ namespace axiom
         {
             m_renderSubsystem.ReloadShaders();
         }
+        // No key repeat: holding Ctrl+O must not reopen the dialog.
+        if (!ImGui::GetIO().WantTextInput && ImGui::IsKeyDown(ImGuiMod_Ctrl) && ImGui::IsKeyPressed(ImGuiKey_N, false))
+        {
+            NewScene();
+        }
+        if (!ImGui::GetIO().WantTextInput && ImGui::IsKeyDown(ImGuiMod_Ctrl) && ImGui::IsKeyPressed(ImGuiKey_O, false))
+        {
+            OpenScene();
+        }
+        if (!ImGui::GetIO().WantTextInput && ImGui::IsKeyDown(ImGuiMod_Ctrl) && ImGui::IsKeyPressed(ImGuiKey_S, false))
+        {
+            SaveScene();
+        }
 
         // must run after RenderSubsystem::BeginScene, before RenderSubsystem::OnRender
         if(Entity* selectedEntity = m_selection.Get())
@@ -103,6 +112,65 @@ namespace axiom
         }
     }
     
+    void EditorUI::NewScene()
+    {
+        m_worldSubsystem.NewScene();
+        OnSceneReplaced();
+    }
+
+    void EditorUI::OpenScene()
+    {
+        std::optional<Path> physicalPath = FileDialog::OpenFile(m_fileSubsystem.Resolve("project://Scenes"));
+        if(!physicalPath)
+        {
+            return;
+        }
+
+        std::optional<String> virtualPath = m_fileSubsystem.ToVirtual(*physicalPath);
+        if(!virtualPath)
+        {
+            Log::Error("Scene is outside every mounted folder: {}", physicalPath->string());
+            return;
+        }
+
+        if(m_worldSubsystem.LoadScene(*virtualPath))
+        {
+            OnSceneReplaced();
+        }
+    }
+
+    void EditorUI::SaveScene()
+    {
+        const String& currentPath = m_worldSubsystem.GetActiveScenePath();
+        if(!currentPath.empty())
+        {
+            m_worldSubsystem.SaveScene(currentPath);
+            return;
+        }
+
+        std::optional<Path> physicalPath = FileDialog::SaveFile(m_fileSubsystem.Resolve("project://Scenes"));
+        if(!physicalPath)
+        {
+            return;
+        }
+
+        std::optional<String> virtualPath = m_fileSubsystem.ToVirtual(*physicalPath);
+        if(!virtualPath)
+        {
+            Log::Error("Scene is outside every mounted folder: {}", physicalPath->string());
+            return;
+        }
+
+        m_worldSubsystem.SaveScene(*virtualPath);
+    }
+
+    void EditorUI::OnSceneReplaced()
+    {
+        // Both hold pointers into the old scene.
+        m_selection.Clear();
+        m_undoStack.Clear();
+    }
+
     ViewportPanel* EditorUI::AddViewportPanel(const String& name)
     {
         auto panel = MakeUnique<ViewportPanel>(name, m_renderSubsystem);

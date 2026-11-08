@@ -5,6 +5,12 @@
 namespace axiom
 {
 
+    Entity::~Entity()
+    {
+        for (auto& [id, component] : m_components)
+            component->Unregister();
+    }
+
     void Entity::AddComponent(UniquePtr<Component> component)
     {
         auto typeId = std::type_index(typeid(*component));
@@ -12,7 +18,10 @@ namespace axiom
         ptr->m_entity = this;
         m_components[typeId] = std::move(component);
         ptr->Register();
-        ptr->Initialize();
+        if (m_live)
+        {
+            ptr->Initialize();
+        }
     }
 
     UniquePtr<Component> Entity::RemoveComponent(std::type_index type)
@@ -20,7 +29,10 @@ namespace axiom
         auto it = m_components.find(type);
         if (it != m_components.end())
         {
-            it->second->Shutdown();
+            if (m_live)
+            {
+                it->second->Shutdown();
+            }
             it->second->Unregister();
             UniquePtr<Component> base = std::move(it->second);
             m_components.erase(it);
@@ -52,18 +64,20 @@ namespace axiom
 
     void Entity::Deserialize(Archive &ar)
     {
+        Object::Deserialize(ar);
         ar.Read("name", m_name);
     }
 
     void Entity::Serialize(Archive &ar)
     {
+        Object::Serialize(ar);
         ar.Write("name", m_name);
     }
 
-    void Entity::OnUnregister()
+    void Entity::OnInitialize()
     {
         for (auto& [id, component] : m_components)
-            component->Unregister();
+            component->Initialize();
     }
 
     void Entity::OnShutdown()

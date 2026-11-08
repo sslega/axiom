@@ -13,11 +13,11 @@ namespace axiom
         float lookSensitivity = 0.002f;
         
         virtual void OnUpdate(float deltaTime) override;
-        
+
     protected:
-        TransformComponent* m_transformComponent;
+        TransformComponent* m_transformComponent = nullptr;
         virtual void OnInitialize() override;
-    
+
     private:
         Vec2 m_lastMouse = {0, 0};
         bool m_firstUpdate = true;

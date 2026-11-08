@@ -41,6 +41,11 @@ namespace axiom
 
         Vector<UniquePtr<EditorPanel>> m_panels;
         
+        void NewScene();
+        void OpenScene();
+        void SaveScene();
+        void OnSceneReplaced();
+
         ViewportPanel* AddViewportPanel(const String& name);
         void AddOutlinerPanel();
         void AddInspectorPanel();

@@ -38,6 +38,17 @@ namespace axiom
         return nullptr;
     }
 
+    void Scene::Clear()
+    {
+        for (auto& [id, entity] : m_entities)
+        {
+            entity->Shutdown();
+            entity->Unregister();
+        }
+        m_entities.clear();
+        m_nameCounters.clear();
+    }
+
     const String& Scene::GetName() const
     {
         return m_name;

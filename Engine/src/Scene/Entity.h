@@ -19,13 +19,16 @@ namespace axiom
     /// entity.AddComponent(std::move(removed));
     /// @endcode
     ///
-    /// Adding a component runs its OnInitialize() immediately, so a component that looks up
-    /// a sibling there depends on add order.
+    /// A component's OnRegister() runs when it joins the entity. Its OnInitialize() runs once the entity is in a
+    /// scene with its components attached, so siblings can be looked up there whatever order they were added in.
+    ///
+    /// A component added to an entity already in a scene initializes straight away, so a sibling can still be
+    /// missing. Other entities may not exist yet during OnInitialize().
     class Entity : public Object
     {
         friend class EngineReflection;
     public:
-        ~Entity() = default;
+        ~Entity();
 
         template <IsComponent T, typename... Args>
         T& CreateComponent(Args&&... args)
@@ -38,10 +41,7 @@ namespace axiom
 
             UniquePtr<T> component = MakeUnique<T>(std::forward<Args>(args)...);
             T* componentPtr = component.get();
-            componentPtr->m_entity = this;
-            m_components[TypeID<T>()] = std::move(component);
-            componentPtr->Register();
-            componentPtr->Initialize();
+            AddComponent(std::move(component));
             return *componentPtr;
         }
 
@@ -80,8 +80,8 @@ namespace axiom
         TypeMap<UniquePtr<Component>> m_components;
 
         virtual void OnRegister()   {}
-        virtual void OnUnregister();
-        virtual void FileSubsystem() {}
+        virtual void OnUnregister() {}
+        virtual void OnInitialize();
         virtual void OnShutdown();
         virtual void OnUpdate(float deltaTime);
         virtual void OnBeginFrame();
@@ -94,11 +94,13 @@ namespace axiom
         friend class Scene;
         void Register()              { OnRegister(); }
         void Unregister()            { OnUnregister(); }
-        void Initialize()            { FileSubsystem(); }
-        void Shutdown()              { OnShutdown(); }
+        void Initialize()            { m_live = true; OnInitialize(); }
+        void Shutdown()              { OnShutdown(); m_live = false; }
         void Update(float deltaTime) { OnUpdate(deltaTime); }
         void BeginFrame()            { OnBeginFrame(); }
         void Render()                { OnRender(); }
         void EndFrame()              { OnEndFrame(); }
+
+        bool m_live = false; // in a scene, with its components initialized
     };
 }

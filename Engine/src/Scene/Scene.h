@@ -26,6 +26,9 @@ namespace axiom
         void AddEntity(SharedPtr<Entity> entity);
         SharedPtr<Entity> RemoveEntity(Entity& entity);
 
+        /// Removes every entity. Anything still holding an Entity* must drop it.
+        void Clear();
+
         const String& GetName() const;
 
         template<typename T>
@@ -56,7 +59,7 @@ namespace axiom
     protected:
         virtual void OnRegister()   {}
         virtual void OnUnregister() {}
-        virtual void FileSubsystem() {}
+        virtual void OnInitialize() {}
         virtual void OnShutdown()   {}
         virtual void OnUpdate(float deltaTime);
         virtual void OnBeginFrame();
@@ -66,7 +69,7 @@ namespace axiom
     private:
         void Register()              { OnRegister(); }
         void Unregister()            { OnUnregister(); }
-        void Initialize()            { FileSubsystem(); }
+        void Initialize()            { OnInitialize(); }
         void Shutdown()              { OnShutdown(); }
         void Update(float deltaTime) { OnUpdate(deltaTime); }
         void BeginFrame()            { OnBeginFrame(); }

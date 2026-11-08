@@ -41,6 +41,35 @@ namespace axiom
         return it->second / relativePath;
     }
 
+    std::optional<String> FileSubsystem::ToVirtual(const Path& physicalPath) const
+    {
+        // Canonical forms, because the same folder can arrive as z:\Axiom and Z:/Axiom.
+        std::error_code error;
+        const Path target = std::filesystem::weakly_canonical(physicalPath, error);
+        if(error)
+        {
+            return std::nullopt;
+        }
+
+        for(const auto& [mountPoint, mountPath] : m_mountPoints)
+        {
+            const Path root = std::filesystem::weakly_canonical(mountPath, error);
+            if(error)
+            {
+                continue;
+            }
+
+            const Path relative = target.lexically_relative(root);
+            if(relative.empty() || *relative.begin() == "..")
+            {
+                continue;
+            }
+            return mountPoint + "://" + relative.generic_string();
+        }
+
+        return std::nullopt;
+    }
+
     void FileSubsystem::OnInitialize()
     {
         AX_ASSERT(MountExists(MountPoints::Engine), "Engine folder not mount.");

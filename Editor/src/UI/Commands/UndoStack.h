@@ -20,6 +20,7 @@ namespace axiom
         inline bool CanRedo(){ return m_head < m_commands.size(); }
         void Undo();
         void Redo();
+        void Clear();
     private:
         size_t m_head = 0;
         Vector<UniquePtr<ICommand>> m_commands;

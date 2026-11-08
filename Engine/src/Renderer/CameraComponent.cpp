@@ -37,6 +37,8 @@ namespace axiom
 
     void CameraComponent::Serialize(Archive &ar)
     {
+        Component::Serialize(ar);
+
         float fov = ToDegrees(m_camera.GetFoV());
         float near = m_camera.GetNear();
         float far = m_camera.GetFar();
@@ -44,6 +46,8 @@ namespace axiom
         float orthoSize = m_camera.GetOrthoSize();
         float orthoLeft = m_camera.GetOrthoLeft();
         float orthoRight = m_camera.GetOrthoRight();
+        float orthoBottom = m_camera.GetOrthoBottom();
+        float orthoTop = m_camera.GetOrthoTop();
         float orthoNear = m_camera.GetOrthoNear();
         float orthoFar = m_camera.GetOrthoFar();
 
@@ -54,20 +58,32 @@ namespace axiom
         ar.Write("orthoSize", orthoSize);
         ar.Write("orthoLeft", orthoLeft);
         ar.Write("orthoRight", orthoRight);
+        ar.Write("orthoBottom", orthoBottom);
+        ar.Write("orthoTop", orthoTop);
         ar.Write("orthoNear", orthoNear);
         ar.Write("orthoFar", orthoFar);
     }
 
     void CameraComponent::Deserialize(Archive &ar)
     {
-        float fov, near, far, orthoSize, orthoLeft, orthoRight, orthoNear, orthoFar, orthoBottom, orthoTop;
-        Camera::ProjectionType projectionType;
+        Component::Deserialize(ar);
+
+        // Read() leaves a missing key's value untouched, so start from the current camera.
+        float fov = ToDegrees(m_camera.GetFoV());
+        float near = m_camera.GetNear();
+        float far = m_camera.GetFar();
+        float orthoLeft = m_camera.GetOrthoLeft();
+        float orthoRight = m_camera.GetOrthoRight();
+        float orthoBottom = m_camera.GetOrthoBottom();
+        float orthoTop = m_camera.GetOrthoTop();
+        float orthoNear = m_camera.GetOrthoNear();
+        float orthoFar = m_camera.GetOrthoFar();
+        Camera::ProjectionType projectionType = m_camera.GetProjectionType();
 
         ar.Read("fov", fov);
         ar.Read("near", near);
         ar.Read("far", far);
         ar.Read("projectionType", projectionType );
-        ar.Read("orthoSize", orthoSize);
         ar.Read("orthoLeft", orthoLeft);
         ar.Read("orthoRight", orthoRight);
         ar.Read("orthoNear", orthoNear);
@@ -77,7 +93,7 @@ namespace axiom
 
         if(projectionType == Camera::ProjectionType::Orthographic)
         {
-            m_camera = Camera(orthoLeft, orthoRight, orthoBottom, orthoTop, near, far);
+            m_camera = Camera(orthoLeft, orthoRight, orthoBottom, orthoTop, orthoNear, orthoFar);
         }
         else
         {

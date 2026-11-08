@@ -28,4 +28,10 @@ namespace axiom
             m_head++;
         }
     }
+
+    void UndoStack::Clear()
+    {
+        m_commands.clear();
+        m_head = 0;
+    }
 }

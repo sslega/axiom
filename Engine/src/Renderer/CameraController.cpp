@@ -4,12 +4,17 @@
 #include "Input/Input.h"
 #include "Math/Math.h"
 #include "Serialization/Archive.h"
-#include "Core/Assert.h"
 
 namespace axiom
 {
     void CameraController::OnUpdate(float deltaTime)
     {
+        // Null if the Inspector added this component to an entity with no transform.
+        if (m_transformComponent == nullptr)
+        {
+            return;
+        }
+
         float dt = MillisecondsToSeconds(deltaTime);
 
         // Mouse look
@@ -54,6 +59,5 @@ namespace axiom
     void CameraController::OnInitialize()
     {
         m_transformComponent = GetEntity().GetComponent<TransformComponent>();
-        AX_ASSERT(m_transformComponent, "TransformComponent required!");
     }
 }

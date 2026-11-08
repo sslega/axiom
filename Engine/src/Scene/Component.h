@@ -13,6 +13,8 @@ namespace axiom
     /// 1. Derive from it, next to the system that consumes it, and override the `On*` hooks you need.
     /// 2. Register the type and its fields in EngineReflection.cpp. That gives you loading, saving, the Inspector and Add Component.
     ///
+    /// OnInitialize() runs once the entity is complete, so siblings can be looked up there. Entity explains the limits.
+    ///
     /// @code{.cpp}
     /// class SpinComponent : public Component
     /// {

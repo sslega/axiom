@@ -37,18 +37,26 @@ namespace axiom
         Vec3 right = { std::cos(m_yaw), 0.0f, -std::sin(m_yaw) };
         Vec3 position = m_camera.GetPosition();
 
-        if (Input::IsKeyPressed(KeyCode::W))
-            position = position + forward * speed;
-        if (Input::IsKeyPressed(KeyCode::S))
-            position = position - forward * speed;
-        if (Input::IsKeyPressed(KeyCode::A))
-            position = position - right * speed;
-        if (Input::IsKeyPressed(KeyCode::D))
-            position = position + right * speed;
-        if (Input::IsKeyPressed(KeyCode::E))
-            position.y += speed;
-        if (Input::IsKeyPressed(KeyCode::Q))
-            position.y -= speed;
+        if( !Input::IsKeyPressed(KeyCode::LeftControl) &&
+            !Input::IsKeyPressed(KeyCode::RightControl) &&
+            !Input::IsKeyPressed(KeyCode::LeftShift) &&
+            !Input::IsKeyPressed(KeyCode::RightShift) &&
+            !Input::IsKeyPressed(KeyCode::LeftAlt) &&
+            !Input::IsKeyPressed(KeyCode::RightAlt))
+        {
+            if (Input::IsKeyPressed(KeyCode::W))
+                position = position + forward * speed;
+            if (Input::IsKeyPressed(KeyCode::S))
+                position = position - forward * speed;
+            if (Input::IsKeyPressed(KeyCode::A))
+                position = position - right * speed;
+            if (Input::IsKeyPressed(KeyCode::D))
+                position = position + right * speed;
+            if (Input::IsKeyPressed(KeyCode::E))
+                position.y += speed;
+            if (Input::IsKeyPressed(KeyCode::Q))
+                position.y -= speed;   
+        }
 
         m_camera.SetView(position, m_yaw, m_pitch);
     }

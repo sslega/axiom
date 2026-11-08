@@ -2,6 +2,7 @@
 
 #include "Core/Types.h"
 #include "Core/ApplicationSubsystem.h"
+#include <optional>
 
 namespace axiom
 {
@@ -22,7 +23,7 @@ namespace axiom
     /// Mount during Application::OnRegisterModules(). `engine` and `project` must be mounted before initialization.
     ///
     /// Resolve() asserts on a path with no `://` or an unknown mount, and lowercases the whole path.
-    /// It only goes from virtual to physical; there is no way back.
+    /// ToVirtual() goes the other way, and returns nothing for a path outside every mount.
     class FileSubsystem : public ApplicationSubsystem
     {
     public:
@@ -32,6 +33,7 @@ namespace axiom
         void Mount(const String& virtualPath, const Path& physicalPath);
         bool MountExists(const String &mountPoint) const;
         Path Resolve(const String& virtualPath) const;
+        std::optional<String> ToVirtual(const Path& physicalPath) const;
 
     protected:
         void OnInitialize() override;
