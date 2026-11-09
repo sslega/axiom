@@ -4,14 +4,14 @@
 PROJECT_NAME           = Axiom
 OUTPUT_DIRECTORY       = build/doxygen
 
-INPUT                  = Engine/src Editor/src Game/src
+INPUT                  = Engine/Core/src Engine/Simulation/src Engine/Graphics/src Engine/Runtime/src Editor/src EditorCore/src Game/src
 RECURSIVE              = YES
 FILE_PATTERNS          = *.h
 
 # Show #include paths the way the code writes them, e.g. "Scene/Entity.h".
 FULL_PATH_NAMES        = YES
 STRIP_FROM_PATH        = .
-STRIP_FROM_INC_PATH    = Engine/src Editor/src Game/src
+STRIP_FROM_INC_PATH    = Engine/Core/src Engine/Simulation/src Engine/Graphics/src Engine/Runtime/src Editor/src EditorCore/src Game/src
 
 # List everything, documented or not. Private members stay out of the reference.
 EXTRACT_ALL            = YES

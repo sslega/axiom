@@ -1,8 +1,8 @@
 #include "InspectorPanel.h"
-#include "UI/Selection.h"
-#include "UI/Commands/UndoStack.h"
-#include "UI/Commands/PropertyEditCommand.h"
-#include "UI/Commands/AddComponentCommand.h"
+#include "Selection.h"
+#include "Commands/UndoStack.h"
+#include "Commands/PropertyEditCommand.h"
+#include "Commands/AddComponentCommand.h"
 #include "Scene/Entity.h"
 #include "Reflection/Reflection.h"
 

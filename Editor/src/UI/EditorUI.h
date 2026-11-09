@@ -2,9 +2,9 @@
 
 #include "AxiomEngine.h"
 #include "UI/EditorPanel.h"
-#include "UI/Selection.h"
+#include "Selection.h"
 #include "UI/GizmoState.h"
-#include "UI/Commands/UndoStack.h"
+#include "Commands/UndoStack.h"
 
 using namespace axiom;
 

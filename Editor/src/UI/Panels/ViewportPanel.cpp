@@ -3,11 +3,13 @@
 #include "Renderer/OutlinePostProcess.h"
 #include "Scene/Entity.h"
 #include "Scene/TransformComponent.h"
+#include "Math/EulerAngles.h"
+#include "Math/Math.h"
 #include "Reflection/Reflection.h"
-#include "UI/Selection.h"
-#include "UI/GizmoMath.h"
-#include "UI/Commands/UndoStack.h"
-#include "UI/Commands/PropertyEditCommand.h"
+#include "Selection.h"
+#include "Gizmo/GizmoMath.h"
+#include "Commands/UndoStack.h"
+#include "Commands/PropertyEditCommand.h"
 #include "Viewport.h"
 
 #include <imgui.h>

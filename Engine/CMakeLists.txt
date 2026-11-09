@@ -67,7 +67,7 @@ target_include_directories(imgui PUBLIC
     ${imgui_SOURCE_DIR}/backends
 )
 
-target_link_libraries(imgui PUBLIC glfw OpenGL::GL)
+target_link_libraries(imgui PRIVATE glfw OpenGL::GL)
 
 # =========================================================
 # GLAD
@@ -114,42 +114,10 @@ FetchContent_Declare(nlohmann_json
 FetchContent_MakeAvailable(nlohmann_json)
 
 # =========================================================
-# Engine
+# Engine libraries, lowest layer first
 # =========================================================
 
-add_library(Engine STATIC)
-
-target_compile_options(Engine PRIVATE /W3)
-
-file(GLOB_RECURSE ENGINE_SOURCES
-    CONFIGURE_DEPENDS
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h
-)
-
-target_sources(Engine PRIVATE
-    ${ENGINE_SOURCES}
-)
-
-target_include_directories(Engine
-    PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/
-)
-
-target_compile_definitions(Engine PUBLIC
-    AX_ENGINE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/Assets"
-    $<$<CONFIG:Debug>:AX_DEBUG>
-)
-
-target_precompile_headers(Engine PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/pch.h
-)
-
-target_link_libraries(Engine PUBLIC
-    glad
-    glfw
-    imgui
-    stb
-    nlohmann_json::nlohmann_json
-    OpenGL::GL
-)
+add_subdirectory(Core)
+add_subdirectory(Simulation)
+add_subdirectory(Graphics)
+add_subdirectory(Runtime)

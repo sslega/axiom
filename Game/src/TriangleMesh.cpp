@@ -1,5 +1,5 @@
 #include "TriangleMesh.h"
-#include "Renderer/Vertex.h"
+#include "Resources/Vertex.h"
 #include "Core/Types.h"
 
 using namespace axiom;

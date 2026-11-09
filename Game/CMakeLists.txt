@@ -16,4 +16,4 @@ target_compile_definitions(Game PRIVATE
     AX_PROJECT_DIR="${CMAKE_CURRENT_SOURCE_DIR}/Assets"
 )
 
-target_link_libraries(Game PRIVATE Engine)
+target_link_libraries(Game PRIVATE Runtime)

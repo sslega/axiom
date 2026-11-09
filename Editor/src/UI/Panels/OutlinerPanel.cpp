@@ -1,11 +1,11 @@
 #include "OutlinerPanel.h"
 #include "Scene/Entity.h"
 #include "Scene/WorldSubsystem.h"
-#include "UI/Selection.h"
-#include "UI/Commands/UndoStack.h"
-#include "UI/Commands/CreateEntityCommand.h"
-#include "UI/Commands/PropertyEditCommand.h"
-#include "UI/Commands/DeleteEntityCommand.h"
+#include "Selection.h"
+#include "Commands/UndoStack.h"
+#include "Commands/CreateEntityCommand.h"
+#include "Commands/PropertyEditCommand.h"
+#include "Commands/DeleteEntityCommand.h"
 
 namespace axiom
 {

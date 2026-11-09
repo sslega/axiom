@@ -1,0 +1,45 @@
+#pragma once
+
+#include "Scene/Component.h"
+#include "Math/EulerAngles.h"
+#include "Math/Vector.h"
+#include "Math/Matrix4.h"
+
+namespace axiom
+{
+
+    class TransformComponent : public Component
+    {
+    public:
+        Vec3 position {0.0f, 0.0f, 0.0f};
+        Vec3 rotation {0.0f, 0.0f, 0.0f};
+        Vec3 scale {1.0f, 1.0f, 1.0f};
+
+        virtual void Serialize(Archive& ar) override;
+        virtual void Deserialize(Archive& ar) override;
+
+        inline Matrix4 GetTransform() const
+        {
+            return Matrix4::Translate(position) * ComposeEulerRotation(rotation) * Matrix4::Scale(scale);
+        }
+
+        inline Matrix4 GetViewMatrix() const 
+        {
+            return Matrix4::GetViewMatrix(position, rotation);
+        }
+
+        Vec3 LocalToWorld(Vec3 localDir) const
+        {
+            Matrix4 rot = ComposeEulerRotation(rotation);
+            return {
+                rot(0,0)*localDir.x + rot(0,1)*localDir.y + rot(0,2)*localDir.z,
+                rot(1,0)*localDir.x + rot(1,1)*localDir.y + rot(1,2)*localDir.z,
+                rot(2,0)*localDir.x + rot(2,1)*localDir.y + rot(2,2)*localDir.z
+            };
+        }
+
+        Vec3 Forward() const { return LocalToWorld({ 0,  0, -1}); }
+        Vec3 Right()   const { return LocalToWorld({ 1,  0,  0}); }
+        Vec3 Up()      const { return LocalToWorld({ 0,  1,  0}); }
+    };
+}

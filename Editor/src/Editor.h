@@ -9,11 +9,19 @@ namespace axiom
 {
     class WindowResizeEvent;
 
+    /// The Editor application: mounts its paths, builds the EditorUI and loads the startup scene.
+    ///
+    /// It lives in the EditorApp library so other executables can run it; Main.cpp is the real entry point.
+    ///
+    /// @code{.cpp}
+    /// return MakeUnique<Editor>(Editor::DefaultConfig());
+    /// @endcode
     class Editor : public Application
     {
     public:
-        /// @param smokeFrames Run this many frames and exit, for automated checks. 0 runs normally.
-        Editor(AppConfig appConfig, int smokeFrames = 0);
+        static AppConfig DefaultConfig();
+
+        Editor(AppConfig appConfig);
         ~Editor() = default;
         void OnResize(const WindowResizeEvent& event);
 
@@ -23,10 +31,11 @@ namespace axiom
         virtual void OnApplicationRun() override;
         virtual void OnRender() override;
         virtual void OnUpdate(float deltaTime) override;
-    
+
+        EditorUI& GetEditorUI() { return *m_editorUI; }
+
     private:
         UniquePtr<EditorUI> m_editorUI;
-        int m_smokeFrames = 0;
     };
 
 }

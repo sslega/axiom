@@ -1,8 +1,8 @@
 #pragma once
 #include "UI/EditorPanel.h"
 #include "Reflection/Reflection.h"
-#include "UI/Commands/UndoStack.h"
-#include "UI/Commands/PropertyEditCommand.h"
+#include "Commands/UndoStack.h"
+#include "Commands/PropertyEditCommand.h"
 
 namespace axiom
 {

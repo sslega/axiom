@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Core/Types.h"
-#include "Core/Global.h"
 
 // Standard library — stable, large, used broadly across the engine
 #include <string>

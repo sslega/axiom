@@ -29,7 +29,7 @@ target_include_directories(imguizmo PUBLIC
 target_link_libraries(imguizmo PUBLIC imgui)
 
 # =========================================================
-# Editor
+# EditorApp - everything but the entry point, so other executables can run the Editor
 # =========================================================
 
 file(GLOB_RECURSE EDITOR_SOURCES
@@ -37,18 +37,34 @@ file(GLOB_RECURSE EDITOR_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
 )
 
-add_executable(Editor ${EDITOR_SOURCES})
+add_library(EditorApp STATIC ${EDITOR_SOURCES})
 
-target_compile_options(Editor PRIVATE /W3)
+target_compile_options(EditorApp PRIVATE /W3)
 
-target_include_directories(Editor
-    PRIVATE
+target_include_directories(EditorApp
+    PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-target_compile_definitions(Editor PRIVATE
+target_compile_definitions(EditorApp PRIVATE
     AX_EDITOR_DIR="${CMAKE_CURRENT_SOURCE_DIR}/Assets"
     AX_DEV_PROJECT_DIR="${CMAKE_SOURCE_DIR}/Game/Assets"
 )
 
-target_link_libraries(Editor PRIVATE Engine imguizmo)
+target_link_libraries(EditorApp
+    PUBLIC
+        Runtime
+        EditorCore
+    PRIVATE
+        imguizmo
+)
+
+# =========================================================
+# Editor
+# =========================================================
+
+add_executable(Editor ${CMAKE_CURRENT_SOURCE_DIR}/Main.cpp)
+
+target_compile_options(Editor PRIVATE /W3)
+
+target_link_libraries(Editor PRIVATE EditorApp)
