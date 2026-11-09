@@ -64,6 +64,20 @@ namespace axiom
 
     int Application::Run()
     {
+        Startup();
+
+        while (!m_applicationWindow->ShouldClose())
+        {
+            RunFrame();
+        }
+
+        Shutdown();
+
+        return 0;
+    }
+
+    void Application::Startup()
+    {
         Log::Info("Starting Axiom Application...");
 
         RegisterSubsystems();
@@ -72,18 +86,19 @@ namespace axiom
         OnInitializeModules();
 
         OnApplicationRun();
+    }
 
-        while (!m_applicationWindow->ShouldClose())
-        {
-            PoolEvents();
-            Update();
-            Render();
-        }
+    void Application::RunFrame()
+    {
+        PoolEvents();
+        Update();
+        Render();
+    }
 
+    void Application::Shutdown()
+    {
         ShutdownSubsystems();
         m_applicationWindow->CloseWindow();
-
-        return 0;
     }
 
     void Application::PoolEvents()

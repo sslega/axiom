@@ -26,6 +26,9 @@ namespace axiom
         void AddEntity(SharedPtr<Entity> entity);
         SharedPtr<Entity> RemoveEntity(Entity& entity);
 
+        /// The entity with this ID, or null if it isn't in the scene.
+        Entity* FindEntity(const String& id) const;
+
         /// Removes every entity. Anything still holding an Entity* must drop it.
         void Clear();
 

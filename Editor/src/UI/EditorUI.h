@@ -28,10 +28,16 @@ namespace axiom
 
         inline Scene& GetActiveScene() { return m_worldSubsystem.GetActiveScene(); };
         inline Selection& GetSelection() { return m_selection; }
+        inline UndoStack& GetUndoStack() { return m_undoStack; }
 
         void OnInitialize();
         void OnUpdate(float dt);
         void OnRender();
+
+        void NewScene();
+
+        /// Replaces the active scene with the file. If it can't be loaded, the scene and undo history stay as they were.
+        bool LoadScene(const String& virtualPath);
     
     private:
         RenderSubsystem& m_renderSubsystem;
@@ -45,7 +51,6 @@ namespace axiom
 
         Vector<UniquePtr<EditorPanel>> m_panels;
         
-        void NewScene();
         void OpenScene();
         void SaveScene();
         void OnSceneReplaced();

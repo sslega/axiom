@@ -15,6 +15,7 @@ namespace axiom
     , m_worldSubsystem(worldSubsystem)
     , m_fileSubsystem(fileSubsystem)
     , m_resourceSubsystem(resourceSubsystem)
+    , m_selection(worldSubsystem.GetActiveScene())
     {
     }
 
@@ -140,10 +141,17 @@ namespace axiom
             return;
         }
 
-        if(m_worldSubsystem.LoadScene(*virtualPath))
+        LoadScene(*virtualPath);
+    }
+
+    bool EditorUI::LoadScene(const String& virtualPath)
+    {
+        if(!m_worldSubsystem.LoadScene(virtualPath))
         {
-            OnSceneReplaced();
+            return false;
         }
+        OnSceneReplaced();
+        return true;
     }
 
     void EditorUI::SaveScene()
@@ -173,7 +181,7 @@ namespace axiom
 
     void EditorUI::OnSceneReplaced()
     {
-        // Both hold pointers into the old scene.
+        // Undo steps hold pointers into the old scene, and a reloaded file can bring back the selected ID.
         m_selection.Clear();
         m_undoStack.Clear();
     }

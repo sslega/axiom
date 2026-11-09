@@ -15,6 +15,7 @@ namespace axiom
         if (!glfwInit())
             assert("Failed to initialize GLFW");
 
+        glfwWindowHint(GLFW_VISIBLE, GetConfig().visible ? GLFW_TRUE : GLFW_FALSE);
         m_window = glfwCreateWindow(GetConfig().width, GetConfig().height, GetConfig().title.c_str(), NULL, NULL);
         if (!m_window)
         {

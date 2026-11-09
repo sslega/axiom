@@ -59,7 +59,11 @@ namespace axiom
         ApplicationWindow& GetApplicationWindow();
 
     protected:
-        
+        // The parts of Run(), for a host that steps the frames itself.
+        void Startup();
+        void RunFrame();
+        void Shutdown();
+
         AppConfig m_appConfig;
         UniquePtr<ApplicationWindow> m_applicationWindow;
 

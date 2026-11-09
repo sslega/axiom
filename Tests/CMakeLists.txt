@@ -17,33 +17,68 @@ set(DOCTEST_WITH_MAIN_IN_STATIC_LIB OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(doctest)
 
 # =========================================================
-# AxiomTests
+# AxiomTestsLogic - graphics-free tests. Its include path has no ImGui or Graphics headers,
+# so including one here is a compile error.
 # =========================================================
 
-file(GLOB_RECURSE TESTS_SOURCES
+file(GLOB_RECURSE TESTS_LOGIC_SOURCES
     CONFIGURE_DEPENDS
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Logic/*.cpp
 )
 
-add_executable(AxiomTests ${TESTS_SOURCES})
+add_library(AxiomTestsLogic OBJECT ${TESTS_LOGIC_SOURCES})
+
+target_compile_options(AxiomTestsLogic PRIVATE /W3)
+
+target_include_directories(AxiomTestsLogic
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/Logic
+)
+
+target_link_libraries(AxiomTestsLogic PRIVATE EditorCore doctest::doctest)
+
+# =========================================================
+# AxiomTestsRuntime - tests that drive the real Editor through the harness
+# =========================================================
+
+file(GLOB_RECURSE TESTS_RUNTIME_SOURCES
+    CONFIGURE_DEPENDS
+    ${CMAKE_CURRENT_SOURCE_DIR}/Runtime/*.cpp
+)
+
+add_library(AxiomTestsRuntime OBJECT ${TESTS_RUNTIME_SOURCES})
+
+target_compile_options(AxiomTestsRuntime PRIVATE /W3)
+
+target_include_directories(AxiomTestsRuntime
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/Harness
+)
+
+target_link_libraries(AxiomTestsRuntime PRIVATE EditorApp doctest::doctest)
+
+# =========================================================
+# AxiomTests - object libraries link in whole, so every test case stays registered
+# =========================================================
+
+file(GLOB_RECURSE TESTS_HARNESS_SOURCES
+    CONFIGURE_DEPENDS
+    ${CMAKE_CURRENT_SOURCE_DIR}/Harness/*.cpp
+)
+
+add_executable(AxiomTests
+    ${TESTS_HARNESS_SOURCES}
+    $<TARGET_OBJECTS:AxiomTestsLogic>
+    $<TARGET_OBJECTS:AxiomTestsRuntime>
+)
 
 target_compile_options(AxiomTests PRIVATE /W3)
 
 target_include_directories(AxiomTests
     PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/Harness
 )
 
-target_link_libraries(AxiomTests PRIVATE EditorCore doctest::doctest)
+target_link_libraries(AxiomTests PRIVATE EditorApp doctest::doctest)
 
 add_test(NAME AxiomTests COMMAND AxiomTests)
-
-# =========================================================
-# EditorSmoke - boots the real Editor for a fixed number of frames
-# =========================================================
-
-add_executable(EditorSmoke ${CMAKE_CURRENT_SOURCE_DIR}/Smoke/EditorSmoke.cpp)
-
-target_compile_options(EditorSmoke PRIVATE /W3)
-
-target_link_libraries(EditorSmoke PRIVATE EditorApp)

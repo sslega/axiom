@@ -24,14 +24,19 @@ namespace axiom
 
         static void Error(StringView message)
         {
+            ++s_errorCount;
             s_instance->ErrorInternal(message);
         }
 
         template<typename... Args> requires (sizeof...(Args) > 0)
         static void Error(const char* fmt, Args&&... args)
         {
+            ++s_errorCount;
             s_instance->ErrorInternal(std::vformat(fmt, std::make_format_args(args...)));
         }
+
+        /// How many errors have been logged since the program started.
+        static uint32 GetErrorCount() { return s_errorCount; }
 
     protected:
         virtual void InfoInternal(StringView message) = 0;
@@ -40,6 +45,7 @@ namespace axiom
     private:
         static void SetInstance(Log* instance) { s_instance = instance; }
         inline static Log* s_instance = nullptr;
+        inline static uint32 s_errorCount = 0;
 
         friend class Application;
     };

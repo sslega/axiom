@@ -17,6 +17,7 @@ namespace axiom
         int height = 600;
         bool fullscreen = false;
         bool vsync = true;
+        bool visible = true;
         String title = "Axiom Engine Window";
         ApplicationWindowBackend backend = ApplicationWindowBackend::GLFW;
     };

@@ -90,7 +90,6 @@ namespace axiom
                 if(entity)
                 {
                     m_undoStack.Execute(MakeUnique<DeleteEntityCommand>(scene, *entity));
-                    m_selection.Clear();
                 }
             }
         }

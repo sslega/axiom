@@ -38,6 +38,12 @@ namespace axiom
         return nullptr;
     }
 
+    Entity* Scene::FindEntity(const String& id) const
+    {
+        auto it = m_entities.find(id);
+        return it != m_entities.end() ? it->second.get() : nullptr;
+    }
+
     void Scene::Clear()
     {
         for (auto& [id, entity] : m_entities)
