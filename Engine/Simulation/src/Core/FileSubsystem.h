@@ -39,6 +39,5 @@ namespace axiom
         void OnInitialize() override;
     private:
         StringMap<Path> m_mountPoints;
-        String ToLower(const String& str) const;
     };
 }

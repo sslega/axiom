@@ -9,6 +9,7 @@ namespace axiom
     {
     public:
         GLShaderLoader(const ResourceSubsystem& resourceModule);
+        std::type_index GetResourceType() const override;
     
     protected:
         virtual SharedPtr<Resource> CreateResource(const FileData& fileData) override;

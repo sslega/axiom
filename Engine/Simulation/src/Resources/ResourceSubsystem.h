@@ -10,7 +10,7 @@ namespace axiom
 {
     class FileSubsystem;
 
-    /// Loads assets by virtual path. Picks a loader by file extension and caches the result by path.
+    /// Loads assets by virtual path. Picks a loader by file extension and caches the result by path, ignoring case.
     ///
     /// Resources are CPU-side data, and the renderer creates GPU objects from them.
     /// The exception is materials, which hold a compiled shader.
@@ -44,6 +44,9 @@ namespace axiom
             static_assert(std::is_base_of_v<ResourceLoader, T>, "T must derive from ResourceLoader");
             m_loaders[fileExtension] = MakeUnique<T>(*this, std::forward<Args>(args)...);
         }
+
+        /// The file extensions, with the dot and sorted, whose loader produces the given resource class.
+        Vector<String> GetExtensions(std::type_index resourceType) const;
 
         SharedPtr<void> ResolveResource(const String& virtualPath) override;
 

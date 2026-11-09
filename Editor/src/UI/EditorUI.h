@@ -24,7 +24,7 @@ namespace axiom
     class EditorUI
     {
     public:
-        EditorUI(RenderSubsystem& renderSubsystem, WorldSubsystem& worldSubsystem, FileSubsystem& m_fileSubsystem);
+        EditorUI(RenderSubsystem& renderSubsystem, WorldSubsystem& worldSubsystem, FileSubsystem& fileSubsystem, ResourceSubsystem& resourceSubsystem);
 
         inline Scene& GetActiveScene() { return m_worldSubsystem.GetActiveScene(); };
         inline Selection& GetSelection() { return m_selection; }
@@ -37,6 +37,7 @@ namespace axiom
         RenderSubsystem& m_renderSubsystem;
         WorldSubsystem& m_worldSubsystem;
         FileSubsystem& m_fileSubsystem;
+        ResourceSubsystem& m_resourceSubsystem;
 
         Selection m_selection;
         UndoStack m_undoStack;

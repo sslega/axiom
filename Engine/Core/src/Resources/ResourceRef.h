@@ -5,6 +5,29 @@
 
 namespace axiom
 {
+    /// A ResourceRef with its type erased, so reflection can carry any resource field as one FieldValue.
+    ///
+    /// @code{.cpp}
+    /// FieldValue before = field.get(component);
+    /// field.set(component, ResourceValue::Resolve("engine://Meshes/cube.obj", resolver));
+    /// @endcode
+    ///
+    /// An empty path is "no resource". The file must exist: the loader asserts on one that doesn't.
+    struct ResourceValue
+    {
+        String path;
+        SharedPtr<void> resource;
+
+        static ResourceValue Resolve(const String& path, IResourceResolver& resolver)
+        {
+            if (path.empty())
+            {
+                return {};
+            }
+            return { path, resolver.ResolveResource(path) };
+        }
+    };
+
     /// A component field that references a resource by path.
     ///
     /// It's saved as the path and resolved during scene load, before the component initializes.
@@ -21,6 +44,7 @@ namespace axiom
     public:
         ResourceRef() = default;
         explicit ResourceRef(const String& path): m_path(path) {}
+        ResourceRef(const String& path, SharedPtr<T> resource): m_path(path), m_resource(std::move(resource)) {}
 
         bool IsResolved() const { return m_resource != nullptr; }
 

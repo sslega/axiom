@@ -15,6 +15,7 @@
 #include "Scene/TransformComponent.h"
 #include "Scene/Entity.h"
 #include "Core/Log.h"
+#include "Core/StringUtils.h"
 #include "Core/Types.h"
 #include "Resources/MaterialResource.h"
 #include <imgui.h>
@@ -125,11 +126,18 @@ namespace axiom
             Log::Error("More than one DirectionalLightComponent present!");
         }
 
-        if(!directionalLight.empty())
+        DirectionalLightComponent* light = directionalLight.empty() ? nullptr : directionalLight[0];
+        TransformComponent* lightTransform = light ? light->GetEntity().GetComponent<TransformComponent>() : nullptr;
+
+        // TODO: Temporary. The Editor can currently remove a transform that a light still needs.
+        // Restore the assert once it refuses to remove a component another one requires.
+        if(light && !lightTransform)
         {
-            DirectionalLightComponent* light = directionalLight[0];
-            TransformComponent* lightTransform = light->GetEntity().GetComponent<TransformComponent>();
-            AX_ASSERT(lightTransform, "No TransformComponent present with DirectionalLightComponent!");
+            Log::Error("No TransformComponent present with DirectionalLightComponent! Treating it as no light.");
+        }
+
+        if(lightTransform)
+        {
             m_renderSceneData.hasDirectionalLight = true;
             m_renderSceneData.lightColor = light->color * light->intensity;
             m_renderSceneData.lightDirection = lightTransform->Forward();
@@ -301,12 +309,12 @@ namespace axiom
 
     SharedPtr<Shader> RenderSubsystem::GetShader(const String path)
     {
-        auto it = m_shaderCache.find(path);
+        const String key = ToLower(path);
+        auto it = m_shaderCache.find(key);
         if(it == m_shaderCache.end())
         {
             auto shader = CreateShader(path);
-            m_shaderCache[path] = shader;
-            it = m_shaderCache.find(path);
+            it = m_shaderCache.emplace(key, shader).first;
         }
         return it->second;
     }

@@ -10,10 +10,11 @@
 
 namespace axiom
 {
-    EditorUI::EditorUI(RenderSubsystem& renderSubsystem, WorldSubsystem& worldSubsystem, FileSubsystem& fileSubsystem)
+    EditorUI::EditorUI(RenderSubsystem& renderSubsystem, WorldSubsystem& worldSubsystem, FileSubsystem& fileSubsystem, ResourceSubsystem& resourceSubsystem)
     : m_renderSubsystem(renderSubsystem)
     , m_worldSubsystem(worldSubsystem)
     , m_fileSubsystem(fileSubsystem)
+    , m_resourceSubsystem(resourceSubsystem)
     {
     }
 
@@ -192,6 +193,6 @@ namespace axiom
     
     void EditorUI::AddInspectorPanel()
     {
-        m_panels.push_back(MakeUnique<InspectorPanel>(m_selection, m_undoStack));
+        m_panels.push_back(MakeUnique<InspectorPanel>(m_selection, m_undoStack, m_resourceSubsystem, m_fileSubsystem));
     }
 }

@@ -8,13 +8,15 @@ namespace axiom
 {
 
     class Selection;
+    class ResourceSubsystem;
+    class FileSubsystem;
 
     class InspectorPanel : public EditorPanel
     {
         using FieldDrawFunction = void (InspectorPanel::*)(Component*, const FieldDescriptor&, const String&);
 
     public:
-        InspectorPanel(Selection& selection, UndoStack& undoStack);
+        InspectorPanel(Selection& selection, UndoStack& undoStack, ResourceSubsystem& resourceSubsystem, FileSubsystem& fileSubsystem);
 
         template<typename T>
         void CommitField(Component* component, const FieldDescriptor& field, FieldValue oldValue, bool activated, bool changed, bool deactivatedAfterEdit, const T& local)
@@ -38,7 +40,10 @@ namespace axiom
     private:
         Selection& m_selection;
         UndoStack& m_undoStack;
+        ResourceSubsystem& m_resourceSubsystem;
+        FileSubsystem& m_fileSubsystem;
         FieldValue m_pendingOldValue;
+        Vector<String> m_resourceCandidates; // for the dropdown that is open; only one can be
 
         void DrawFloat(Component* component, const FieldDescriptor& field, const String& label);
         void DrawBool(Component* component, const FieldDescriptor& field, const String& label);
@@ -46,6 +51,7 @@ namespace axiom
         void DrawString(Component* component, const FieldDescriptor& field, const String& label);
         void DrawVec3(Component* component, const FieldDescriptor& field, const String& label);
         void DrawColor(Component* component, const FieldDescriptor& field, const String& label);
+        void DrawResource(Component* component, const FieldDescriptor& field, const String& label);
         UnorderedMap<FieldType, FieldDrawFunction> m_fieldDrawFunction;
     };
 }

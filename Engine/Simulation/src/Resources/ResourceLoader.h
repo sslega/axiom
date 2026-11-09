@@ -26,6 +26,9 @@ namespace axiom
         virtual ~ResourceLoader() = default;
         
         SharedPtr<Resource> Load(const Path& path);
+
+        /// The resource class this loader produces.
+        virtual std::type_index GetResourceType() const = 0;
     
     protected:
         virtual SharedPtr<Resource> CreateResource(const FileData& fileData) = 0;

@@ -13,6 +13,11 @@ namespace axiom
     {
     }
 
+    std::type_index GLShaderLoader::GetResourceType() const
+    {
+        return typeid(ShaderResource);
+    }
+
     SharedPtr<Resource> GLShaderLoader::CreateResource(const FileData &fileData)
     {
 

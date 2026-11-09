@@ -21,7 +21,7 @@ namespace axiom
     constexpr FieldType FieldTypeTag(String*)   { return FieldType::String; }
 
     template<class>   struct IsResourceRef                  : std::false_type {};
-    template<class R> struct IsResourceRef<ResourceRef<R>>  : std::true_type  {};
+    template<class R> struct IsResourceRef<ResourceRef<R>>  : std::true_type  { using ResourceType = R; };
 
 
     template<class U> 
@@ -39,6 +39,18 @@ namespace axiom
         if constexpr (IsResourceRef<U>::value)
         {            
             f.type = FieldType::Resource;
+            using R = typename IsResourceRef<U>::ResourceType;
+            f.resourceType = typeid(R);
+            f.get = [m](const void* o)
+            {
+                const U& ref = static_cast<const T*>(o)->*m;
+                return FieldValue(ResourceValue{ ref.GetPath(), ref.GetResource() });
+            };
+            f.set = [m](void* o, const FieldValue& v)
+            {
+                const ResourceValue& value = std::get<ResourceValue>(v);
+                static_cast<T*>(o)->*m = U(value.path, std::static_pointer_cast<R>(value.resource));
+            };
         }
         else
         {

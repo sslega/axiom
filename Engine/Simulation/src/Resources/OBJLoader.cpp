@@ -15,6 +15,11 @@ namespace axiom
     {
     }
 
+    std::type_index OBJLoader::GetResourceType() const
+    {
+        return typeid(MeshResource);
+    }
+
     SharedPtr<Resource> OBJLoader::CreateResource(const FileData &fileData)
     {
         String source(fileData.buffer.begin(), fileData.buffer.end());

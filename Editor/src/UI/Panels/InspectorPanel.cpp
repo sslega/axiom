@@ -3,8 +3,16 @@
 #include "Commands/UndoStack.h"
 #include "Commands/PropertyEditCommand.h"
 #include "Commands/AddComponentCommand.h"
+#include "Commands/RemoveComponentCommand.h"
+#include "Core/StringUtils.h"
+#include "UI/ResourceCandidates.h"
+#include "Resources/ResourceSubsystem.h"
+#include "Core/FileSubsystem.h"
 #include "Scene/Entity.h"
 #include "Reflection/Reflection.h"
+#include <algorithm>
+#include <cstring>
+#include <optional>
 
 namespace axiom
 {
@@ -30,8 +38,14 @@ namespace axiom
         return output;
     }
 
-    InspectorPanel::InspectorPanel(Selection &selection, UndoStack &undoStack)
-    : EditorPanel("Inspector"), m_selection(selection), m_undoStack(undoStack)
+    static const char* ComponentSortName(const Component& component)
+    {
+        const TypeDescriptor* typeDescriptor = Reflection::Get().Find(typeid(component));
+        return typeDescriptor ? typeDescriptor->name : typeid(component).name();
+    }
+
+    InspectorPanel::InspectorPanel(Selection &selection, UndoStack &undoStack, ResourceSubsystem &resourceSubsystem, FileSubsystem &fileSubsystem)
+    : EditorPanel("Inspector"), m_selection(selection), m_undoStack(undoStack), m_resourceSubsystem(resourceSubsystem), m_fileSubsystem(fileSubsystem)
     {
         m_fieldDrawFunction[FieldType::Bool] = &InspectorPanel::DrawBool;
         m_fieldDrawFunction[FieldType::Int] = &InspectorPanel::DrawInt;
@@ -39,6 +53,7 @@ namespace axiom
         m_fieldDrawFunction[FieldType::String] = &InspectorPanel::DrawString;
         m_fieldDrawFunction[FieldType::Vec3] = &InspectorPanel::DrawVec3;
         m_fieldDrawFunction[FieldType::Color] = &InspectorPanel::DrawColor;
+        m_fieldDrawFunction[FieldType::Resource] = &InspectorPanel::DrawResource;
     }
 
     void InspectorPanel::OnRender()
@@ -54,7 +69,19 @@ namespace axiom
         }
 
         ImGui::TextUnformatted(entity->GetName().c_str());
-        for (Component* component : entity->GetComponents())
+
+        // Removing here would pull a component out from under the walk below, so it waits until the walk ends.
+        std::optional<std::type_index> pendingRemoval;
+
+        // An entity's components have no order of their own, and adding one back can move it,
+        // so draw them by type name, the order the scene file uses.
+        Vector<Component*> components = entity->GetComponents();
+        std::sort(components.begin(), components.end(), [](const Component* a, const Component* b)
+        {
+            return std::strcmp(ComponentSortName(*a), ComponentSortName(*b)) < 0;
+        });
+
+        for (Component* component : components)
         {
             const TypeDescriptor* typeDescriptor = Reflection::Get().Find(typeid(*component));
             if(!typeDescriptor)
@@ -64,7 +91,32 @@ namespace axiom
             }
 
             ImGui::PushID(component);
-            if (ImGui::CollapsingHeader(typeDescriptor->name, ImGuiTreeNodeFlags_DefaultOpen))
+            const char* componentMenu = "ComponentMenu";
+
+            ImGui::SetNextItemAllowOverlap();
+            const bool headerOpen = ImGui::CollapsingHeader(typeDescriptor->name, ImGuiTreeNodeFlags_DefaultOpen);
+            if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
+            {
+                ImGui::OpenPopup(componentMenu);
+            }
+
+            const float menuButtonWidth = ImGui::CalcTextSize("...").x + ImGui::GetStyle().FramePadding.x * 2.0f;
+            ImGui::SameLine(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - menuButtonWidth);
+            if (ImGui::Button("..."))
+            {
+                ImGui::OpenPopup(componentMenu);
+            }
+
+            if (ImGui::BeginPopup(componentMenu))
+            {
+                if (ImGui::MenuItem("Remove Component"))
+                {
+                    pendingRemoval = std::type_index(typeid(*component));
+                }
+                ImGui::EndPopup();
+            }
+
+            if (headerOpen)
             {
                 ImGui::BeginTable("Fields", 2);
                 ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 120.0f);
@@ -79,12 +131,7 @@ namespace axiom
                     ImGui::TableSetColumnIndex(1);
 
                     String label = "##" + String(field.name);
-                    
-                    if (field.type == FieldType::Resource)
-                    {
-                        ImGui::TextDisabled("<resource>");
-                        continue;
-                    }
+
                     auto it = m_fieldDrawFunction.find(field.type);
                     AX_ASSERT(it != m_fieldDrawFunction.end(), "No valid fieldDrawFunction registered");
                     (this->*it->second)(component, field, label);
@@ -93,6 +140,11 @@ namespace axiom
             }
             ImGui::PopID();
             ImGui::Spacing();
+        }
+
+        if (pendingRemoval)
+        {
+            m_undoStack.Execute(MakeUnique<RemoveComponentCommand>(*entity, *pendingRemoval));
         }
 
         if (ImGui::Button("Add Component", ImVec2(-FLT_MIN, 0.0f)))
@@ -194,6 +246,49 @@ namespace axiom
         ImGui::EndTable();
 
         CommitField(component, field, value, activated, changed, deactivatedAfterEdit, local);
+    }
+
+    void InspectorPanel::DrawResource(Component *component, const FieldDescriptor &field, const String &label)
+    {
+        const FieldValue value = field.get(component);
+        const String& currentPath = std::get<ResourceValue>(value).path;
+        const char* preview = currentPath.empty() ? "None" : currentPath.c_str();
+        if (!ImGui::BeginCombo(label.c_str(), preview))
+        {
+            return;
+        }
+
+        // Scanned on opening, so a file added while the Editor runs is there the next time.
+        const bool justOpened = ImGui::IsWindowAppearing();
+        if (justOpened)
+        {
+            m_resourceCandidates = ListResourceCandidates(m_fileSubsystem, m_resourceSubsystem, field.resourceType);
+        }
+
+        const String currentKey = ToLower(currentPath);
+        std::optional<String> pickedPath;
+        if (ImGui::Selectable("None", currentPath.empty()))
+        {
+            pickedPath = String();
+        }
+        for (const String& candidate : m_resourceCandidates)
+        {
+            const bool isCurrent = ToLower(candidate) == currentKey;
+            if (ImGui::Selectable(candidate.c_str(), isCurrent))
+            {
+                pickedPath = candidate;
+            }
+            if (isCurrent && justOpened)
+            {
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+        ImGui::EndCombo();
+
+        if (pickedPath && ToLower(*pickedPath) != currentKey)
+        {
+            m_undoStack.Execute(MakeUnique<PropertyEditCommand>(component, &field, value, ResourceValue::Resolve(*pickedPath, m_resourceSubsystem)));
+        }
     }
 
     void InspectorPanel::DrawColor(Component *component, const FieldDescriptor &field, const String &label)

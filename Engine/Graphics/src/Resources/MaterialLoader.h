@@ -9,6 +9,7 @@ namespace axiom
     {
     public:
         MaterialLoader(const ResourceSubsystem& resourceModule, RenderSubsystem& renderModule);
+        std::type_index GetResourceType() const override;
     protected:
         SharedPtr<Resource> CreateResource(const FileData& fileData) override;
     private:

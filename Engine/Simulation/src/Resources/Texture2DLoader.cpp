@@ -10,6 +10,11 @@ namespace axiom
     {
     }
 
+    std::type_index Texture2DLoader::GetResourceType() const
+    {
+        return typeid(Texture2DResource);
+    }
+
     SharedPtr<Resource> Texture2DLoader::CreateResource(const FileData& fileData)
     {
         int w, h, channels;

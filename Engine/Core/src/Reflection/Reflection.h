@@ -4,6 +4,7 @@
 #include "Assert.h"
 #include "Scene/Component.h"
 #include "Math/Vector.h"
+#include "Resources/ResourceRef.h"
 #include <variant>
 #include <functional>
 
@@ -12,7 +13,7 @@ namespace axiom
 
     class Archive;
 
-    using FieldValue = std::variant<float, int, bool, Vec3, String, Color>;
+    using FieldValue = std::variant<float, int, bool, Vec3, String, Color, ResourceValue>;
 
     enum class FieldType { Float, Int, Bool, Vec3, String, Color, Resource };
 
@@ -20,6 +21,7 @@ namespace axiom
     {
         const char* name;
         FieldType type;
+        std::type_index resourceType = typeid(void); // what a Resource field refers to; typeid(void) for any other field
         std::function<FieldValue(const void*)> get;
         std::function<void(void*, const FieldValue&)> set;
 

@@ -1,5 +1,6 @@
 #include "Core/FileSubsystem.h"
 #include "Core/Assert.h"
+#include "Core/StringUtils.h"
 #include <filesystem>
 
 namespace axiom
@@ -74,14 +75,5 @@ namespace axiom
     {
         AX_ASSERT(MountExists(MountPoints::Engine), "Engine folder not mount.");
         AX_ASSERT(MountExists(MountPoints::Project), "Project folder not mount.");
-    }
-
-    String FileSubsystem::ToLower(const String& str) const
-    {
-        String result = str;
-        std::transform(result.begin(), result.end(), result.begin(),
-            [](unsigned char c) { return std::tolower(c); });
-        return result;
-
     }
 }

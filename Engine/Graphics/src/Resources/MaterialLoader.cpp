@@ -13,6 +13,11 @@ namespace axiom
     {
     }
 
+    std::type_index MaterialLoader::GetResourceType() const
+    {
+        return typeid(MaterialResource);
+    }
+
     SharedPtr<Resource> MaterialLoader::CreateResource(const FileData& fileData)
     {
         String content(fileData.buffer.begin(), fileData.buffer.end());
