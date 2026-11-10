@@ -8,8 +8,16 @@
 #include <imgui.h>
 #include <ImGuizmo.h>
 
+#include <filesystem>
+#include <system_error>
+
 namespace axiom
 {
+    namespace
+    {
+        constexpr const char* kDefaultLayoutPath = "editor://Layouts/DefaultLayout.ini";
+    }
+
     EditorUI::EditorUI(RenderSubsystem& renderSubsystem, WorldSubsystem& worldSubsystem, FileSubsystem& fileSubsystem, ResourceSubsystem& resourceSubsystem)
     : m_renderSubsystem(renderSubsystem)
     , m_worldSubsystem(worldSubsystem)
@@ -22,6 +30,7 @@ namespace axiom
     void EditorUI::OnInitialize()
     {
         EditorTheme::Apply(m_fileSubsystem);
+        SetupLayout();
 
         AddViewportPanel("Scene");
         AddOutlinerPanel();
@@ -30,6 +39,13 @@ namespace axiom
 
     void EditorUI::OnUpdate(float dt)
     {
+        // Here, not in the menu handler: ImGui can't load settings between NewFrame and Render.
+        if (m_layoutResetRequested)
+        {
+            m_layoutResetRequested = false;
+            ApplyLayoutReset();
+        }
+
         for(auto& panel : m_panels)
         {
             panel->OnUpdate(dt);
@@ -74,7 +90,15 @@ namespace axiom
                     m_renderSubsystem.ReloadShaders();
                 }
                 ImGui::EndMenu();
-            }  
+            }
+            if (ImGui::BeginMenu("View"))
+            {
+                if(ImGui::MenuItem("Reset Layout to Default", nullptr, false, m_hasDefaultLayout))
+                {
+                    RequestLayoutReset();
+                }
+                ImGui::EndMenu();
+            }
             ImGui::EndMainMenuBar();
         }
         
@@ -120,6 +144,51 @@ namespace axiom
         }
     }
     
+    void EditorUI::RequestLayoutReset()
+    {
+        m_layoutResetRequested = true;
+    }
+
+    void EditorUI::SetupLayout()
+    {
+        // Outside build/, so Debug and Release share one layout and it survives a clean build.
+        const Path userDir = AX_EDITOR_USER_DIR;
+        std::error_code error;
+        std::filesystem::create_directories(userDir, error);
+        if (error)
+        {
+            Log::Error("Editor settings folder could not be created: {} ({})", userDir.string(), error.message());
+        }
+
+        const Path userLayoutPath = userDir / "imgui.ini";
+        m_userLayoutPath = userLayoutPath.string();
+        ImGui::GetIO().IniFilename = m_userLayoutPath.c_str();
+
+        m_defaultLayoutPath = m_fileSubsystem.Resolve(kDefaultLayoutPath).string();
+        m_hasDefaultLayout = std::filesystem::exists(m_defaultLayoutPath);
+        if (!m_hasDefaultLayout)
+        {
+            Log::Error("Default editor layout is missing: {}", m_defaultLayoutPath);
+            return;
+        }
+
+        // Loaded before the first frame, so ImGui skips its own load of IniFilename; on later runs the user's file wins.
+        if (!std::filesystem::exists(userLayoutPath))
+        {
+            ImGui::LoadIniSettingsFromDisk(m_defaultLayoutPath.c_str());
+        }
+    }
+
+    void EditorUI::ApplyLayoutReset()
+    {
+        if (!m_hasDefaultLayout)
+        {
+            return;
+        }
+        // Loading clears ImGui's dock nodes and rebuilds them from the file, re-docking windows that are already open.
+        ImGui::LoadIniSettingsFromDisk(m_defaultLayoutPath.c_str());
+    }
+
     void EditorUI::NewScene()
     {
         m_worldSubsystem.NewScene();

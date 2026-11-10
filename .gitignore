@@ -4,3 +4,4 @@ build/
 .claudeignore
 Docs/
 CLAUDE.md
+Editor/UserSettings/

@@ -50,6 +50,7 @@ target_include_directories(EditorApp
 
 target_compile_definitions(EditorApp PRIVATE
     AX_EDITOR_DIR="${CMAKE_CURRENT_SOURCE_DIR}/Assets"
+    AX_EDITOR_USER_DIR="${CMAKE_CURRENT_SOURCE_DIR}/UserSettings"
     AX_DEV_PROJECT_DIR="${CMAKE_SOURCE_DIR}/Game/Assets"
 )
 

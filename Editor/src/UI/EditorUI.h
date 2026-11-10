@@ -21,6 +21,11 @@ namespace axiom
     /// @code{.cpp}
     /// m_panels.push_back(MakeUnique<OutlinerPanel>(m_worldSubsystem, m_selection, m_undoStack));
     /// @endcode
+    ///
+    /// Layout: ImGui saves the user's layout to `Editor/UserSettings/imgui.ini`. When that file doesn't exist yet,
+    /// the Editor starts from `editor://Layouts/DefaultLayout.ini`, which it only ever reads.
+    /// RequestLayoutReset() brings the default back at the start of the next OnUpdate, since ImGui
+    /// can't load settings inside a frame.
     class EditorUI
     {
     public:
@@ -36,6 +41,10 @@ namespace axiom
 
         void NewScene();
 
+        /// Replaces the layout with the default at the start of the next OnUpdate. Ignored when the default is missing.
+        void RequestLayoutReset();
+        inline const String& GetUserLayoutPath() const { return m_userLayoutPath; }
+
         /// Replaces the active scene with the file. If it can't be loaded, the scene and undo history stay as they were.
         bool LoadScene(const String& virtualPath);
     
@@ -50,6 +59,14 @@ namespace axiom
         GizmoState m_gizmoState;
 
         Vector<UniquePtr<EditorPanel>> m_panels;
+
+        String m_userLayoutPath; // ImGui doesn't copy IniFilename
+        String m_defaultLayoutPath;
+        bool m_hasDefaultLayout = false;
+        bool m_layoutResetRequested = false;
+
+        void SetupLayout();
+        void ApplyLayoutReset();
         
         void OpenScene();
         void SaveScene();

@@ -17,7 +17,7 @@ namespace axiom::tests
     /// editor.RunFrame();
     /// @endcode
     ///
-    /// The layout file stays off, so a run can't overwrite the user's. Set the window's visibility before
+    /// Every boot starts from the default layout and never writes an ini, so a run can't overwrite the user's. Set the window's visibility before
     /// the first boot; it can't change afterwards.
     class EditorHarness : public Editor
     {

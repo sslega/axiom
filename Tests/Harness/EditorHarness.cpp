@@ -49,9 +49,12 @@ namespace axiom::tests
 
     void EditorHarness::OnInitializeModules()
     {
-        // An automated run must not overwrite the user's layout.
-        ImGui::GetIO().IniFilename = nullptr;
         Editor::OnInitializeModules();
+
+        // After the base call, which points ImGui at the user's layout: a run must never write it.
+        // Every boot starts from the default instead, so no case depends on the user's layout.
+        ImGui::GetIO().IniFilename = nullptr;
+        GetEditorUI().RequestLayoutReset();
     }
 
     void EditorHarness::OnRender()
