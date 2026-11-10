@@ -10,7 +10,7 @@ namespace axiom
     /// ViewportPanel owns it and submits its View. Only an active viewport's camera takes input.
     ///
     /// @code{.cpp}
-    /// viewportPanel->GetViewport()->AddPostProcess<OutlinePostProcess>();
+    /// viewportPanel->GetViewport()->AddPostProcess<OutlinePostProcess>(outlineColor);
     /// @endcode
     class Viewport
     {

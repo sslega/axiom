@@ -23,7 +23,7 @@ namespace axiom
     /// and it releases every temporary framebuffer it acquires.
     ///
     /// @code{.cpp}
-    /// viewport->AddPostProcess<OutlinePostProcess>();
+    /// viewport->AddPostProcess<OutlinePostProcess>(outlineColor);
     /// @endcode
     class PostProcessBase
     {

@@ -11,9 +11,11 @@
 #include "Commands/UndoStack.h"
 #include "Commands/PropertyEditCommand.h"
 #include "Viewport.h"
+#include "UI/EditorTheme.h"
 
 #include <imgui.h>
 #include <ImGuizmo.h>
+#include <IconsFontAwesome6.h>
 
 #include <algorithm>
 #include <cmath>
@@ -26,6 +28,9 @@ namespace axiom
         constexpr float kRotateSnapDegrees = 15.0f;
         constexpr float kScaleSnap = 0.1f;
         constexpr float kGizmoSizeClipSpace = 0.2f; // ImGuizmo's default of 0.1 is too small to grab comfortably
+        constexpr float kToolbarMargin = 10.0f;
+        constexpr float kToolButtonSize = 40.0f;
+        constexpr float kToolButtonGap = 2.0f;
 
         // The size of the axis a scale drag is working on. The centre handle moves every axis, so it
         // uses the largest, which gives the finest steps.
@@ -94,6 +99,8 @@ namespace axiom
         SharedPtr<FrameBuffer> frameBuffer = renderSubsystem.GetGraphicsDevice().CreateFrameBuffer(frameBufferSpec);
 
         m_viewport = MakeUnique<Viewport>(frameBuffer, m_name);
+
+        m_viewport->AddPostProcess<OutlinePostProcess>(EditorTheme::SelectionOutlineColor());
     }
 
     ViewportPanel::~ViewportPanel() = default;
@@ -105,8 +112,14 @@ namespace axiom
 
         // ImGui starts moving a floating window at the end of the click frame, and ImGuizmo never claims the
         // click as an item would. Last frame's hover is the only thing known early enough to prevent it.
-        const ImGuiWindowFlags windowFlags = m_gizmoWantsMouse ? ImGuiWindowFlags_NoMove : ImGuiWindowFlags_None;
-        const bool visible = ImGui::Begin(m_viewport->GetName().c_str(), nullptr, windowFlags);
+        ImGuiWindowFlags windowFlags = m_gizmoWantsMouse ? ImGuiWindowFlags_NoMove : ImGuiWindowFlags_None;
+
+        // In a short viewport the toolbar column overflows the image. A scrollbar would shrink the image and shift the gizmo.
+        windowFlags |= ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
+
+        EditorTheme::PushViewportWindow();
+        const bool visible = ImGui::Begin(EditorTheme::PanelTitle(ICON_FA_DISPLAY, m_viewport->GetName()).c_str(), nullptr, windowFlags);
+        EditorTheme::PopViewportWindow();
         UpdateCameraActive();
         ImVec2 available = ImGui::GetContentRegionAvail();
 
@@ -144,7 +157,7 @@ namespace axiom
             }
         }
 
-        ImGui::End();
+        EditorTheme::EndPanel();
     }
 
     void ViewportPanel::OnUpdate(float deltaTime)
@@ -290,37 +303,28 @@ namespace axiom
 
     void ViewportPanel::DrawToolbar(const ImVec2& imagePos)
     {
-        struct Button { const char* label; GizmoMode mode; };
-        static constexpr Button buttons[] = {
-            { "Select", GizmoMode::None },
-            { "Translate", GizmoMode::Translate },
-            { "Rotate", GizmoMode::Rotate },
-            { "Scale", GizmoMode::Scale },
+        struct Tool { const char* label; const char* tooltip; GizmoMode mode; };
+        static constexpr Tool tools[] = {
+            { ICON_FA_ARROW_POINTER "##Select", "Select (Q)", GizmoMode::None },
+            { ICON_FA_ARROWS_UP_DOWN_LEFT_RIGHT "##Translate", "Translate (W)", GizmoMode::Translate },
+            { ICON_FA_ROTATE "##Rotate", "Rotate (E)", GizmoMode::Rotate },
+            { ICON_FA_UP_RIGHT_AND_DOWN_LEFT_FROM_CENTER "##Scale", "Scale (R)", GizmoMode::Scale },
         };
 
-        ImGui::SetCursorScreenPos(ImVec2(imagePos.x + 6.0f, imagePos.y + 6.0f));
-        bool first = true;
-        for (const Button& button : buttons)
+        ImVec2 position(imagePos.x + kToolbarMargin, imagePos.y + kToolbarMargin);
+        for (const Tool& tool : tools)
         {
-            if (!first)
-            {
-                ImGui::SameLine(0.0f, 2.0f);
-            }
-            first = false;
+            ImGui::SetCursorScreenPos(position);
 
-            const bool active = m_gizmoState.mode == button.mode;
-            if (active)
+            EditorTheme::PushToolButton(m_gizmoState.mode == tool.mode);
+            if (ImGui::Button(tool.label, ImVec2(kToolButtonSize, kToolButtonSize)) && !m_gizmoState.dragging)
             {
-                ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive));
+                m_gizmoState.mode = tool.mode;
             }
-            if (ImGui::SmallButton(button.label) && !m_gizmoState.dragging)
-            {
-                m_gizmoState.mode = button.mode;
-            }
-            if (active)
-            {
-                ImGui::PopStyleColor();
-            }
+            EditorTheme::PopToolButton();
+            ImGui::SetItemTooltip("%s", tool.tooltip);
+
+            position.y += kToolButtonSize + kToolButtonGap;
         }
     }
 

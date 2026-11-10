@@ -5,6 +5,11 @@
 
 namespace axiom
 {
+    OutlinePostProcess::OutlinePostProcess(const Vec4& outlineColor)
+    : m_outlineColor(outlineColor)
+    {
+    }
+
     void OutlinePostProcess::Execute(const PostProcessContext& context)
     {
         if(!context.customMask) return;
@@ -70,7 +75,7 @@ namespace axiom
         m_shader->UploadUniform("u_ScreenTexture", 0);
         m_shader->UploadUniform("u_SeedTexture", 1);
         m_shader->UploadUniform("u_SelectionColor",Vec4(0, 1, 0, 0));
-        m_shader->UploadUniform("u_OutlineColor", Vec4(1, 1, 0, 1.0));
+        m_shader->UploadUniform("u_OutlineColor", m_outlineColor);
         m_shader->UploadUniform("u_OutlineThickness", int(thickness));
 
         context.renderer.GetGraphicsDevice().BindFrameBufferTexture(context.source, 0);

@@ -14,7 +14,7 @@ namespace axiom
     /// {
     /// public:
     ///     MyPanel(Selection& selection) : EditorPanel("My Panel"), m_selection(selection) {}
-    ///     void OnRender() override { ImGui::Begin(m_name.c_str()); ImGui::End(); }
+    ///     void OnRender() override { ImGui::Begin(EditorTheme::PanelTitle(ICON_FA_LIST, m_name).c_str()); EditorTheme::EndPanel(); }
     /// private:
     ///     Selection& m_selection;
     /// };

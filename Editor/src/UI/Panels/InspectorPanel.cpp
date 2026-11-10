@@ -5,11 +5,14 @@
 #include "Commands/AddComponentCommand.h"
 #include "Commands/RemoveComponentCommand.h"
 #include "Core/StringUtils.h"
+#include "UI/EditorIcons.h"
+#include "UI/EditorTheme.h"
 #include "UI/ResourceCandidates.h"
 #include "Resources/ResourceSubsystem.h"
 #include "Core/FileSubsystem.h"
 #include "Scene/Entity.h"
 #include "Reflection/Reflection.h"
+#include <IconsFontAwesome6.h>
 #include <algorithm>
 #include <cstring>
 #include <optional>
@@ -58,17 +61,18 @@ namespace axiom
 
     void InspectorPanel::OnRender()
     {
-        ImGui::Begin(GetName().c_str());
+        ImGui::Begin(EditorTheme::PanelTitle(ICON_FA_SLIDERS, GetName()).c_str());
 
         Entity* entity = m_selection.Get();
         if(!entity)
         {
              ImGui::TextUnformatted("No entity selected");
-             ImGui::End();
+             EditorTheme::EndPanel();
              return;
         }
 
-        ImGui::TextUnformatted(entity->GetName().c_str());
+        ImGui::AlignTextToFramePadding();
+        ImGui::Text("%s  %s", EditorIcons::ForEntity(*entity), entity->GetName().c_str());
 
         // Removing here would pull a component out from under the walk below, so it waits until the walk ends.
         std::optional<std::type_index> pendingRemoval;
@@ -94,15 +98,18 @@ namespace axiom
             const char* componentMenu = "ComponentMenu";
 
             ImGui::SetNextItemAllowOverlap();
-            const bool headerOpen = ImGui::CollapsingHeader(typeDescriptor->name, ImGuiTreeNodeFlags_DefaultOpen);
+            const bool headerOpen = EditorTheme::ComponentHeader(EditorIcons::ForComponent(std::type_index(typeid(*component))), ToTitleCase(typeDescriptor->name).c_str());
             if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
             {
                 ImGui::OpenPopup(componentMenu);
             }
 
-            const float menuButtonWidth = ImGui::CalcTextSize("...").x + ImGui::GetStyle().FramePadding.x * 2.0f;
+            const float menuButtonWidth = ImGui::CalcTextSize(ICON_FA_ELLIPSIS).x + ImGui::GetStyle().FramePadding.x * 2.0f;
             ImGui::SameLine(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - menuButtonWidth);
-            if (ImGui::Button("..."))
+            EditorTheme::PushHeaderButton();
+            const bool menuClicked = ImGui::Button(ICON_FA_ELLIPSIS);
+            EditorTheme::PopHeaderButton();
+            if (menuClicked)
             {
                 ImGui::OpenPopup(componentMenu);
             }
@@ -125,6 +132,7 @@ namespace axiom
                 {
                     ImGui::TableNextRow();
                     ImGui::TableSetColumnIndex(0);
+                    ImGui::AlignTextToFramePadding();
                     ImGui::TextUnformatted(ToTitleCase(field.name).c_str());
 
                     ImGui::SetNextItemWidth(-FLT_MIN); 
@@ -147,7 +155,7 @@ namespace axiom
             m_undoStack.Execute(MakeUnique<RemoveComponentCommand>(*entity, *pendingRemoval));
         }
 
-        if (ImGui::Button("Add Component", ImVec2(-FLT_MIN, 0.0f)))
+        if (ImGui::Button("Add Component", ImVec2(-FLT_MIN, EditorTheme::kActionButtonHeight)))
 
         {
             ImGui::OpenPopup("AddComponentPopup");
@@ -167,7 +175,7 @@ namespace axiom
             ImGui::EndPopup();
         }
 
-        ImGui::End();
+        EditorTheme::EndPanel();
     }
 
     void InspectorPanel::DrawFloat(Component *component, const FieldDescriptor &field, const String &label)
@@ -182,7 +190,7 @@ namespace axiom
     {
         FieldValue value = field.get(component);
         bool local = std::get<bool>(value);
-        bool changed = ImGui::Checkbox(label.c_str(), &local);
+        bool changed = EditorTheme::CompactCheckbox(label.c_str(), &local);
         CommitField(component, field, value, ImGui::IsItemActivated(), changed, ImGui::IsItemDeactivatedAfterEdit(), local);
     }
 

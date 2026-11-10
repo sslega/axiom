@@ -6,6 +6,10 @@
 #include "Commands/CreateEntityCommand.h"
 #include "Commands/PropertyEditCommand.h"
 #include "Commands/DeleteEntityCommand.h"
+#include "UI/EditorIcons.h"
+#include "UI/EditorTheme.h"
+
+#include <IconsFontAwesome6.h>
 
 namespace axiom
 {
@@ -16,7 +20,7 @@ namespace axiom
 
     void OutlinerPanel::OnRender()
     {
-        ImGui::Begin(GetName().c_str());
+        ImGui::Begin(EditorTheme::PanelTitle(ICON_FA_LIST, GetName()).c_str());
         
         for(Entity* e : m_world.GetActiveScene().GetEntities())
         {
@@ -51,7 +55,8 @@ namespace axiom
             }
             else
             {
-                if(ImGui::Selectable(label.c_str(), isSelected))
+                const String row = String(EditorIcons::ForEntity(*e)) + "  " + label;
+                if(ImGui::Selectable(row.c_str(), isSelected, ImGuiSelectableFlags_None, ImVec2(0.0f, EditorTheme::kListRowHeight)))
                 {
                     m_selection.Set(e);
                 }
@@ -93,6 +98,6 @@ namespace axiom
                 }
             }
         }
-        ImGui::End();
+        EditorTheme::EndPanel();
     }
 }

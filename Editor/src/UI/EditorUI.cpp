@@ -1,9 +1,9 @@
 #include "EditorUI.h"
+#include "EditorTheme.h"
 #include "Panels/ViewportPanel.h"
 #include "Panels/OutlinerPanel.h"
 #include "Panels/InspectorPanel.h"
 #include "Viewport.h"
-#include "Renderer/OutlinePostProcess.h"
 #include "Platform/FileDialog.h"
 #include <imgui.h>
 #include <ImGuizmo.h>
@@ -21,9 +21,9 @@ namespace axiom
 
     void EditorUI::OnInitialize()
     {
-        ViewportPanel* ViewportA = AddViewportPanel("ViewportA");
-        ViewportPanel* ViewportB = AddViewportPanel("ViewportB");
-        ViewportB->GetViewport()->AddPostProcess<OutlinePostProcess>();
+        EditorTheme::Apply(m_fileSubsystem);
+
+        AddViewportPanel("Scene");
         AddOutlinerPanel();
         AddInspectorPanel();
     }
