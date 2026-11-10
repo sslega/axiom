@@ -2,6 +2,10 @@
 .claude/
 build/
 .claudeignore
-Docs/
 CLAUDE.md
 Editor/UserSettings/
+
+# Obsidian vault config (the repo root is the vault) and private notes
+.obsidian/
+.trash/
+Docs/Private/

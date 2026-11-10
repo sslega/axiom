@@ -1,0 +1,58 @@
+schema: spec-driven
+
+# Constraints an agent can't infer from the code. Architecture docs: Docs/Engine/Engine Map.md.
+context: |
+  Axiom is a C++20 game engine with an ImGui editor. Windows, MSVC (Visual Studio 2022), CMake 3.28+.
+
+  Architecture constraints:
+  - OpenGL is temporary; DirectX 12 is the target backend. Don't add DX12-specific patterns yet, but flag designs
+    that would fight an explicit API (hidden global state, implicit resource lifetimes).
+  - All OpenGL/GLFW code lives in Engine/Graphics/src/Platform/. Nothing in Renderer/ includes OpenGL headers.
+  - Single-threaded by design. No job system or thread-safety requirements yet.
+  - Prefer extending the existing ECS over workarounds; anything that doesn't fit the component model is an open question.
+  - ImGui is the editor UI. Editor logic (selection, commands, undo, gizmo math, asset listing) lives in EditorCore,
+    which can't include ImGui; ImGui only draws panels in Editor/src/UI. One window with dockable panels.
+  - Dependencies point downward: Editor, AxiomTests -> EditorApp -> Runtime, EditorCore; Game -> Runtime;
+    Tests/Logic -> EditorCore; EditorCore -> EngineCore; Runtime -> Graphics -> Simulation -> EngineCore.
+    Engine code never includes Editor headers.
+  - A new engine service is an ApplicationSubsystem unless it passes the four-question test in
+    Docs/Engine/Reference/Where Things Go.md.
+  - New reflected component fields are registered in Engine/Runtime/src/Reflection/EngineReflection.cpp; scene JSON
+    keys must match the registered names exactly.
+  - Conventions: namespace axiom, m_ member prefix, types from Engine/Core/src/Core/Types.h (String, Vector<T>,
+    SharedPtr<T>...) over raw STL names.
+
+  Living specs live in openspec/specs/editor/<surface>/. Specs describe user-visible behaviour only.
+  Code, comments and commit messages never reference spec files or requirement names.
+
+rules:
+  proposal:
+    - State what is out of scope (things a reasonable reader might assume are included).
+    - Keep it a five-minute read.
+  specs:
+    - Every requirement is checkable, either by an automated test or by a described visual check in the Editor.
+    - A conflict with an existing living spec or with Docs/Engine/Editor/EditorUX.md is an open question, not a silent choice.
+  design:
+    - Record each decision with what it beat, why, the principle behind it (with a checkable source) or "judgment call",
+      and when to revisit.
+    - Use Mermaid diagrams for ownership and data flow when more than two types interact.
+  tasks:
+    - Each task leaves the engine building and running.
+    - End with a verification group listing the automated checks and the visual checks.
+
+operations:
+  apply:
+    guidance:
+      - Stop and ask before any change under Engine/, any lifecycle or reflection change, any new dependency,
+        or a workaround for a flaw found along the way, unless the change's design explicitly allows it.
+      - Build with the Visual Studio CMake (not on PATH) - "C:\Program Files\Microsoft Visual Studio\2022\Professional\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" --build build --config Debug
+      - build/ is shared with the developer. Before each build, check for a running Editor or Game process; if one
+        is running, stop and report. Never kill it. Never delete or reconfigure build/.
+      - At most three fix attempts per distinct build error, then stop and report what was tried.
+      - Checks in order - a clean build, then build/Tests/Debug/AxiomTests.exe (exit code 0). A logged error fails a
+        runtime case unless the case declares it.
+      - Never commit. Never touch files outside the change's stated impact.
+      - Report per requirement - pass, fail, or needs a visual check.
+  archive:
+    guidance:
+      - Archive only after the developer confirms the visual checks.
