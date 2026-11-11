@@ -1,3 +1,6 @@
+// Portions derived from Hazel (https://github.com/TheCherno/Hazel), Apache-2.0,
+// modified for Axiom. See THIRD_PARTY_NOTICES.md.
+
 #include "Platform/OpenGL/OpenGLTexture2D.h"
 #include "Resources/Texture2DResource.h"
 #include "Core/Assert.h"

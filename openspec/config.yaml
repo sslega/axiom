@@ -22,6 +22,19 @@ context: |
   - Conventions: namespace axiom, m_ member prefix, types from Engine/Core/src/Core/Types.h (String, Vector<T>,
     SharedPtr<T>...) over raw STL names.
 
+  Licensing and provenance:
+  - Axiom is MIT. Every third-party component is listed with its licence in THIRD_PARTY_NOTICES.md.
+    Copyleft (GPL, LGPL, AGPL, CC BY-SA) and non-commercial (CC BY-NC) code or assets are never used.
+  - Third-party code is never reproduced verbatim.
+  - Implementing a named, published algorithm or technique, or adapting code from any external source (paper,
+    book, article, tutorial, sample, another codebase), is a hard stop: name the source and its licence, say
+    whether the code is written from the description or adapted from an implementation, and wait for the
+    developer's approval. Approved adaptations carry a short comment naming the source and its licence.
+
+  Change size: a bug fix or refactor with no behaviour change needs no change folder. A change with new behaviour
+  but no real design choice is "lite": its design.md is one line ("No design decisions; see proposal.md").
+  A full design.md is written only when the change makes a decision with real alternatives.
+
   Living specs live in openspec/specs/editor/<surface>/. Specs describe user-visible behaviour only.
   Code, comments and commit messages never reference spec files or requirement names.
 
@@ -33,6 +46,10 @@ rules:
     - Every requirement is checkable, either by an automated test or by a described visual check in the Editor.
     - A conflict with an existing living spec or with Docs/Engine/Editor/EditorUX.md is an open question, not a silent choice.
   design:
+    - Write a full design only when the change makes a decision with real alternatives; otherwise design.md is the
+      one-line lite stub.
+    - A design that relies on a published algorithm or an external implementation names the source and its licence
+      as an open question for the developer.
     - Record each decision with what it beat, why, the principle behind it (with a checkable source) or "judgment call",
       and when to revisit.
     - Use Mermaid diagrams for ownership and data flow when more than two types interact.
@@ -45,12 +62,19 @@ operations:
     guidance:
       - Stop and ask before any change under Engine/, any lifecycle or reflection change, any new dependency,
         or a workaround for a flaw found along the way, unless the change's design explicitly allows it.
+      - A proposed new dependency states its licence; an approved one is added to THIRD_PARTY_NOTICES.md.
+      - Implementing a published algorithm or adapting external code is a hard stop (see context), even when the
+        change's design allows other stops.
       - Build with the Visual Studio CMake (not on PATH) - "C:\Program Files\Microsoft Visual Studio\2022\Professional\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" --build build --config Debug
       - build/ is shared with the developer. Before each build, check for a running Editor or Game process; if one
         is running, stop and report. Never kill it. Never delete or reconfigure build/.
       - At most three fix attempts per distinct build error, then stop and report what was tried.
-      - Checks in order - a clean build, then build/Tests/Debug/AxiomTests.exe (exit code 0). A logged error fails a
-        runtime case unless the case declares it.
+      - Checks in order - a clean build, then build/Tests/Debug/AxiomTests.exe (exit code 0), then the licence scan
+        Z:\Tools\scanoss\Scripts\python.exe Tools/licence_scan.py (exit code 0). A logged error fails a runtime case
+        unless the case declares it.
+      - A licence scan match is reported to the developer with both sides of the match, never resolved by rewriting
+        to dodge the scanner and never by adding a scanoss.json entry. Exit code 2 (scan failed, e.g. offline) is
+        reported, not skipped.
       - Never commit. Never touch files outside the change's stated impact.
       - Report per requirement - pass, fail, or needs a visual check.
   archive:

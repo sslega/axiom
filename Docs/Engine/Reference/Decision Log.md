@@ -1,11 +1,21 @@
 ---
 tags: [engine, decisions]
-updated: 2026-11-10
+updated: 2026-11-11
 ---
 
 # Decision Log
 
 Choices that **can't be recovered from the code**: what was picked, what it beat, why, and when to revisit. Newest first. Add to this page whenever a design discussion ends. From 2026-11-05, new tables also name the **principle** behind each decision (a pattern or rule with a checkable source), or say it's a judgment call.
+
+## Licensing and provenance (2026-11-11)
+
+| Decision | Instead of | Why | Principle | Revisit when |
+|---|---|---|---|---|
+| Axiom is MIT-licensed | Apache-2.0; source-available; no licence | simplest permissive licence; the author keeps every right to use the engine in closed products, and a repo with no licence is legally unclear to everyone else | judgment call | patent concerns or a commercial engine licence come up |
+| Every third-party component is listed with its licence in `THIRD_PARTY_NOTICES.md`; copyleft and non-commercial sources are never used | tracking licences ad hoc | the engine must stay usable in closed-source products, which copyleft or NC code would block | judgment call | — |
+| Snippet-level licence scan with SCANOSS on changed files at every CL, and on all files before a release | no scanning; a commercial scanner; scanning on every build | catches copied or regurgitated code, including old tutorial-derived code; only fingerprints leave the machine. Per CL, not per build, because it needs the network | shift checks left, but to the cheapest point that still catches the problem | scan noise outweighs findings, or a CI pipeline exists |
+| Implementing a published algorithm or adapting external code needs explicit approval of the source and its licence first | a provenance comment written after the fact | a comment records a licence problem; a stop prevents one | judgment call | — |
+| Commits with AI-written code carry the standard `Co-Authored-By` trailer; commits without it are human-written code | no marking; a custom tag; a separate spec commit before the code | the boundary between human and AI-written code can be checked from history alone, with the convention git hosts already show. A spec commit minutes before the code proves nothing a timestamp can't be edited to say | judgment call | mixed commits become common |
 
 ## Editor layout (2026-11-10)
 

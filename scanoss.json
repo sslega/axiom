@@ -1,0 +1,13 @@
+{
+  "bom": {
+    "remove": [
+      { "path": "Engine/Graphics/src/Renderer/Buffer.h", "purl": "pkg:github/overshifted/overengine", "comment": "Both derive from Hazel (Apache-2.0); attributed in THIRD_PARTY_NOTICES.md" },
+      { "path": "Engine/Graphics/src/Platform/OpenGL/OpenGLBuffer.cpp", "purl": "pkg:github/markvilar/pine", "comment": "Both derive from Hazel (Apache-2.0); attributed in THIRD_PARTY_NOTICES.md" },
+      { "path": "Engine/Graphics/src/Platform/OpenGL/OpenGLBuffer.h", "purl": "pkg:github/kaiwangm/engine", "comment": "Both derive from Hazel (Apache-2.0); attributed in THIRD_PARTY_NOTICES.md" },
+      { "path": "Engine/Graphics/src/Platform/OpenGL/OpenGLFrameBuffer.h", "purl": "pkg:github/saturn-labs/saturn", "comment": "Both derive from Hazel (Apache-2.0); attributed in THIRD_PARTY_NOTICES.md" },
+      { "path": "Engine/Graphics/src/Platform/OpenGL/OpenGLTexture2D.cpp", "purl": "pkg:github/yanschw/suoraengine", "comment": "Both derive from Hazel (Apache-2.0); attributed in THIRD_PARTY_NOTICES.md" },
+      { "path": "Engine/Graphics/src/Platform/OpenGL/OpenGLTexture2D.h", "purl": "pkg:github/seaside2mm/hazel", "comment": "Hazel fork; derives from Hazel (Apache-2.0); attributed in THIRD_PARTY_NOTICES.md" },
+      { "path": "Engine/Graphics/src/Input/Input.h", "purl": "pkg:github/qsxw/immortal", "comment": "Both derive from Hazel (Apache-2.0); attributed in THIRD_PARTY_NOTICES.md" }
+    ]
+  }
+}

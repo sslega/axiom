@@ -1,3 +1,6 @@
+// Portions derived from Hazel (https://github.com/TheCherno/Hazel), Apache-2.0,
+// modified for Axiom. See THIRD_PARTY_NOTICES.md.
+
 #include "Platform/OpenGL/OpenGLBuffer.h"
 #include <glad/glad.h>
 #include "OpenGLBuffer.h"

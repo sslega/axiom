@@ -1,3 +1,6 @@
+// Portions derived from Hazel (https://github.com/TheCherno/Hazel), Apache-2.0,
+// modified for Axiom. See THIRD_PARTY_NOTICES.md.
+
 #pragma once
 
 #include "Renderer/FrameBuffer.h"
