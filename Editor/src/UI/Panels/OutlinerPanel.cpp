@@ -34,6 +34,11 @@ namespace axiom
             if(m_renamingEntity == e)
             {
                 ImGui::SetNextItemWidth(-FLT_MIN);
+                if(m_setRenamingFocus)
+                {
+                    ImGui::SetKeyboardFocusHere();
+                    m_setRenamingFocus = false;
+                }
                 ImGui::InputText("", m_renameBuffer, sizeof(m_renameBuffer));
                 if (ImGui::IsItemDeactivatedAfterEdit())
                 {
@@ -61,9 +66,10 @@ namespace axiom
                     m_selection.Set(e);
                 }
             }
-            if(ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+            if(!m_renamingEntity && ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
             {
                 m_renamingEntity = e;
+                m_setRenamingFocus = true;
                 strncpy_s(m_renameBuffer, sizeof(m_renameBuffer), e->GetName().c_str(), _TRUNCATE);
             }
             ImGui::PopID();

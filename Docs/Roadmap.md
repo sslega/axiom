@@ -17,7 +17,7 @@ The editor becomes a complete scene builder.
 |---|---|---|
 | E1 | Save / New / Open scene, with repeatable scene files | done |
 | E2 | Resource picker and remove component | done |
-| E2b | Fix: the Outliner rename field stays open after clicking away | planned |
+| E2b | Fix: the Outliner rename field stays open after clicking away | done |
 | E2c | Components declare the components they require, so a required one can't be removed | planned |
 | E3 | Duplicate entity (Ctrl+D) | planned |
 | E4 | Editor theme: palette, Inter font, icons, rounded panels | done |

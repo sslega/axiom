@@ -21,6 +21,7 @@ namespace axiom
         UndoStack& m_undoStack;
 
         Entity* m_renamingEntity = nullptr;
+        bool m_setRenamingFocus = false;
         char m_renameBuffer[256] = {};
     };
 }
