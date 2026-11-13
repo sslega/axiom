@@ -22,6 +22,19 @@ namespace axiom
             s_instance->InfoInternal(std::vformat(fmt, std::make_format_args(args...)));
         }
 
+        static void Warning(StringView message)
+        {
+            ++s_warningCount;
+            s_instance->WarningInternal(message);
+        }
+
+        template<typename... Args> requires (sizeof...(Args) > 0)
+        static void Warning(const char* fmt, Args&&... args)
+        {
+            ++s_warningCount;
+            s_instance->WarningInternal(std::vformat(fmt, std::make_format_args(args...)));
+        }
+
         static void Error(StringView message)
         {
             ++s_errorCount;
@@ -37,15 +50,18 @@ namespace axiom
 
         /// How many errors have been logged since the program started.
         static uint32 GetErrorCount() { return s_errorCount; }
+        static uint32 GetWarningCount() { return s_warningCount; }
 
     protected:
         virtual void InfoInternal(StringView message) = 0;
+        virtual void WarningInternal(StringView message) = 0;
         virtual void ErrorInternal(StringView message) = 0;
 
     private:
         static void SetInstance(Log* instance) { s_instance = instance; }
         inline static Log* s_instance = nullptr;
         inline static uint32 s_errorCount = 0;
+        inline static uint32 s_warningCount = 0;
 
         friend class Application;
     };
@@ -55,6 +71,12 @@ namespace axiom
         virtual void InfoInternal(StringView message) override
         {
             printf("[INFO] %.*s\n", (int)message.size(), message.data());
+            fflush(stdout);
+        }
+
+        virtual void WarningInternal(StringView message) override
+        {
+            printf("[WARNING] %.*s\n", (int)message.size(), message.data());
             fflush(stdout);
         }
 

@@ -24,6 +24,8 @@ namespace axiom
         
         inline const Matrix4& GetProjectionMatrix() const { return m_camera.GetProjectionMatrix(); }
 
+        const virtual Vector<std::type_index>& GetRequiredComponents() const override;
+
         virtual void Serialize(Archive& ar) override;
         virtual void Deserialize(Archive& ar) override;
     

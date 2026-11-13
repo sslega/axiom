@@ -47,7 +47,7 @@ namespace axiom
         return it != m_components.end();
     }
 
-    Vector<Component *> Entity::GetComponents() const
+    Vector<Component*> Entity::GetComponents() const
     {
         Vector<Component*> results;
         GetComponents(results);
@@ -60,6 +60,27 @@ namespace axiom
         {
             outComponents.push_back(component.get());
         }         
+    }
+
+    Vector<Component*> Entity::FindComponentsRequiring(std::type_index componentType) const
+    {
+        Vector<Component*> componentsRequiring;
+        for (auto& [type, component] : m_components)
+        {
+            if(component->RequiresComponent(componentType)) componentsRequiring.emplace_back(component.get());
+        }
+        return componentsRequiring;
+    }
+
+    Vector<std::type_index> Entity::FindMissingRequirements(const Component& component) const
+    {
+        Vector<std::type_index> missingRequirements;
+        const Vector<std::type_index>& requiredComponents = component.GetRequiredComponents();
+        for(auto& componentType : requiredComponents)
+        {
+            if(!HasComponent(componentType)) missingRequirements.emplace_back(componentType);
+        }
+        return missingRequirements;
     }
 
     void Entity::Deserialize(Archive &ar)

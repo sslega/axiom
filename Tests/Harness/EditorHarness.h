@@ -39,6 +39,7 @@ namespace axiom::tests
     protected:
         void OnInitializeModules() override;
         void OnRender() override;
+        void OnRegisterModules() override;
 
     private:
         std::function<void()> m_duringRender;

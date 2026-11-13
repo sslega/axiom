@@ -1,7 +1,6 @@
 #pragma once
 #include "Core/Types.h"
 #include "Core/Assert.h"
-#include "Assert.h"
 #include "Scene/Component.h"
 #include "Math/Vector.h"
 #include "Resources/ResourceRef.h"
@@ -38,6 +37,11 @@ namespace axiom
         std::type_index baseType = typeid(void);
 
         const FieldDescriptor* FindField(const char* fieldName) const;
+        UniquePtr<Component> Create() const 
+        { 
+            AX_ASSERT(factory, "Reflected type '{}' has no factory and can't be created", name);
+            return factory(); 
+        }
     };
 
 

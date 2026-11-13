@@ -1,4 +1,7 @@
 #include "EditorHarness.h"
+#include "TestComponents.h"
+#include "Reflection/ReflectionSubsystem.h"
+#include "Core/FileSubsystem.h"
 
 #include <utility>
 
@@ -68,5 +71,13 @@ namespace axiom::tests
             m_duringRender = nullptr;
             callback();
         }
+    }
+    
+    void EditorHarness::OnRegisterModules()
+    {
+        Editor::OnRegisterModules();
+
+        GetSubsystem<ReflectionSubsystem>().AddRegistrar(&RegisterTestComponents);
+        GetSubsystem<FileSubsystem>().Mount("tests", AX_TESTS_DIR);
     }
 }

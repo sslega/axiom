@@ -19,6 +19,8 @@ namespace axiom
         ResourceRef<MeshResource> mesh;
         ResourceRef<MaterialResource> material;
 
+        const virtual Vector<std::type_index>& GetRequiredComponents() const override;
+
     protected:
 
         bool m_isVisible = true;

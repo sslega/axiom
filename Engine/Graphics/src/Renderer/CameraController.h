@@ -14,6 +14,8 @@ namespace axiom
         
         virtual void OnUpdate(float deltaTime) override;
 
+        const virtual Vector<std::type_index>& GetRequiredComponents() const override;
+
     protected:
         TransformComponent* m_transformComponent = nullptr;
         virtual void OnInitialize() override;

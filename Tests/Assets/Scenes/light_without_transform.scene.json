@@ -1,0 +1,16 @@
+{
+  "version": 1,
+
+  "entities": [
+    {
+      "name": "Light",
+      "components": [
+        {
+          "type": "DirectionalLightComponent",
+          "color": [1.5, 2.95, 3.21],
+          "intensity": 1.5
+        }
+      ]
+    }
+  ]
+}

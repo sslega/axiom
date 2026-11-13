@@ -1,6 +1,6 @@
 ---
 tags: [roadmap]
-updated: 2026-11-10
+updated: 2026-11-13
 ---
 
 # Roadmap
@@ -18,7 +18,7 @@ The editor becomes a complete scene builder.
 | E1 | Save / New / Open scene, with repeatable scene files | done |
 | E2 | Resource picker and remove component | done |
 | E2b | Fix: the Outliner rename field stays open after clicking away | done |
-| E2c | Components declare the components they require, so a required one can't be removed | planned |
+| E2c | Components declare the components they require, so a required one can't be removed | done |
 | E3 | Duplicate entity (Ctrl+D) | planned |
 | E4 | Editor theme: palette, Inter font, icons, rounded panels | done |
 | E4b | Default editor layout and View → Reset Layout to Default | done |
@@ -29,6 +29,7 @@ The editor becomes a complete scene builder.
 | E6b | Reusable render features extracted from the mask and ID passes | planned |
 | E6c | Outline for occluded selected objects | planned |
 | E7 | Multi-select and multi-edit | planned |
+| E7b | Manual component order in the Inspector | planned |
 | E8 | Hierarchy: parenting, transform composition, visibility toggle, local/world gizmo | planned |
 | E9 | Asset browser with thumbnails | planned |
 

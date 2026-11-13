@@ -1,4 +1,5 @@
 #include "CameraComponent.h"
+#include "Scene/TransformComponent.h"
 #include "Serialization/Archive.h"
 #include "Math/Math.h"
 
@@ -33,6 +34,12 @@ namespace axiom
     CameraComponent::CameraComponent(float left, float right, float bottom, float top, float near, float far)
     : m_camera(left, right, bottom, top, near, far)
     {
+    }
+
+    const Vector<std::type_index>& CameraComponent::GetRequiredComponents() const
+    {
+        static const Vector<std::type_index> required = { TypeID<TransformComponent>() };
+        return required;
     }
 
     void CameraComponent::Serialize(Archive &ar)

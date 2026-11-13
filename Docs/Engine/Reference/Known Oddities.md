@@ -1,6 +1,6 @@
 ---
 tags: [engine, issues]
-updated: 2026-11-09
+updated: 2026-11-13
 ---
 
 # Known Oddities
@@ -31,7 +31,6 @@ Stale, buggy, inconsistent or surprising spots. **Verify before acting**, becaus
 | The outline ignores occlusion (x-ray) | planned fix in [Post-Processing](../Rendering/Post-Processing.md) |
 | The frame-order contract for editor submissions is implicit | see [Frame Lifecycle](../Core/Frame%20Lifecycle.md); refactor wanted |
 | Render stats are global, not per view | two viewports' draw counts are summed |
-| A directional light with no transform counts as no light and logs an error every frame | temporary, until E2c blocks removing a required component and the assert comes back |
 
 ## Leftovers and naming
 
@@ -47,7 +46,8 @@ Stale, buggy, inconsistent or surprising spots. **Verify before acting**, becaus
 | What | Consequence |
 |---|---|
 | Unordered entity / component maps | Outliner and draw order are arbitrary between runs. The Inspector sorts components by type name to stay stable |
-| A component can cache a sibling pointer in its initialize hook | removing a transform from under a camera controller leaves its pointer dangling, and the next WASD crashes. `main.scene.json` has no controller today. E2c ends it |
+| Component requirements are enforced only by the editor commands and the scene loader | code calling `Entity::AddComponent` / `RemoveComponent` directly can still break one; a component caching a sibling pointer (the camera controller's transform) is then left dangling, and the renderer asserts a light or mesh with no transform |
+| A requirement missing from a scene file is filled with a default on open | the entity gains, for example, a transform at the origin, and the next Save writes it. A warning names the entity and both types |
 | Loading doesn't update the scene's name counters | a new "Entity" can share a name with a loaded one |
 | Per-draw uniforms are written into shared materials | hazard for a render thread |
 | GPU caches keyed by raw pointers | stale hits once anything unloads |

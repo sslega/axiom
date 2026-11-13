@@ -15,8 +15,10 @@ namespace axiom
     /// m_undoStack.Execute(MakeUnique<RemoveComponentCommand>(entity, typeid(MeshComponent)));
     /// @endcode
     ///
-    /// Don't run it while walking the entity's components. Anything that caches a pointer to the
-    /// removed component, such as CameraController with its transform, is left dangling.
+    /// Don't run it while walking the entity's components. It doesn't check requirements itself:
+    /// the caller refuses to remove a component that another one on the entity requires
+    /// (Entity::FindComponentsRequiring), as the Inspector does. Run unchecked, it leaves components
+    /// that cache a sibling pointer, such as CameraController with its transform, dangling.
     class RemoveComponentCommand : public ICommand
     {
     public:

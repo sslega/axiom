@@ -127,17 +127,11 @@ namespace axiom
         }
 
         DirectionalLightComponent* light = directionalLight.empty() ? nullptr : directionalLight[0];
-        TransformComponent* lightTransform = light ? light->GetEntity().GetComponent<TransformComponent>() : nullptr;
-
-        // TODO: Temporary. The Editor can currently remove a transform that a light still needs.
-        // Restore the assert once it refuses to remove a component another one requires.
-        if(light && !lightTransform)
+        
+        if(light)
         {
-            Log::Error("No TransformComponent present with DirectionalLightComponent! Treating it as no light.");
-        }
-
-        if(lightTransform)
-        {
+            TransformComponent* lightTransform = light->GetEntity().GetComponent<TransformComponent>();
+            AX_ASSERT(lightTransform, "No valid TransformComponent available for Directional Light");
             m_renderSceneData.hasDirectionalLight = true;
             m_renderSceneData.lightColor = light->color * light->intensity;
             m_renderSceneData.lightDirection = lightTransform->Forward();
@@ -152,7 +146,6 @@ namespace axiom
             
             m_renderSceneData.lightViewMatrix = Matrix4::Identity();
         }
-
 
         // Mesh Components
         auto meshComponents = scene.GetComponents<MeshComponent>();
@@ -176,11 +169,12 @@ namespace axiom
                 m_customMaskDrawCount++;
             }
 
-            TransformComponent* tc = entity.GetComponent<TransformComponent>();
+            TransformComponent* transformComponent = entity.GetComponent<TransformComponent>();
+            AX_ASSERT(transformComponent, "No valid TransformComponent available!");
             renderCommands.push_back({ 
                 meshComponent->mesh.GetResource(), 
                 meshComponent->material.GetResource(), 
-                tc ? tc->GetTransform() : Matrix4::Identity(),
+                transformComponent->GetTransform(),
                 renderFlags
             });
         }

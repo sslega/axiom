@@ -1,6 +1,6 @@
 ---
 tags: [engine, scene, ecs]
-updated: 2026-11-08
+updated: 2026-11-13
 ---
 
 # Scene and ECS
@@ -47,6 +47,20 @@ stateDiagram-v2
 
 > [!note] Initialize waits for the whole entity
 > A component can look up its siblings in its initialize hook whatever order they were added in, so component order in a scene file doesn't matter. Two limits: a component added to an entity already in a scene initializes straight away, so a sibling can still be missing, and other entities may not exist yet.
+
+## Required components
+
+A component type declares the sibling types it can't work without (a mesh, a light and a camera need a transform). `Entity` only answers questions about that: which components require a type, and what a component is missing. The rules live with the callers that change entities:
+
+```mermaid
+flowchart LR
+    C["Component<br/>declares requirements"] --> E["Entity<br/>answers queries"]
+    E --> Add["Add Component command<br/>adds missing ones first, one undo step"]
+    E --> Insp["Inspector<br/>refuses Remove of a required one"]
+    E --> Load["Scene loader<br/>fills missing ones with defaults + warning"]
+```
+
+So a component can trust its requirements instead of checking for them. Code calling `Entity` directly bypasses all three; see [Known Oddities](../Reference/Known%20Oddities.md).
 
 ## Conventions
 

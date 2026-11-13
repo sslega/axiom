@@ -1,0 +1,14 @@
+{
+  "version": 1,
+
+  "entities": [
+    {
+      "name": "Chain",
+      "components": [
+        {
+          "type": "ReqTop"
+        }
+      ]
+    }
+  ]
+}

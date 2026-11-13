@@ -72,6 +72,9 @@ namespace axiom
         const String& GetName() const { return m_name; }
         void SetName(const String& name) { m_name = name; }
 
+        Vector<Component*> FindComponentsRequiring(std::type_index componentType) const;
+        Vector<std::type_index> FindMissingRequirements(const Component& component) const;
+
         void Deserialize(Archive& ar) override;
         void Serialize(Archive& ar) override;
 

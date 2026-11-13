@@ -25,7 +25,7 @@ namespace axiom
         {
             if(typeDescriptor.name == name)
             {
-                return typeDescriptor.factory();
+                return typeDescriptor.Create();
             }
         }
         return nullptr;

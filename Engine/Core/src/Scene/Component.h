@@ -15,11 +15,21 @@ namespace axiom
     ///
     /// OnInitialize() runs once the entity is complete, so siblings can be looked up there. Entity explains the limits.
     ///
+    /// A component that needs a sibling declares it by overriding GetRequiredComponents(). Add Component and
+    /// scene loading then add the sibling first, and the Inspector refuses to remove it, so the component can
+    /// trust it's there instead of checking. Only the editor commands and the loader enforce this; code calling
+    /// Entity::AddComponent or RemoveComponent directly is unchecked.
+    ///
     /// @code{.cpp}
     /// class SpinComponent : public Component
     /// {
     /// public:
     ///     float speed = 1.0f;
+    ///     const Vector<std::type_index>& GetRequiredComponents() const override
+    ///     {
+    ///         static const Vector<std::type_index> required = { TypeID<TransformComponent>() };
+    ///         return required;
+    ///     }
     /// protected:
     ///     void OnUpdate(float deltaTime) override
     ///     {
@@ -33,6 +43,9 @@ namespace axiom
         virtual ~Component() = default;
 
         Entity& GetEntity() const;
+        
+        const virtual Vector<std::type_index>& GetRequiredComponents() const;
+        bool RequiresComponent(std::type_index componentType) const;
         
         void Deserialize(Archive& ar) override;
         void Serialize(Archive& ar) override;

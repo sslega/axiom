@@ -1,6 +1,6 @@
 ---
 tags: [engine, cookbook, placement]
-updated: 2026-11-10
+updated: 2026-11-13
 ---
 
 # Where Things Go
@@ -22,6 +22,8 @@ updated: 2026-11-10
 | Add a logic test | doctest case in `Tests/Logic/`, in the `logic` suite. It can reach `EngineCore` and `EditorCore` only |
 | Add a test against the real Editor | case using the `RuntimeTest` fixture in `Tests/Runtime/`, in the `runtime` suite, one file per scenario. Test code stays out of the `Editor` project |
 | Change how runtime tests boot, reset or step frames | `Tests/Harness/` |
+| Add a test-only component type or test scene | `Tests/Harness/TestComponents.h` (registered by the harness's reflection registrar, so it exists only in `AxiomTests`); scenes in `Tests/Assets/`, reached as `tests://` |
+| Make a component require a sibling | override its requirements getter (see the `Component` header). The Add Component command, the Inspector and the scene loader enforce it |
 | Change which scene loads at startup | `Editor` or `Sandbox`, in the app's run hook |
 | Mount a path like `project://` | the app's register hook; `engine://` is mounted in `Application` |
 | Build UI at startup | the app's initialize hook |

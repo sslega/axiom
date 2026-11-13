@@ -47,6 +47,29 @@ namespace axiom
         return typeDescriptor ? typeDescriptor->name : typeid(component).name();
     }
 
+    // "Required by Camera Controller, Directional Light Component". Names are sorted so the text
+    // stays the same from frame to frame; the entity's components have no order of their own.
+    static String RequiredByTooltip(const Vector<Component*>& requiredBy)
+    {
+        Vector<String> names;
+        for (const Component* component : requiredBy)
+        {
+            names.push_back(ToTitleCase(ComponentSortName(*component)));
+        }
+        std::sort(names.begin(), names.end());
+
+        String tooltip = "Required by ";
+        for (size_t i = 0; i < names.size(); ++i)
+        {
+            if (i > 0)
+            {
+                tooltip += ", ";
+            }
+            tooltip += names[i];
+        }
+        return tooltip;
+    }
+
     InspectorPanel::InspectorPanel(Selection &selection, UndoStack &undoStack, ResourceSubsystem &resourceSubsystem, FileSubsystem &fileSubsystem)
     : EditorPanel("Inspector"), m_selection(selection), m_undoStack(undoStack), m_resourceSubsystem(resourceSubsystem), m_fileSubsystem(fileSubsystem)
     {
@@ -116,9 +139,14 @@ namespace axiom
 
             if (ImGui::BeginPopup(componentMenu))
             {
-                if (ImGui::MenuItem("Remove Component"))
+                const Vector<Component*> requiredBy = entity->FindComponentsRequiring(typeid(*component));
+                if (ImGui::MenuItem("Remove Component", nullptr, false, requiredBy.empty()))
                 {
                     pendingRemoval = std::type_index(typeid(*component));
+                }
+                if (!requiredBy.empty() && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
+                {
+                    ImGui::SetTooltip("%s", RequiredByTooltip(requiredBy).c_str());
                 }
                 ImGui::EndPopup();
             }

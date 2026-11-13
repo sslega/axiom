@@ -9,12 +9,6 @@ namespace axiom
 {
     void CameraController::OnUpdate(float deltaTime)
     {
-        // Null if the Inspector added this component to an entity with no transform.
-        if (m_transformComponent == nullptr)
-        {
-            return;
-        }
-
         float dt = MillisecondsToSeconds(deltaTime);
 
         // Mouse look
@@ -54,6 +48,12 @@ namespace axiom
             m_transformComponent->position.y += speed;
         if (Input::IsKeyPressed(KeyCode::Q))
             m_transformComponent->position.y -= speed;
+    }
+
+    const Vector<std::type_index>& CameraController::GetRequiredComponents() const
+    {
+        static const Vector<std::type_index> required = { TypeID<TransformComponent>() };
+        return required;
     }
 
     void CameraController::OnInitialize()

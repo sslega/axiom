@@ -1,11 +1,22 @@
 ---
 tags: [engine, decisions]
-updated: 2026-11-11
+updated: 2026-11-13
 ---
 
 # Decision Log
 
 Choices that **can't be recovered from the code**: what was picked, what it beat, why, and when to revisit. Newest first. Add to this page whenever a design discussion ends. From 2026-11-05, new tables also name the **principle** behind each decision (a pattern or rule with a checkable source), or say it's a judgment call.
+
+## Component requirements (2026-11-13)
+
+| Decision | Instead of | Why | Principle | Revisit when |
+|---|---|---|---|---|
+| A component declares the sibling types it requires with a virtual getter on `Component` | a list on `TypeDescriptor` filled in `EngineReflection.cpp` | the declaration sits in the component's own header, and every check already has an instance | Information Expert (Larman, *Applying UML and Patterns*) | something needs a type's requirements without an instance, such as the Add Component menu |
+| The editor commands and the scene loader enforce requirements; `Entity` only answers queries about them | `Entity::AddComponent` adding or refusing on its own | only a command can make "add X and what it needs" one undo step, and loading must see all of an entity's components before judging it | separate mechanism from policy (Raymond, *The Art of Unix Programming*) | game code assembles entities at runtime: check once when an entity joins the scene |
+| Removing a required component is refused: a disabled menu item with a tooltip naming what requires it | removing the dependents too | the user can't lose more than they picked, and sees why before clicking | judgment call (Unity's behaviour) | multi-select remove (E7) |
+| On scene open, a missing requirement is added with defaults and a warning | an assert; dropping the component that lacks it | a bad file is data, not a programmer error, and adding keeps everything the file holds. The invented default is saved on the next Save | use assertions for the impossible, not to validate input (Hunt & Thomas, *The Pragmatic Programmer*) | scene files get versioning or migration |
+| Components trust their declared requirements; the renderer asserts a light's and a mesh's transform | per-component null checks and silent fallbacks | one guarantee at the edges instead of defensive code in every component | judgment call | code paths outside the commands and loader start building entities |
+| `AX_ASSERT` takes a `std::format` message with arguments, formatted only on failure | a log line before each assert | an assert can name what failed, and a passing one costs nothing | judgment call | — |
 
 ## Licensing and provenance (2026-11-11)
 
@@ -15,7 +26,7 @@ Choices that **can't be recovered from the code**: what was picked, what it beat
 | Every third-party component is listed with its licence in `THIRD_PARTY_NOTICES.md`; copyleft and non-commercial sources are never used | tracking licences ad hoc | the engine must stay usable in closed-source products, which copyleft or NC code would block | judgment call | — |
 | Snippet-level licence scan with SCANOSS on changed files at every CL, and on all files before a release | no scanning; a commercial scanner; scanning on every build | catches copied or regurgitated code, including old tutorial-derived code; only fingerprints leave the machine. Per CL, not per build, because it needs the network | shift checks left, but to the cheapest point that still catches the problem | scan noise outweighs findings, or a CI pipeline exists |
 | Implementing a published algorithm or adapting external code needs explicit approval of the source and its licence first | a provenance comment written after the fact | a comment records a licence problem; a stop prevents one | judgment call | — |
-| Commits with AI-written code carry the standard `Co-Authored-By` trailer; commits without it are human-written code | no marking; a custom tag; a separate spec commit before the code | the boundary between human and AI-written code can be checked from history alone, with the convention git hosts already show. A spec commit minutes before the code proves nothing a timestamp can't be edited to say | judgment call | mixed commits become common |
+| Commits carry no AI attribution (replaces marking AI-written code with a `Co-Authored-By` trailer, 2026-11-13) | the `Co-Authored-By` trailer on commits with AI-written code; a custom tag | most CLs mix human and AI-assisted code, so a per-commit mark draws no useful line and the trailer was dropped from history | judgment call | provenance must be shown per commit |
 
 ## Editor layout (2026-11-10)
 
@@ -59,7 +70,7 @@ Choices that **can't be recovered from the code**: what was picked, what it beat
 | The file listing takes plain folders and extensions, in `EditorCore` | moving it to `EditorApp` beside the subsystems | it stays reachable from `AxiomTests`, which can't see `Simulation` | levelization (Lakos, *Large-Scale C++ Software Design*) | — |
 | Virtual paths ignore case through one `ToLower`, used for lookups and cache keys only; stored paths keep their casing | comparing without case at each call site; lowercasing stored paths | the file lookup already ignored case while the caches didn't, so one file could load twice. Lowercasing stored paths would rewrite saved scenes | one owner for a convention | the engine targets a case-sensitive file system |
 | The Inspector sorts components by type name | ordered storage in `Entity`, with undo restoring the position | scene saving already sorts by that name, so the panel matches the file and needs no Engine change. There's no user-chosen order | judgment call | components need a user-chosen order |
-| Temporary: a directional light with no transform counts as no light, and logs an error every frame | keeping the assert, which aborts the Editor; blocking the removal in this change | Remove Component made the assert reachable, and blocking needs components to declare what they require. Marked temporary so it can't become lasting error handling | judgment call | E2c blocks the removal and restores the assert |
+| ~~Temporary: a directional light with no transform counts as no light, and logs an error every frame~~ | keeping the assert, which aborts the Editor; blocking the removal in this change | Remove Component made the assert reachable, and blocking needs components to declare what they require. Marked temporary so it can't become lasting error handling | judgment call | superseded 2026-11-13: the removal is blocked and the assert is back (Component requirements) |
 
 ## Engine layers and tests (2026-11-09)
 

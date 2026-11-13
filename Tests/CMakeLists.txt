@@ -81,4 +81,6 @@ target_include_directories(AxiomTests
 
 target_link_libraries(AxiomTests PRIVATE EditorApp doctest::doctest)
 
+target_compile_definitions(AxiomTests PRIVATE AX_TESTS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/Assets")
+
 add_test(NAME AxiomTests COMMAND AxiomTests)

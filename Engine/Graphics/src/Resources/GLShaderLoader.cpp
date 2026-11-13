@@ -70,7 +70,7 @@ namespace axiom
             }
             else
             {
-                AX_ASSERT(false, ("Unknown shader stage: " + String(stageStr)).c_str());
+                AX_ASSERT(false, "Unknown shader stage: {}", stageStr);
             }
 
             pos = nextType;

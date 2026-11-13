@@ -65,6 +65,27 @@ namespace axiom
                 entity->AddComponent(std::move(component));
             }
 
+            Vector<Component*> components = entity->GetComponents();
+            for (size_t i = 0; i < components.size(); ++i)
+            {
+                Component* component = components[i];
+                Vector<std::type_index> missingRequirements = entity->FindMissingRequirements(*component);
+                for(auto& missingType : missingRequirements)
+                {
+                    const TypeDescriptor* descriptor = m_reflectionSubsystem.GetTypeRegistry().Find(missingType);
+                    AX_ASSERT(descriptor, "Required component type is not reflected");
+                    Log::Warning(
+                        "Entity '{}': {} requires {}, added a default one",
+                        entity->GetName(),
+                        m_reflectionSubsystem.GetTypeRegistry().Find(typeid(*component))->name,
+                        descriptor->name);
+
+                    UniquePtr<Component> created = descriptor->Create();
+                    components.push_back(created.get());
+                    entity->AddComponent(std::move(created));
+                }
+            }
+
             // Added last: the scene files the entity under its saved ID, and joining initializes all its components.
             m_scene.AddEntity(entity);
         }
